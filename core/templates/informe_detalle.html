@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Detalle del Informe{% endblock %}
+{% block content %}
+<div style="max-width:600px;margin:auto;background:#fff;border:2px dashed #222;border-radius:8px;padding:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);color:#222;">
+    <h2>Detalle del Informe</h2>
+    <p><strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}</p>
+    <p><strong>Químico usado:</strong> {{ informe.quimico.nombre }}</p>
+    <p><strong>Nota:</strong></p>
+    <div style="background:#f5f5f5;padding:1rem;border-radius:6px;border:1px solid #222;white-space:pre-line;">{{ informe.nota }}</div>
+    {% if informe.imagen %}
+    <div style="margin-top:2rem;text-align:center;">
+        <img src="{{ informe.imagen.url }}" alt="Foto cuaderno" style="max-width:100%;max-height:200px;display:inline-block;border:2px solid #222;filter: grayscale(1);">
+    </div>
+    {% endif %}
+    <div style="margin-top:2rem;display:flex;justify-content:space-between;align-items:center;">
+        <a href="/cuaderno/" style="color:#1976d2;">&larr; Volver al cuaderno</a>
+        <a href="{% url 'descargar_informe_pdf' informe.id %}" style="background:#222;color:#fff;padding:0.5rem 1.5rem;border-radius:4px;text-decoration:none;">Descargar PDF</a>
+    </div>
+</div>
+{% endblock %}

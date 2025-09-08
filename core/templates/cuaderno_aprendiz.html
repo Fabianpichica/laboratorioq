@@ -1,0 +1,50 @@
+{% extends "dashboard_aprendiz.html" %}
+{% block content %}
+<div style="display:flex;justify-content:center;align-items:flex-start;min-height:60vh;background:#fff;">
+    <div style="background:#fff;border:2px dashed #222;border-radius:8px;width:600px;min-height:300px;padding:2rem;box-shadow:0 2px 8px rgba(0,0,0,0.08);color:#222;">
+        <h2 style="margin-top:0;">Cuaderno de Laboratorio</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="quimico">Químico utilizado:</label>
+            <select name="quimico" id="quimico" required style="width:100%;margin-bottom:1rem;">
+                <option value="">Selecciona un químico</option>
+                {% for quimico in quimicos %}
+                <option value="{{ quimico.id }}" {% if quimico.id == quimico_usado_id %}selected{% endif %}>{{ quimico.nombre }}</option>
+                {% endfor %}
+            </select>
+            <label for="nota">Nota:</label>
+            <textarea name="nota" id="nota" rows="6" style="width:100%;margin-bottom:1rem;resize:vertical;background:#fff;color:#222;border:1px solid #222;" placeholder="Describe el experimento..."></textarea>
+            <label for="foto">Cargar foto:</label>
+            <input type="file" id="foto" name="foto" accept="image/*" style="margin-bottom:1rem;display:block;">
+            <button type="submit" style="background:#222;color:#fff;padding:0.5rem 2rem;border:none;border-radius:4px;">Guardar</button>
+        </form>
+        {% if imagen_url %}
+        <div style="margin-top:2rem;text-align:center;">
+            <img src="{{ imagen_url }}" alt="Foto cuaderno" style="max-width:100%;max-height:200px;display:inline-block;border:2px solid #222;filter: grayscale(1);">
+        </div>
+        {% endif %}
+        {% if nota %}
+        <div style="margin-top:1rem;background:#f5f5f5;padding:1rem;border-radius:6px;border:1px solid #222;">
+            <strong>Nota guardada:</strong>
+            <p>{{ nota }}</p>
+            {% if quimico_usado %}
+            <p><strong>Químico usado:</strong> {{ quimico_usado.nombre }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+        <hr>
+        <h3>Mis informes guardados</h3>
+        <ul style="padding-left:1rem;">
+            {% for informe in informes %}
+            <li style="margin-bottom:0.5rem;">
+                <a href="{% url 'informe_detalle' informe.id %}">
+                    {{ informe.fecha|date:'d/m/Y H:i' }} - {{ informe.quimico.nombre }}
+                </a>
+            </li>
+            {% empty %}
+            <li>No hay informes guardados.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

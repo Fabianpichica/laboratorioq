@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Bienvenido - Laboratorio{% endblock %}
+{% block content %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;">
+    <h2 style="margin-bottom:1rem;">¡Bienvenido al Laboratorio Virtual!</h2>
+    <p style="margin-bottom:2rem;max-width:500px;text-align:center;">Accede a tu espacio de aprendizaje, gestiona tus cursos y recursos, y mantén tus notas y materiales organizados.</p>
+    <div>
+        <a href="/login/" style="padding:0.7rem 2rem;background:#1976d2;color:#fff;text-decoration:none;border-radius:5px;margin-right:1rem;">Iniciar sesión</a>
+        <a href="/register/" style="padding:0.7rem 2rem;background:#43a047;color:#fff;text-decoration:none;border-radius:5px;">Registrarse</a>
+    </div>
+</div>
+{% endblock %}

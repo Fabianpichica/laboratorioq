@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Aprendiz{% endblock %}
+{% block content %}
+<div style="display:flex;min-height:70vh;">
+    <aside style="width:220px;background:#f5f5f5;padding:1rem 0;">
+        <nav>
+            <ul style="list-style:none;padding:0;margin:0;">
+                <li style="margin-bottom:1rem;"><a href="#" style="text-decoration:none;color:#1976d2;">Inicio</a></li>
+                <li style="margin-bottom:1rem;"><a href="#" style="text-decoration:none;color:#1976d2;">Evaluaciones</a></li>
+                <li style="margin-bottom:1rem;"><a href="/perfil/" style="text-decoration:none;color:#1976d2;">Perfil</a></li>
+                <li style="margin-bottom:1rem;"><a href="/cuaderno/" style="text-decoration:none;color:#1976d2;">Cuaderno</a></li>
+                <li style="margin-bottom:1rem;"><a href="/materiales/" style="text-decoration:none;color:#1976d2;">Materiales</a></li>
+                <li style="margin-bottom:1rem;"><a href="/reportes/" style="text-decoration:none;color:#1976d2;">Reportes</a></li>
+                <li style="margin-bottom:1rem;"><a href="{% url 'logout' %}" style="text-decoration:none;color:#1976d2;">Cerrar sesión</a></li>
+            </ul>
+        </nav>
+    </aside>
+    <section style="flex:1;padding:2rem;">
+        <h2>Bienvenido, Aprendiz</h2>
+        <p>Este es tu dashboard. Selecciona una opción del menú lateral para comenzar.</p>
+    </section>
+</div>
+{% endblock %}

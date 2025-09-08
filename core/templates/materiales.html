@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Materiales - Químicos{% endblock %}
+{% block content %}
+<div style="max-width:800px;margin:auto;">
+    <h2>Gestión de Químicos</h2>
+    <form method="post" style="margin-bottom:2rem;">
+        {% csrf_token %}
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <input type="text" name="nombre" placeholder="Nombre del químico" required style="flex:2;">
+            <input type="number" name="cantidad" placeholder="Cantidad" min="1" required style="flex:1;">
+            <input type="text" name="descripcion" placeholder="Descripción" style="flex:3;">
+            <input type="date" name="fecha_vencimiento" placeholder="Fecha de vencimiento" style="flex:2;">
+            <button type="submit">Añadir</button>
+        </div>
+    </form>
+    <table border="1" cellpadding="8" cellspacing="0" style="width:100%;background:#fff;">
+        <thead style="background:#1976d2;color:#fff;">
+            <tr>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Descripción</th>
+                <th>Fecha de vencimiento</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quimico in quimicos %}
+            <tr>
+                <td>{{ quimico.nombre }}</td>
+                <td>{{ quimico.cantidad }}</td>
+                <td>{{ quimico.descripcion }}</td>
+                <td>{% if quimico.fecha_vencimiento %}{{ quimico.fecha_vencimiento }}{% else %}-{% endif %}</td>
+                <td>
+                    <a href="{% url 'editar_quimico' quimico.id %}">Editar</a> |
+                    <a href="{% url 'eliminar_quimico' quimico.id %}" onclick="return confirm('¿Eliminar este químico?');">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;">No hay químicos registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
