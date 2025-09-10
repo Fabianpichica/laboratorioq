@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Editar Químico{% endblock %}
 {% block content %}
-<div style="max-width:500px;margin:auto;">
+<div class="editar-quimico-container">
     <h2>Editar Químico</h2>
-    <form method="post">
+    <form method="post" class="editar-quimico-form">
         {% csrf_token %}
         <label>Nombre:</label>
-        <input type="text" name="nombre" value="{{ quimico.nombre }}" required style="width:100%;margin-bottom:1rem;">
+        <input type="text" name="nombre" value="{{ quimico.nombre }}" required>
         <label>Cantidad:</label>
-        <input type="number" name="cantidad" value="{{ quimico.cantidad }}" min="1" required style="width:100%;margin-bottom:1rem;">
+        <input type="number" name="cantidad" value="{{ quimico.cantidad }}" min="1" required>
         <label>Descripción:</label>
-        <input type="text" name="descripcion" value="{{ quimico.descripcion }}" style="width:100%;margin-bottom:1rem;">
+        <input type="text" name="descripcion" value="{{ quimico.descripcion }}">
         <label>Fecha de vencimiento:</label>
-        <input type="date" name="fecha_vencimiento" value="{{ quimico.fecha_vencimiento|date:'Y-m-d' }}" style="width:100%;margin-bottom:1rem;">
+        <input type="date" name="fecha_vencimiento" value="{{ quimico.fecha_vencimiento|date:'Y-m-d' }}">
         <button type="submit">Guardar cambios</button>
-        <a href="{% url 'materiales' %}" style="margin-left:1rem;">Cancelar</a>
+        <a href="{% url 'materiales' %}">Cancelar</a>
     </form>
 </div>
 {% endblock %}

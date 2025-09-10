@@ -1,0 +1,543 @@
+/* styles.css - Estilos globales para Laboratorio Virtual */
+
+/* Estos estilos se aplican principalmente a la plantilla base.html,
+   que es extendida por todas las demás páginas HTML del proyecto. */
+
+/* body: Establece la fuente, elimina márgenes y relleno, y define el fondo general. */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+}
+
+/* header: Aplica fondo azul, color blanco y centra el texto. Corresponde al header de base.html y sus extendidas. */
+header {
+    background: #1976d2;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+/* footer: Fondo oscuro, color blanco, fija el pie de página abajo. Corresponde al footer de base.html y sus extendidas. */
+footer {
+    background: #222;
+    color: #fff;
+    padding: 0.5rem;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+/* main: Añade relleno y altura mínima al contenido principal. Corresponde al bloque main de base.html y sus extendidas. */
+main {
+    padding: 2rem;
+    min-height: 80vh;
+}
+
+/* Estos estilos afectan a todas las páginas que extienden base.html:
+   - landing.html
+   - login.html
+   - register.html
+   - dashboard_aprendiz.html
+   - cuaderno_aprendiz.html
+   - editar_quimico.html
+   - materiales.html
+   - perfil_aprendiz.html
+   - informe_detalle.html
+   - reportes.html
+*/
+
+/* Estilos extraídos de dashboard_aprendiz.html */
+.dashboard-container {
+    display: flex;
+    min-height: 70vh;
+}
+.dashboard-aside {
+    width: 220px;
+    background: #f5f5f5;
+    padding: 1rem 0;
+}
+.dashboard-aside ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.dashboard-aside li {
+    margin-bottom: 1rem;
+}
+.dashboard-aside a {
+    text-decoration: none;
+    color: #1976d2;
+}
+.dashboard-section {
+    flex: 1;
+    padding: 2rem;
+}
+/* Estos estilos corresponden a dashboard_aprendiz.html */
+
+/* Estilos extraídos de cuaderno_aprendiz.html */
+.cuaderno-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 60vh;
+    background: #fff;
+}
+.cuaderno-box {
+    background: #fff;
+    border: 2px dashed #222;
+    border-radius: 8px;
+    width: 600px;
+    min-height: 300px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    color: #222;
+}
+.cuaderno-box h2 {
+    margin-top: 0;
+}
+.cuaderno-form select,
+.cuaderno-form textarea {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+.cuaderno-form textarea {
+    resize: vertical;
+    background: #fff;
+    color: #222;
+    border: 1px solid #222;
+}
+.cuaderno-form input[type="file"] {
+    margin-bottom: 1rem;
+    display: block;
+}
+.cuaderno-form button {
+    background: #222;
+    color: #fff;
+    padding: 0.5rem 2rem;
+    border: none;
+    border-radius: 4px;
+}
+.cuaderno-imagen {
+    margin-top: 2rem;
+    text-align: center;
+}
+.cuaderno-imagen img {
+    max-width: 100%;
+    max-height: 200px;
+    display: inline-block;
+    border: 2px solid #222;
+    filter: grayscale(1);
+}
+.cuaderno-nota {
+    margin-top: 1rem;
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #222;
+}
+.cuaderno-informes {
+    padding-left: 1rem;
+}
+.cuaderno-informes li {
+    margin-bottom: 0.5rem;
+}
+/* Estos estilos corresponden a cuaderno_aprendiz.html */
+
+/* Estilos extraídos de materiales.html */
+.materiales-container {
+    max-width: 800px;
+    margin: auto;
+}
+.materiales-form {
+    margin-bottom: 2rem;
+}
+.materiales-form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.materiales-form-row input[type="text"],
+.materiales-form-row input[type="number"],
+.materiales-form-row input[type="date"] {
+    flex: 1;
+}
+.materiales-form-row input[name="nombre"] {
+    flex: 2;
+}
+.materiales-form-row input[name="cantidad"] {
+    flex: 1;
+}
+.materiales-form-row input[name="descripcion"] {
+    flex: 3;
+}
+.materiales-form-row input[name="fecha_vencimiento"] {
+    flex: 2;
+}
+.materiales-table {
+    width: 100%;
+    background: #fff;
+    border-collapse: collapse;
+}
+.materiales-table th, .materiales-table td {
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+.materiales-table thead {
+    background: #1976d2;
+    color: #fff;
+}
+.materiales-table-empty {
+    text-align: center;
+}
+/* Estos estilos corresponden a materiales.html */
+
+/* Estilos extraídos de reportes.html */
+.reportes-container {
+    max-width: 700px;
+    margin: auto;
+}
+.reportes-form {
+    margin-bottom: 2rem;
+}
+/* Estos estilos corresponden a reportes.html */
+
+/* Estilos extraídos de editar_quimico.html */
+.editar-quimico-container {
+    max-width: 500px;
+    margin: auto;
+}
+.editar-quimico-form input[type="text"],
+.editar-quimico-form input[type="number"],
+.editar-quimico-form input[type="date"] {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+.editar-quimico-form a {
+    margin-left: 1rem;
+}
+/* Estos estilos corresponden a editar_quimico.html */
+
+/* Estilos extraídos de login.html */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: #f5f5f5;
+}
+.login-form {
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    min-width: 320px;
+    max-width: 350px;
+    width: 100%;
+}
+.login-form h2 {
+    text-align: center;
+    color: #1976d2;
+    margin-bottom: 1.5rem;
+}
+.login-messages {
+    margin-bottom: 1rem;
+    color: #d32f2f;
+    text-align: center;
+}
+.login-form label {
+    display: block;
+    color: #333;
+}
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+.login-form button {
+    width: 100%;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.7rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.login-form .login-link {
+    text-align: center;
+    margin-top: 1rem;
+}
+.login-form .login-link a {
+    color: #1976d2;
+    text-decoration: none;
+}
+/* Estos estilos corresponden a login.html */
+
+/* Estilos extraídos de register.html */
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: #f5f5f5;
+}
+.register-form {
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    min-width: 320px;
+    max-width: 350px;
+    width: 100%;
+}
+.register-form h2 {
+    text-align: center;
+    color: #1976d2;
+    margin-bottom: 1.5rem;
+}
+.register-messages {
+    margin-bottom: 1rem;
+    color: #d32f2f;
+    text-align: center;
+}
+.register-form label {
+    display: block;
+    color: #333;
+}
+.register-form input[type="text"],
+.register-form input[type="email"],
+.register-form input[type="password"],
+.register-form select {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+}
+.register-form select {
+    margin-bottom: 1.5rem;
+}
+.register-form button {
+    width: 100%;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.7rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.register-form .register-link {
+    text-align: center;
+    margin-top: 1rem;
+}
+.register-form .register-link a {
+    color: #1976d2;
+    text-decoration: none;
+}
+/* Estos estilos corresponden a register.html */
+
+/* Estilos extraídos de perfil_aprendiz.html */
+.perfil-aprendiz-container {
+    max-width: 500px;
+    margin: auto;
+    background: #fff;
+    border: 2px solid #1976d2;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+/* Estos estilos corresponden a perfil_aprendiz.html */
+
+/* Estilos extraídos de informe_detalle.html */
+.informe-detalle-container {
+    max-width: 600px;
+    margin: auto;
+    background: #fff;
+    border: 2px dashed #222;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    color: #222;
+}
+.informe-detalle-nota {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #222;
+    white-space: pre-line;
+}
+.informe-detalle-imagen {
+    margin-top: 2rem;
+    text-align: center;
+}
+.informe-detalle-imagen img {
+    max-width: 100%;
+    max-height: 200px;
+    display: inline-block;
+    border: 2px solid #222;
+    filter: grayscale(1);
+}
+.informe-detalle-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.informe-detalle-actions a {
+    color: #1976d2;
+    background: #222;
+    color: #fff;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+}
+/* Estos estilos corresponden a informe_detalle.html */
+
+/* Estilos extraídos de landing.html */
+.landing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+.landing-container h2 {
+    margin-bottom: 1rem;
+}
+.landing-container p {
+    margin-bottom: 2rem;
+    max-width: 500px;
+    text-align: center;
+}
+.landing-container a {
+    padding: 0.7rem 2rem;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-right: 1rem;
+}
+.landing-container a[href="/login/"] {
+    background: #1976d2;
+}
+.landing-container a[href="/register/"] {
+    background: #43a047;
+    margin-right: 0;
+}
+/* Estos estilos corresponden a landing.html */
+
+/* Estilos extraídos de base.html */
+.base-footer {
+    background: #222;
+    color: #fff;
+    padding: 0.5rem;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+/* Estos estilos corresponden a base.html */
+
+/* --- Estilos dashboard_profesor.html --- */
+body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; }
+.profesor-dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+.profesor-sidebar {
+    width: 220px;
+    background: #23272b;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+}
+.sidebar-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 24px 24px 12px 24px;
+    border-bottom: 1px solid #2c3136;
+}
+.profesor-sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.profesor-sidebar nav ul li {
+    padding: 14px 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    transition: background 0.2s, color 0.2s;
+    border-left: 4px solid transparent;
+}
+.profesor-sidebar nav ul li .icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+.profesor-sidebar nav ul li.active,
+.profesor-sidebar nav ul li:hover {
+    background: #007bff;
+    color: #fff;
+    border-left: 4px solid #0056b3;
+}
+.profesor-dashboard-section {
+    flex: 1;
+    padding: 40px;
+}
+@media (max-width: 900px) {
+    .profesor-dashboard-wrapper {
+        flex-direction: column;
+    }
+    .profesor-sidebar {
+        width: 100%;
+        min-height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+    }
+    .profesor-sidebar nav ul {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .profesor-sidebar nav ul li {
+        padding: 12px 10px;
+        font-size: 0.95rem;
+        border-left: none;
+        border-bottom: 4px solid transparent;
+    }
+    .profesor-sidebar nav ul li.active,
+    .profesor-sidebar nav ul li:hover {
+        background: #007bff;
+        border-bottom: 4px solid #0056b3;
+        border-left: none;
+    }
+    .sidebar-title {
+        padding: 12px;
+        font-size: 1rem;
+        border-bottom: none;
+    }
+    .profesor-dashboard-section {
+        padding: 20px;
+    }
+}
+@media (max-width: 600px) {
+    .profesor-dashboard-section {
+        padding: 10px;
+    }
+    h2 {
+        font-size: 1.2rem;
+    }
+    .sidebar-title {
+        font-size: 0.95rem;
+    }
+}
+/* --- Fin estilos dashboard_profesor.html --- */

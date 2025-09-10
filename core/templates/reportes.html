@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Reportes de Químicos{% endblock %}
 {% block content %}
-<div style="max-width:700px;margin:auto;">
+<div class="reportes-container">
     <h2>Reporte: Químicos más usados</h2>
-    <form method="get" style="margin-bottom:2rem;">
+    <form method="get" class="reportes-form">
         <label for="aprendiz">Selecciona aprendiz:</label>
         <select name="aprendiz" id="aprendiz" onchange="this.form.submit()">
             {% for user in aprendices %}

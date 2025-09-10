@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Guías del Profesor</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="profesor-dashboard-wrapper">
+        <aside class="profesor-sidebar">
+            <div class="sidebar-title">Panel de Profesor</div>
+            <nav>
+                <ul>
+                    <li><a href="/profesor/dashboard/">Inicio</a></li>
+                    <li class="active"><a href="/profesor/guias/">Guías</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <section class="profesor-dashboard-section">
+            <h2>Guías disponibles</h2>
+            {% if guias %}
+                <ul>
+                    {% for guia in guias %}
+                        <li>
+                            <strong>{{ guia.titulo }}</strong><br>
+                            {{ guia.descripcion }}<br>
+                            {% if guia.archivo %}
+                                <a href="{{ guia.archivo.url }}" download>Descargar archivo</a>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No hay guías disponibles.</p>
+            {% endif %}
+        </section>
+    </div>
+</body>
+</html>

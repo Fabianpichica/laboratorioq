@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estudiantes del salón</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .profesor-dashboard-section {
+            flex: 1;
+            padding: 40px;
+        }
+        .salon-estudiantes-list {
+            margin-top: 20px;
+            padding: 0;
+            list-style: none;
+        }
+        .salon-estudiantes-list li {
+            background: #f4f6f8;
+            border: 1px solid #e3e6ea;
+            border-radius: 6px;
+            padding: 12px 18px;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        @media (max-width: 900px) {
+            .profesor-dashboard-wrapper {
+                flex-direction: column;
+            }
+            .profesor-sidebar {
+                width: 100%;
+                min-height: auto;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            .profesor-sidebar nav ul {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .profesor-sidebar nav ul li {
+                padding: 12px 10px;
+                font-size: 0.95rem;
+                border-left: none;
+                border-bottom: 4px solid transparent;
+            }
+            .profesor-sidebar nav ul li.active,
+            .profesor-sidebar nav ul li:hover {
+                background: #007bff;
+                border-bottom: 4px solid #0056b3;
+                border-left: none;
+            }
+            .sidebar-title {
+                padding: 12px;
+                font-size: 1rem;
+                border-bottom: none;
+            }
+            .profesor-dashboard-section {
+                padding: 20px;
+            }
+        }
+        @media (max-width: 600px) {
+            .profesor-dashboard-section {
+                padding: 10px;
+            }
+            h2 {
+                font-size: 1.2rem;
+            }
+            .sidebar-title {
+                font-size: 0.95rem;
+            }
+            .salon-estudiantes-list li {
+                font-size: 0.95rem;
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profesor-dashboard-wrapper">
+        <aside class="profesor-sidebar">
+            <div class="sidebar-title">Panel de Profesor</div>
+            <nav>
+                <ul>
+                    <li><a href="/profesor/dashboard/">Inicio</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <section class="profesor-dashboard-section">
+            <h2>Estudiantes en el salón: {{ salon.nombre }}</h2>
+            {% if jornada %}
+                <h3>Jornada: {{ jornada.nombre }} ({{ jornada.fecha }})</h3>
+            {% endif %}
+            {% if estudiantes %}
+                <ul class="salon-estudiantes-list">
+                    {% for estudiante in estudiantes %}
+                        <li>
+                            <strong>{{ estudiante.nombre|default:'Sin nombre' }}</strong><br>
+                            Documento: {{ estudiante.documento|default:'-' }}<br>
+                            Tipo: {{ estudiante.get_tipo_documento_display|default:'-' }}<br>
+                            Jornada:
+                            {% if estudiante.jornada %}
+                                {{ estudiante.jornada.nombre }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No hay estudiantes asignados a este salón y jornada.</p>
+            {% endif %}
+        </section>
+    </div>
+</body>
+</html>

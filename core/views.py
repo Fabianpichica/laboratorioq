@@ -25,6 +25,8 @@ def login_view(request):
                 profile = Profile.objects.get(user=user)
                 if profile.role == 'aprendiz':
                     return redirect('dashboard_aprendiz')
+                elif profile.role == 'profesor':
+                    return redirect('dashboard_profesor')
             except Profile.DoesNotExist:
                 pass
             return redirect('/')

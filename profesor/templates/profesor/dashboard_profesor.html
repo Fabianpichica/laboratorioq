@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Profesor</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="profesor-dashboard-wrapper">
+        <aside class="profesor-sidebar">
+            <div class="sidebar-title">Panel de Profesor</div>
+            <nav>
+                <ul>
+                    <li class="active"><span class="icon">🏠</span> Inicio</li>
+                    <li><a href="{% url 'guias_profesor' %}"><span class="icon">📄</span> Guías</a></li>
+                    <li><span class="icon">📦</span> Materiales</li>
+                    <li><span class="icon">📊</span> Reportes</li>
+                    <li><span class="icon">👤</span> Perfil</li>
+                    <li><span class="icon">🚪</span> Cerrar sesión</li>
+                </ul>
+            </nav>
+        </aside>
+        <section class="profesor-dashboard-section">
+            <h2>Bienvenido, Profesor</h2>
+            <p>Este es tu dashboard. Selecciona una opción del menú lateral para comenzar.</p>
+            <div class="jornadas-profesor">
+                <h3>Jornadas asignadas</h3>
+                {% if jornadas %}
+                    <ul class="jornadas-list">
+                        {% for jornada in jornadas %}
+                            <li class="jornada-item">
+                                <button class="jornada-toggle" onclick="toggleSalones('salones-{{ jornada.id }}')">
+                                    <strong>{{ jornada.nombre }}</strong> - {{ jornada.fecha }}
+                                </button>
+                                <div id="salones-{{ jornada.id }}" class="salones-jornada" style="display:none; margin-left:20px;">
+                                    <h4>Salones asignados:</h4>
+                                    {% if jornada.salones.all %}
+                                        <ul>
+                                            {% for salon in jornada.salones.all %}
+                                                <li>
+                                                    <a href="{% url 'salon_estudiantes' salon.id jornada.id %}">{{ salon.nombre }}{% if salon.ubicacion %} ({{ salon.ubicacion }}){% endif %}</a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <em>No hay salones asignados.</em>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No tienes jornadas asignadas.</p>
+                {% endif %}
+            </div>
+            <script>
+                function toggleSalones(id) {
+                    var el = document.getElementById(id);
+                    if (el.style.display === "none") {
+                        el.style.display = "block";
+                    } else {
+                        el.style.display = "none";
+                    }
+                }
+            </script>
+        </section>
+    </div>
+</body>
+</html>
