@@ -21,7 +21,25 @@ def salon_estudiantes(request, salon_id, jornada_id=None):
 
 @login_required
 def guias_profesor(request):
-    guias = Guia.objects.all().order_by('-fecha_creacion')
-    return render(request, 'profesor/guias_profesor.html', {'guias': guias})
+    jornadas = Jornada.objects.filter(profesor=request.user)
+    salones = Salon.objects.filter(jornadas__profesor=request.user).distinct()
+    mensaje = None
+    if request.method == 'POST' and 'asignar_guia' in request.POST:
+        salon_id = request.POST.get('salon_id')
+        archivo = request.FILES.get('archivo_guia')
+        titulo = request.POST.get('titulo', 'Guía sin título')
+        descripcion = request.POST.get('descripcion', '')
+        if salon_id and archivo:
+            salon = Salon.objects.get(id=salon_id)
+            guia = Guia.objects.create(titulo=titulo, descripcion=descripcion, archivo=archivo)
+            guia.salones.add(salon)
+            mensaje = f'Guía "{guia.titulo}" subida y asignada correctamente al salón {salon.nombre}.'
+        else:
+            mensaje = 'Debes subir el archivo final de la guía y seleccionar un salón.'
+    return render(request, 'profesor/guia_form.html', {
+        'jornadas': jornadas,
+        'salones': salones,
+        'mensaje': mensaje
+    })
 
 # Create your views here.

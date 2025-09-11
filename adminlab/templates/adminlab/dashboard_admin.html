@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Admin</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f7f9fc;
+        }
+        .admin-dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        .admin-sidebar {
+            width: 240px;
+            background: #1a237e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 32px 0 0 0;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+        .admin-sidebar h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 32px 32px;
+            color: #fff;
+        }
+        .admin-sidebar nav {
+            width: 100%;
+        }
+        .admin-sidebar ul {
+            list-style: none;
+            padding: 0 0 0 32px;
+            margin: 0;
+        }
+        .admin-sidebar li {
+            margin-bottom: 18px;
+        }
+        .admin-sidebar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+        }
+        .admin-sidebar a:hover {
+            color: #90caf9;
+        }
+        .admin-main-content {
+            margin-left: 240px;
+            padding: 48px 32px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard-wrapper">
+        <aside class="admin-sidebar">
+            <h2>Panel Admin</h2>
+            <nav>
+                <ul>
+                    <li><a href="/adminlab/dashboard/">Inicio</a></li>
+                    <li><a href="/admin/">Admin clásico</a></li>
+                    <!-- Puedes agregar más enlaces aquí -->
+                </ul>
+            </nav>
+        </aside>
+        <main class="admin-main-content">
+            <h1>Bienvenido, Administrador</h1>
+            <p>Este es tu panel personalizado de administración.</p>
+            <ul>
+                <li>Acceso solo para superusuarios.</li>
+                <li>Aquí puedes agregar accesos rápidos, estadísticas o gestión avanzada.</li>
+            </ul>
+        </main>
+    </div>
+</body>
+</html>

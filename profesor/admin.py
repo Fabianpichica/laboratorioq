@@ -16,7 +16,7 @@ class JornadaAdminForm(forms.ModelForm):
 class EstudianteAdminForm(forms.ModelForm):
     class Meta:
         model = Estudiante
-        fields = ['nombre', 'documento', 'tipo_documento', 'salon', 'jornada']
+        fields = ['nombre', 'documento', 'tipo_documento', 'direccion', 'correo', 'telefono', 'password', 'contacto_emergencia', 'nombre_contacto_emergencia', 'eps', 'foto', 'jornada', 'salon']
 
 class JornadaAdmin(admin.ModelAdmin):
     form = JornadaAdminForm
@@ -25,7 +25,20 @@ class JornadaAdmin(admin.ModelAdmin):
 class EstudianteAdmin(admin.ModelAdmin):
     form = EstudianteAdminForm
     list_display = ('nombre', 'documento', 'tipo_documento', 'salon', 'jornada')
-    search_fields = ('nombre', 'documento')
+    search_fields = ('nombre', 'documento', 'correo', 'telefono')
+
+    def save_model(self, request, obj, form, change):
+        from django.contrib.auth.models import User
+        from core.models import Profile
+        # Crear usuario si no existe
+        if not User.objects.filter(username=obj.documento).exists():
+            user = User.objects.create_user(
+                username=obj.documento,
+                email=obj.correo or '',
+                password=obj.password or User.objects.make_random_password()
+            )
+            Profile.objects.create(user=user, role='aprendiz')
+        super().save_model(request, obj, form, change)
 
 class GuiaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'fecha_creacion')

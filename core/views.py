@@ -13,25 +13,43 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from profesor.models import Estudiante, Guia, Salon
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
+        documento = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            auth_login(request, user)
-            try:
-                profile = Profile.objects.get(user=user)
-                if profile.role == 'aprendiz':
-                    return redirect('dashboard_aprendiz')
-                elif profile.role == 'profesor':
-                    return redirect('dashboard_profesor')
-            except Profile.DoesNotExist:
-                pass
-            return redirect('/')
-        else:
-            messages.error(request, 'Usuario o contraseña incorrectos.')
+        from profesor.models import Estudiante
+        from django.contrib.auth import authenticate, login as auth_login
+        from core.models import Profile
+        try:
+            estudiante = Estudiante.objects.get(documento=documento)
+            if estudiante.password == password:
+                user = authenticate(request, username=estudiante.documento, password=password)
+                if user:
+                    auth_login(request, user)
+                request.session['estudiante_id'] = estudiante.id
+                return redirect('dashboard_aprendiz')
+            else:
+                messages.error(request, 'Documento o contraseña incorrectos.')
+        except Estudiante.DoesNotExist:
+            # Si no es aprendiz, intenta autenticar como User (profesor/instructor/superuser)
+            user = authenticate(request, username=documento, password=password)
+            if user is not None:
+                auth_login(request, user)
+                if user.is_superuser:
+                    return redirect('dashboard_admin')
+                try:
+                    profile = Profile.objects.get(user=user)
+                    if profile.role == 'profesor':
+                        return redirect('dashboard_profesor')
+                    elif profile.role == 'instructor':
+                        return redirect('dashboard_instructor')
+                except Profile.DoesNotExist:
+                    pass
+                return redirect('/')
+            else:
+                messages.error(request, 'Documento o contraseña incorrectos.')
     return render(request, 'login.html')
 
 def register_view(request):
@@ -214,6 +232,25 @@ def perfil_aprendiz(request):
         })
     else:
         return redirect('/')
+
+@login_required
+def evaluaciones_aprendiz(request):
+    profile = Profile.objects.get(user=request.user)
+    if profile.role != 'aprendiz':
+        return redirect('/')
+    # Buscar el estudiante por documento o por nombre de usuario
+    estudiante = None
+    try:
+        estudiante = Estudiante.objects.get(documento=request.user.username)
+    except Estudiante.DoesNotExist:
+        # Buscar por nombre si el documento no coincide
+        try:
+            estudiante = Estudiante.objects.get(nombre=request.user.get_full_name())
+        except Estudiante.DoesNotExist:
+            return render(request, 'evaluaciones_aprendiz.html', {'guias': []})
+    salon = estudiante.salon
+    guias = Guia.objects.filter(salones=salon).distinct() if salon else []
+    return render(request, 'evaluaciones_aprendiz.html', {'guias': guias})
 
 def logout_view(request):
     logout(request)
