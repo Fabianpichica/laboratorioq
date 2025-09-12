@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from core.views import buscar_quimico_local
 
 urlpatterns = [
     path('', views.landing_view, name='landing'),
@@ -16,4 +17,6 @@ urlpatterns = [
     path('perfil/', views.perfil_aprendiz, name='perfil_aprendiz'),
     path('logout/', views.logout_view, name='logout'),
     path('evaluaciones/', views.evaluaciones_aprendiz, name='evaluaciones_aprendiz'),
+    path('buscar-quimico/', views.buscar_quimico_pubchem, name='buscar_quimico_pubchem'),
+    path('buscar-quimico-local/', buscar_quimico_local, name='buscar_quimico_local'),
 ]

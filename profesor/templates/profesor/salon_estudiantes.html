@@ -106,6 +106,30 @@
                         </li>
                     {% endfor %}
                 </ul>
+                {% if guias_info %}
+                    <hr>
+                    <h3>Guías asignadas a este salón</h3>
+                    {% for guia_info in guias_info %}
+                        <div style="margin-bottom:24px;">
+                            <h4>{{ guia_info.guia.titulo }}</h4>
+                            <ul>
+                                {% for estudiante, informe in guia_info.entregas.items %}
+                                    <li>
+                                        <strong>{{ estudiante.nombre|default:'Sin nombre' }}</strong>:
+                                        {% if informe %}
+                                            <span style="color:green;">Entregado</span>
+                                            <br><strong>Nota:</strong> {{ informe.nota|truncatechars:80 }}
+                                            <br><strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}
+                                            {% if informe.imagen %}<br><a href="{{ informe.imagen.url }}" target="_blank">Ver imagen</a>{% endif %}
+                                        {% else %}
+                                            <span style="color:red;">No entregado</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             {% else %}
                 <p>No hay estudiantes asignados a este salón y jornada.</p>
             {% endif %}

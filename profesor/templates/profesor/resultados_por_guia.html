@@ -1,0 +1,35 @@
+{% extends "profesor/dashboard_profesor.html" %}
+{% block content %}
+<div class="profesor-dashboard-section">
+    <h2>Resultados de estudiantes por guía</h2>
+    {% if guias %}
+        {% for guia in guias %}
+            <div class="guia-resultados-box" style="margin-bottom:32px;">
+                <h3>{{ guia.titulo }}</h3>
+                <p>{{ guia.descripcion }}</p>
+                {% if resultados.guia %}
+                    <ul>
+                        {% for informe in resultados.guia %}
+                        <li>
+                            <strong>Estudiante:</strong> {{ informe.aprendiz.username }}<br>
+                            <strong>Químico:</strong> {{ informe.quimico.nombre }}<br>
+                            <strong>Nota:</strong> {{ informe.nota|truncatechars:80 }}<br>
+                            <strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}<br>
+                            {% if informe.imagen %}
+                                <a href="{{ informe.imagen.url }}" target="_blank">Ver imagen</a>
+                            {% endif %}
+                        </li>
+                        {% empty %}
+                        <li>No hay resultados registrados para esta guía.</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No hay resultados registrados para esta guía.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No hay guías asignadas a tus salones.</p>
+    {% endif %}
+</div>
+{% endblock %}

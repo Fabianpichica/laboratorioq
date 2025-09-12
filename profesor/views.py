@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Jornada, Salon, Estudiante, Guia
 from django.contrib.auth.models import User
+from core.models import CuadernoEntry
 
 @login_required
 def dashboard_profesor(request):
@@ -17,7 +18,25 @@ def salon_estudiantes(request, salon_id, jornada_id=None):
     else:
         estudiantes = salon.estudiantes.all()
         jornada = None
-    return render(request, 'profesor/salon_estudiantes.html', {'salon': salon, 'estudiantes': estudiantes, 'jornada': jornada})
+    # Guías asignadas a este salón
+    guias = salon.guias_asignadas.all()
+    # Para cada guía, obtener dict de aprendiz: informe (o None)
+    guias_info = []
+    for guia in guias:
+        entregas = {}
+        for estudiante in estudiantes:
+            user = User.objects.filter(username=estudiante.documento).first()
+            informe = None
+            if user:
+                informe = CuadernoEntry.objects.filter(aprendiz=user, guia=guia).first()
+            entregas[estudiante] = informe
+        guias_info.append({'guia': guia, 'entregas': entregas})
+    return render(request, 'profesor/salon_estudiantes.html', {
+        'salon': salon,
+        'estudiantes': estudiantes,
+        'jornada': jornada,
+        'guias_info': guias_info
+    })
 
 @login_required
 def guias_profesor(request):
@@ -40,6 +59,26 @@ def guias_profesor(request):
         'jornadas': jornadas,
         'salones': salones,
         'mensaje': mensaje
+    })
+
+@login_required
+def resultados_por_guia(request):
+    # Solo profesores
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'profesor':
+        return redirect('/')
+    # Obtener jornadas y salones del profesor
+    jornadas = Jornada.objects.filter(profesor=request.user)
+    salones = Salon.objects.filter(jornadas__profesor=request.user).distinct()
+    guias = Guia.objects.filter(salones__in=salones).distinct()
+    resultados = {}
+    for guia in guias:
+        # Entradas de cuaderno asociadas a la guía
+        informes = CuadernoEntry.objects.filter(guia=guia).select_related('aprendiz', 'quimico').order_by('-fecha')
+        resultados[guia] = informes
+    return render(request, 'profesor/resultados_por_guia.html', {
+        'guias': guias,
+        'resultados': resultados,
+        'jornadas': jornadas
     })
 
 # Create your views here.

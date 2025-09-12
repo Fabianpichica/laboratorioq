@@ -12,6 +12,13 @@
                 <option value="{{ quimico.id }}" {% if quimico.id == quimico_usado_id %}selected{% endif %}>{{ quimico.nombre }}</option>
                 {% endfor %}
             </select>
+            <label for="guia">Guía asociada:</label>
+            <select name="guia" id="guia">
+                <option value="">Selecciona una guía (opcional)</option>
+                {% for guia in guias %}
+                <option value="{{ guia.id }}" {% if guia.id == guia_usada_id %}selected{% endif %}>{{ guia.titulo }}</option>
+                {% endfor %}
+            </select>
             <label for="nota">Nota:</label>
             <textarea name="nota" id="nota" rows="6" placeholder="Describe el experimento..."></textarea>
             <label for="foto">Cargar foto:</label>
@@ -39,6 +46,7 @@
             <li>
                 <a href="{% url 'informe_detalle' informe.id %}">
                     {{ informe.fecha|date:'d/m/Y H:i' }} - {{ informe.quimico.nombre }}
+                    {% if informe.guia %}<br><span style="font-size:0.95em;color:#3949ab;">Guía: {{ informe.guia.titulo }}</span>{% endif %}
                 </a>
             </li>
             {% empty %}

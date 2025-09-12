@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ material|default:'Agregar Material' }}{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>{% if material %}Editar Material{% else %}Agregar Material{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="nombre" placeholder="Nombre" value="{{ material.nombre|default:'' }}" required><br>
+        <input type="number" name="cantidad" placeholder="Cantidad" value="{{ material.cantidad|default:'' }}" min="0" required><br>
+        <input type="text" name="descripcion" placeholder="Descripción" value="{{ material.descripcion|default:'' }}"><br>
+        <button type="submit">Guardar</button>
+        <a href="{% url 'inventario_admin' %}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

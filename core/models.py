@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from profesor.models import Guia
 
 class Profile(models.Model):
     ROLE_CHOICES = [
@@ -26,9 +27,10 @@ class Quimico(models.Model):
 class CuadernoEntry(models.Model):
     aprendiz = models.ForeignKey(User, on_delete=models.CASCADE)
     quimico = models.ForeignKey(Quimico, on_delete=models.CASCADE)
+    guia = models.ForeignKey(Guia, on_delete=models.SET_NULL, null=True, blank=True, related_name='resultados')
     nota = models.TextField(blank=True)
     imagen = models.ImageField(upload_to='cuadernos/', blank=True, null=True)
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.aprendiz.username} - {self.quimico.nombre} - {self.fecha.date()}"
+        return f"{self.aprendiz.username} - {self.guia.titulo if self.guia else 'Sin guía'} - {self.fecha.date()}"

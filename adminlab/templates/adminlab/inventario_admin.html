@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario de Laboratorio</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body { background: #f7f9fc; }
+        .inventario-container { max-width: 1100px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px; }
+        h1 { color: #1a237e; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+        th, td { border: 1px solid #e3e6ea; padding: 8px 12px; text-align: left; }
+        th { background: #e3e6ea; }
+        .section-title { margin-top: 32px; color: #3949ab; }
+    </style>
+</head>
+<body>
+    <div class="inventario-container">
+        <h1>Inventario Centralizado</h1>
+        <h2 class="section-title">Reactivos Químicos</h2>
+        <a href="{% url 'agregar_quimico_admin' %}" class="btn-agregar">Agregar Reactivo</a>
+        <table>
+            <tr><th>Nombre</th><th>Cantidad</th><th>Descripción</th><th>Fecha de Vencimiento</th><th>Acciones</th></tr>
+            {% for q in quimicos %}
+            <tr>
+                <td>{{ q.nombre }}</td>
+                <td>{{ q.cantidad }}</td>
+                <td>{{ q.descripcion }}</td>
+                <td>{{ q.fecha_vencimiento|default:'-' }}</td>
+                <td>
+                    <a href="{% url 'editar_quimico_admin' q.id %}">Editar</a> |
+                    <a href="{% url 'eliminar_quimico_admin' q.id %}" onclick="return confirm('¿Eliminar este reactivo?');">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No hay reactivos registrados.</td></tr>
+            {% endfor %}
+        </table>
+        <h2 class="section-title">Materiales</h2>
+        <a href="{% url 'agregar_material_admin' %}" class="btn-agregar">Agregar Material</a>
+        <table>
+            <tr><th>Nombre</th><th>Cantidad</th><th>Descripción</th><th>Acciones</th></tr>
+            {% for m in materiales %}
+            <tr>
+                <td>{{ m.nombre }}</td>
+                <td>{{ m.cantidad }}</td>
+                <td>{{ m.descripcion }}</td>
+                <td>
+                    <a href="{% url 'editar_material_admin' m.id %}">Editar</a> |
+                    <a href="{% url 'eliminar_material_admin' m.id %}" onclick="return confirm('¿Eliminar este material?');">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No hay materiales registrados.</td></tr>
+            {% endfor %}
+        </table>
+        <h2 class="section-title">Equipos</h2>
+        <a href="{% url 'agregar_equipo_admin' %}" class="btn-agregar">Agregar Equipo</a>
+        <table>
+            <tr><th>Nombre</th><th>Cantidad</th><th>Descripción</th><th>Acciones</th></tr>
+            {% for e in equipos %}
+            <tr>
+                <td>{{ e.nombre }}</td>
+                <td>{{ e.cantidad }}</td>
+                <td>{{ e.descripcion }}</td>
+                <td>
+                    <a href="{% url 'editar_equipo_admin' e.id %}">Editar</a> |
+                    <a href="{% url 'eliminar_equipo_admin' e.id %}" onclick="return confirm('¿Eliminar este equipo?');">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No hay equipos registrados.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

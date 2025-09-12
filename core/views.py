@@ -8,12 +8,14 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_exempt
 import os
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from profesor.models import Estudiante, Guia, Salon
+import requests
+from django.http import JsonResponse
 
 def login_view(request):
     if request.method == 'POST':
@@ -88,17 +90,36 @@ def cuaderno_aprendiz(request):
     profile = Profile.objects.get(user=request.user)
     quimicos = Quimico.objects.all()
     informes = CuadernoEntry.objects.filter(aprendiz=request.user).order_by('-fecha')
+    # Obtener guías asignadas al aprendiz (según su salón)
+    guias = []
+    try:
+        estudiante = Estudiante.objects.get(documento=request.user.username)
+    except Estudiante.DoesNotExist:
+        try:
+            estudiante = Estudiante.objects.get(nombre=request.user.get_full_name())
+        except Estudiante.DoesNotExist:
+            estudiante = None
+    salon = estudiante.salon if estudiante else None
+    if salon:
+        guias = Guia.objects.filter(salones=salon).distinct()
     if profile.role == 'aprendiz':
         if request.method == 'POST':
             nota = request.POST.get('nota')
             foto = request.FILES.get('foto')
             quimico_id = request.POST.get('quimico')
+            guia_id = request.POST.get('guia')
             quimico_usado = None
+            guia_usada = None
             if quimico_id:
                 try:
                     quimico_usado = Quimico.objects.get(id=quimico_id)
                 except Quimico.DoesNotExist:
                     quimico_usado = None
+            if guia_id:
+                try:
+                    guia_usada = Guia.objects.get(id=guia_id)
+                except Guia.DoesNotExist:
+                    guia_usada = None
             imagen_url = None
             imagen_file = None
             if foto:
@@ -109,6 +130,7 @@ def cuaderno_aprendiz(request):
             entry = CuadernoEntry.objects.create(
                 aprendiz=request.user,
                 quimico=quimico_usado,
+                guia=guia_usada,
                 nota=nota,
                 imagen=imagen_file if imagen_file else None
             )
@@ -119,9 +141,11 @@ def cuaderno_aprendiz(request):
                 'quimicos': quimicos,
                 'quimico_usado': quimico_usado,
                 'quimico_usado_id': quimico_usado.id if quimico_usado else None,
+                'guias': guias,
+                'guia_usada_id': guia_usada.id if guia_usada else None,
                 'informes': informes
             })
-        return render(request, 'cuaderno_aprendiz.html', {'quimicos': quimicos, 'informes': informes})
+        return render(request, 'cuaderno_aprendiz.html', {'quimicos': quimicos, 'guias': guias, 'informes': informes})
     else:
         return redirect('/')
 
@@ -251,6 +275,64 @@ def evaluaciones_aprendiz(request):
     salon = estudiante.salon
     guias = Guia.objects.filter(salones=salon).distinct() if salon else []
     return render(request, 'evaluaciones_aprendiz.html', {'guias': guias})
+
+@login_required
+def buscar_quimico_pubchem(request):
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return JsonResponse({'results': []})
+    url = f'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{query}/JSON'
+    if query.replace('-', '').isdigit():
+        url = f'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/xref/RN/{query}/JSON'
+    try:
+        r = requests.get(url, timeout=5)
+        data = r.json()
+        results = []
+        for c in data.get('PC_Compounds', []):
+            props = c.get('props', [])
+            nombre_iupac = None
+            nombre_comun = None
+            cas = None
+            synonyms = c.get('synonyms', [])
+            if synonyms:
+                nombre_comun = synonyms[0]  # Primer sinónimo como nombre común
+            for p in props:
+                urn = p.get('urn', {})
+                label = urn.get('label', '')
+                name = urn.get('name', '')
+                if label == 'IUPAC Name' and not nombre_iupac:
+                    nombre_iupac = p.get('value', {}).get('sval', '')
+                if label == 'Registry Number' and name == 'CAS':
+                    cas = p.get('value', {}).get('sval', '')
+            results.append({
+                'nombre_comun': nombre_comun,
+                'nombre_iupac': nombre_iupac,
+                'cas': cas,
+            })
+        # Si no hay resultados, intentar buscar por synonym
+        if not results and 'InformationList' in data:
+            for info in data['InformationList'].get('Information', []):
+                nombre_comun = info.get('Title', query)
+                cas = info.get('RN', query)
+                results.append({'nombre_comun': nombre_comun, 'nombre_iupac': None, 'cas': cas})
+        return JsonResponse({'results': results})
+    except Exception:
+        return JsonResponse({'results': []})
+
+@login_required
+def buscar_quimico_local(request):
+    q = request.GET.get('q', '').strip()
+    if not q:
+        return JsonResponse({'results': []})
+    quimicos = Quimico.objects.filter(nombre__istartswith=q)[:10]
+    results = []
+    for quimico in quimicos:
+        results.append({
+            'nombre_comun': quimico.nombre,
+            'nombre_iupac': '',
+            'cas': '',
+        })
+    return JsonResponse({'results': results})
 
 def logout_view(request):
     logout(request)

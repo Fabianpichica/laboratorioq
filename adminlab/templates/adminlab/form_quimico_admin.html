@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ quimico|default:'Agregar Reactivo' }}{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>{% if quimico %}Editar Reactivo{% else %}Agregar Reactivo{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="nombre" placeholder="Nombre" value="{{ quimico.nombre|default:'' }}" required><br>
+        <input type="number" name="cantidad" placeholder="Cantidad" value="{{ quimico.cantidad|default:'' }}" min="0" required><br>
+        <input type="text" name="descripcion" placeholder="Descripción" value="{{ quimico.descripcion|default:'' }}"><br>
+        <input type="date" name="fecha_vencimiento" placeholder="Fecha de vencimiento" value="{{ quimico.fecha_vencimiento|default:'' }}"><br>
+        <button type="submit">Guardar</button>
+        <a href="{% url 'inventario_admin' %}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

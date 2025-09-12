@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ equipo|default:'Agregar Equipo' }}{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>{% if equipo %}Editar Equipo{% else %}Agregar Equipo{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="nombre" placeholder="Nombre" value="{{ equipo.nombre|default:'' }}" required><br>
+        <input type="number" name="cantidad" placeholder="Cantidad" value="{{ equipo.cantidad|default:'' }}" min="0" required><br>
+        <input type="text" name="descripcion" placeholder="Descripción" value="{{ equipo.descripcion|default:'' }}"><br>
+        <button type="submit">Guardar</button>
+        <a href="{% url 'inventario_admin' %}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
