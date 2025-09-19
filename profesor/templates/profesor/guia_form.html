@@ -1,351 +1,788 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Agregar Guía</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        .guia-container {
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
+    }
+    .dashboard-aside {
+        width: 240px;
+        background: #1a237e;
+        color: #fff;
+        padding: 0;
+        min-height: 100vh;
+        box-shadow: 2px 0 12px rgba(40,53,147,0.07);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 10;
+    }
+    .dashboard-aside nav {
+        width: 100%;
+    }
+    .dashboard-aside ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
+    .dashboard-aside li {
+        width: 100%;
+    }
+    .dashboard-aside a {
+        display: block;
+        color: #fff;
+        text-decoration: none;
+        padding: 16px 32px;
+        font-size: 1.1rem;
+        transition: background 0.2s;
+    }
+    .dashboard-aside a:hover, .dashboard-aside .active {
+        background: #3949ab;
+        border-left: 4px solid #ffb300;
+    }
+    .dashboard-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 40px;
+        margin-left: 240px;
+        min-height: 100vh;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+        .dashboard-container {
+            flex-direction: column;
+        }
+        .dashboard-aside {
+            width: 100vw;
+            min-width: unset;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 56px;
+            height: 56px;
+            box-shadow: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: unset;
+            z-index: 20;
+            overflow-x: visible;
+            background: #1a237e;
+        }
+        .dashboard-aside nav {
+            width: 100vw;
+        }
+        .dashboard-aside ul {
             display: flex;
             flex-direction: row;
-            gap: 32px;
-            padding: 32px;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-        }
-        .guia-col {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-        .guia-img-box {
-            width: 100%;
-            height: 160px;
-            background: #f4f4f4;
-            border: 1px dashed #bbb;
-            border-radius: 8px;
-            display: flex;
+            width: 100vw;
+            justify-content: flex-start;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
+            margin: 0;
+            padding: 0 4px;
+            overflow-x: auto;
+            gap: 0;
+            background: #1a237e;
         }
-        .guia-section {
-            margin-bottom: 16px;
+        .dashboard-aside li {
+            width: auto;
+            flex: 0 0 auto;
         }
-        .guia-section label {
-            font-weight: 600;
-            margin-bottom: 4px;
+        .dashboard-aside a {
+            padding: 10px 10px;
+            font-size: 0.98rem;
+            border-left: none !important;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .dashboard-aside a:hover, .dashboard-aside .active {
+            background: #3949ab;
+            border-left: none;
+            border-bottom: 3px solid #ffb300;
+        }
+        .dashboard-section {
+            padding: 18px 2vw 8vw 2vw;
+            margin-left: 0;
+            margin-top: 56px;
+            min-width: 0;
+        }
+        .guia-container {
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px 2vw;
+            margin-top: 16px;
+        }
+        .menu-toggle {
             display: block;
         }
-        .guia-section input,
-        .guia-section textarea {
-            width: 100%;
-            border: none;
-            border-bottom: 1px solid #ccc;
-            background: transparent;
-            margin-bottom: 8px;
-            padding: 4px 0;
-            font-size: 1rem;
+        .dashboard-aside ul {
+            display: none;
         }
-        .guia-section textarea {
-            overflow: visible !important;
-            resize: none !important;
-            height: auto !important;
-            min-height: 0 !important;
-            max-height: none !important;
-            display: block !important;
-            white-space: pre-wrap !important;
-        }
-        .guia-section select {
-            width: 100%;
-            margin-bottom: 8px;
-        }
-        .guia-labels {
+        .dashboard-aside.open ul {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            position: absolute;
+            top: 56px;
+            left: 0;
+            width: 100vw;
+            flex-direction: column;
+            background: #1a237e;
+            box-shadow: 0 4px 16px rgba(40,53,147,0.13);
+            z-index: 30;
+        }
+        .dashboard-aside.open ul li {
+            width: 100vw;
+        }
+        .dashboard-aside.open ul a {
+            border-bottom: 1px solid #3949ab;
+            border-left: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+        }
+    }
+    @media (max-width: 600px) {
+        .dashboard-section {
+            padding: 4vw 1vw 8vw 1vw;
+        }
+        .guia-container {
+            padding: 4px 0;
+        }
+        .guia-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
+            padding: 6px 1vw 6px 1vw !important;
+            min-width: 0;
+        }
+        .dashboard-aside a {
+            font-size: 0.92rem;
+            padding: 8px 4px;
+        }
+        .guia-img-box {
+            height: 110px;
+        }
+        .guia-section input, .guia-section textarea, .guia-section select {
+            font-size: 0.98rem;
+            padding: 8px 8px;
         }
         .guia-label {
-            background: #e3e6ea;
-            border-radius: 6px;
-            padding: 4px 12px;
+            font-size: 0.92rem;
+            padding: 6px 10px;
+        }
+        .no-print {
+            font-size: 1rem;
+            padding: 10px 16px;
+        }
+    }
+    @media (max-width: 400px) {
+        .dashboard-section {
+            padding: 2vw 0 8vw 0;
+        }
+        .guia-container {
+            padding: 2px 0;
+        }
+        .guia-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
+            padding: 2px 0 2px 0 !important;
+        }
+        .dashboard-aside a {
+            font-size: 0.85rem;
+            padding: 6px 2px;
+        }
+    }
+    .menu-toggle {
+        display: none;
+        position: absolute;
+        left: 16px;
+        top: 12px;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 2rem;
+        z-index: 40;
+        cursor: pointer;
+    }
+    .guia-container {
+        display: flex;
+        flex-direction: row;
+        gap: 32px;
+        padding: 48px 40px 40px 40px;
+        background: #fff;
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(60,72,88,0.13);
+        margin-top: 48px;
+        border: 2.5px solid #e3e6ea;
+        transition: box-shadow 0.2s;
+    }
+    .guia-container:hover {
+        box-shadow: 0 12px 40px rgba(60,72,88,0.18);
+    }
+    .guia-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+    }
+    .guia-img-box {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
+        border: 2.5px dashed #bfc8d6;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        transition: border 0.2s;
+    }
+    .guia-img-box:hover {
+        border: 2.5px solid #3949ab;
+    }
+    .guia-section {
+        background: linear-gradient(120deg, #f7f9fc 80%, #e3e6ea 100%);
+        border-radius: 18px;
+        box-shadow: 0 4px 18px rgba(60,72,88,0.13);
+        padding: 22px 22px 14px 22px;
+        margin-bottom: 22px;
+        border: 2px solid #d1d9e6;
+        transition: box-shadow 0.2s, border 0.2s, background 0.2s;
+        position: relative;
+    }
+    .guia-section:hover {
+        box-shadow: 0 8px 32px rgba(60,72,88,0.18);
+        border: 2px solid #1976d2;
+        background: linear-gradient(120deg, #e3e6ea 60%, #f7f9fc 100%);
+    }
+    .guia-section label {
+        color: #1a237e;
+        font-size: 1.13rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        display: block;
+        letter-spacing: 0.7px;
+        text-shadow: 0 1px 0 #fff, 0 1.5px 2px #bfc8d6;
+    }
+    .guia-section input[type="text"],
+    .guia-section select,
+    .guia-section textarea {
+        border: 2px solid #bfc8d6;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 1.13rem;
+        margin-bottom: 12px;
+        background: #f7f9fc;
+        box-shadow: 0 2px 8px rgba(60,72,88,0.06);
+        transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+        color: #222;
+    }
+    .guia-section input[type="text"]:focus,
+    .guia-section select:focus,
+    .guia-section textarea:focus {
+        border: 2px solid #3949ab;
+        outline: none;
+        box-shadow: 0 4px 16px rgba(25,118,210,0.13);
+        background: #e3e6ea;
+    }
+    .guia-section select {
+        min-width: 120px;
+        max-width: 100%;
+        background: linear-gradient(90deg, #f7f9fc 80%, #e3e6ea 100%);
+        color: #3949ab;
+        font-weight: 600;
+    }
+    .guia-section input[type="file"] {
+        background: #f7f9fc;
+        border: 1.5px dashed #bfc8d6;
+        font-size: 1rem;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        padding: 8px 10px;
+        color: #3949ab;
+        transition: border 0.2s;
+    }
+    .guia-section input[type="file"]:hover {
+        border: 1.5px solid #3949ab;
+        background: #e3e6ea;
+    }
+    .guia-section .guia-label {
+        background: linear-gradient(90deg, #e3e6ea 60%, #f7f9fc 100%);
+        color: #3949ab;
+        border-radius: 10px;
+        padding: 10px 22px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(60,72,88,0.08);
+        font-size: 1.07rem;
+        letter-spacing: 0.5px;
+    }
+    .guia-section:last-child {
+        margin-bottom: 0;
+    }
+    .guia-section input[type="text"]::placeholder,
+    .guia-section textarea::placeholder {
+        color: #bfc8d6;
+        opacity: 1;
+        font-style: italic;
+    }
+    .guia-section select:disabled,
+    .guia-section input:disabled,
+    .guia-section textarea:disabled {
+        background: #e3e6ea;
+        color: #bfc8d6;
+        cursor: not-allowed;
+    }
+    @media (max-width: 900px) {
+        .guia-section {
+            padding: 14px 8px 10px 8px;
+        }
+        .guia-section input[type="text"],
+        .guia-section select,
+        .guia-section textarea {
+            font-size: 1rem;
+            padding: 10px 10px;
+        }
+        .guia-section .guia-label {
+            font-size: 0.98rem;
+            padding: 8px 12px;
+        }
+    }
+    @media (max-width: 600px) {
+        .guia-section {
+            padding: 8px 2px 6px 2px;
+        }
+        .guia-section input[type="text"],
+        .guia-section select,
+        .guia-section textarea {
             font-size: 0.95rem;
+            padding: 8px 6px;
         }
-        @media (max-width: 900px) {
-            .guia-container {
-                flex-direction: column;
-                gap: 16px;
-                padding: 12px;
-            }
+        .guia-section .guia-label {
+            font-size: 0.92rem;
+            padding: 6px 8px;
         }
-        @media print {
-            @page {
-                margin: 24mm 18mm 18mm 18mm;
-            }
-            body {
-                background: #fff !important;
-                font-family: 'Segoe UI', 'Arial', sans-serif !important;
-                color: #222 !important;
-            }
-            h2 {
-                font-size: 2rem;
-                font-weight: 700;
-                text-align: center;
-                margin-bottom: 18px;
-                color: #1a237e;
-            }
-            .guia-container {
-                box-shadow: none;
-                padding: 0;
-            }
-            .guia-section, .guia-img-box, .guia-labels {
-                page-break-inside: avoid;
-            }
-            .guia-section {
-                page-break-after: auto;
-                margin-bottom: 22px;
-            }
-            /* Ocultar pie de página automático del navegador */
-            footer, .footer, .print-footer {
-                display: none !important;
-                visibility: hidden !important;
-                height: 0 !important;
-            }
-            /* Forzar salto de página si el texto es muy largo */
-            .page-break {
-                page-break-before: always;
-            }
-            .guia-section textarea {
-                overflow: visible !important;
-                height: auto !important;
-                min-height: 0 !important;
-                max-height: none !important;
-                display: block !important;
-                white-space: pre-wrap !important;
-            }
-            .guia-texto-adicional {
-                width: 100vw !important;
-                max-width: 100vw !important;
-                box-sizing: border-box !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-                font-size: 1.15rem;
-                line-height: 1.8;
-                color: #222;
-                background: #f7f9fc;
-                border: 1.5px solid #bfc8d6;
-                border-radius: 12px;
-                padding: 24px;
-                margin-bottom: 24px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            }
-            label {
-                font-weight: 600;
-                color: #1a237e;
-                font-size: 1.1rem;
-                margin-bottom: 6px;
-            }
-            .guia-labels {
-                margin-top: 12px;
-            }
-            .guia-label {
-                background: #e3e6ea;
-                border-radius: 6px;
-                padding: 6px 16px;
-                font-size: 1rem;
-                color: #333;
-                font-weight: 500;
-            }
-            .guia-texto-adicional {
-                background: none !important;
-                border: none !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-                padding: 0 !important;
-                margin-bottom: 24px;
-            }
-            #imagen1, label[for="imagen1"], .guia-section label[for="imagen1"], .guia-section input[type="file"] {
-                display: none !important;
-                visibility: hidden !important;
-                height: 0 !important;
-            }
-            .guia-img-box {
-                border: none !important;
-                background: none !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-                padding: 0 !important;
-            }
-            .no-print, .jornadas-profesor {
-                display: none !important;
-                visibility: hidden !important;
-                height: 0 !important;
-            }
+    }
+    .guia-texto-adicional {
+        min-height: 110px;
+        background: #f7f9fc;
+        border: 2px solid #bfc8d6;
+        border-radius: 12px;
+        padding: 16px;
+        font-size: 1.12rem;
+        color: #222;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 8px rgba(60,72,88,0.06);
+    }
+    .no-print {
+        display: block;
+        margin: 40px auto 0 auto;
+        padding: 14px 36px;
+        background: linear-gradient(90deg, #ffb300 60%, #ffa000 100%);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 1.15rem;
+        box-shadow: 0 4px 16px rgba(60,72,88,0.13);
+        transition: background 0.2s;
+    }
+    .no-print:hover {
+        background: linear-gradient(90deg, #ffa000 60%, #ffb300 100%);
+    }
+    .jornadas-profesor h3 {
+        color: #1a237e;
+        margin-bottom: 16px;
+        font-weight: 700;
+        font-size: 1.15rem;
+    }
+    .jornadas-list {
+        list-style: none;
+        padding: 0;
+    }
+    .jornada-item {
+        margin-bottom: 22px;
+    }
+    .jornada-toggle {
+        background: #3949ab;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 24px;
+        font-size: 1.08rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 8px rgba(60,72,88,0.10);
+        transition: background 0.2s;
+    }
+    .jornada-toggle:hover {
+        background: #1a237e;
+    }
+    .salones-jornada {
+        background: #f7f9fc;
+        border-radius: 12px;
+        padding: 18px 26px;
+        margin-top: 10px;
+        box-shadow: 0 2px 8px rgba(60,72,88,0.06);
+    }
+    .salones-jornada h4 {
+        color: #3949ab;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    .salones-jornada ul {
+        list-style: none;
+        padding: 0;
+    }
+    .salones-jornada li {
+        margin-bottom: 12px;
+    }
+    .salones-jornada a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .salones-jornada a:hover {
+        text-decoration: underline;
+    }
+    .salones-jornada form {
+        margin-top: 10px;
+    }
+    .salones-jornada button {
+        background: #28a745;
+        color: #fff;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.05em;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(60,72,88,0.10);
+        transition: background 0.2s;
+    }
+    .salones-jornada button:hover {
+        background: #218838;
+    }
+    @media print {
+        body, html {
+            background: #fff !important;
         }
-        textarea {
-            overflow: hidden !important;
-            resize: none !important;
-            height: auto !important;
-            min-height: 0 !important;
-            max-height: none !important;
-        }
-        .guia-texto-adicional {
-            overflow: visible !important;
-            resize: none !important;
-            min-height: 100px;
-            max-height: none !important;
+        .dashboard-container {
             display: block !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100vw !important;
+        }
+        .dashboard-aside {
+            display: none !important;
+            width: 0 !important;
+            min-width: 0 !important;
+            max-width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            position: static !important;
+            float: none !important;
+            visibility: hidden !important;
+            overflow: hidden !important;
+            z-index: -1 !important;
+            height: 0 !important;
+        }
+        .dashboard-section {
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+            min-width: 0 !important;
+            max-width: 100vw !important;
+        }
+        .dashboard-aside, .dashboard-aside *,
+        .no-print, nav, button, label, input, select, textarea,
+        .guia-label, .menu-toggle, .alert, .jornadas-profesor, .jornada-toggle, .salones-jornada,
+        .guia-section input, .guia-section select, .guia-section textarea, .guia-section label,
+        .guia-section input[type="file"], .guia-section[for="imagen1"],
+        .guia-section label[for="imagen1"], .guia-section label:contains('Subir imagen'),
+        .guia-section label:has([for="imagen1"]) {
+            display: none !important;
+            width: 0 !important;
+            min-width: 0 !important;
+            max-width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .guia-section:empty {
+            display: none !important;
+        }
+        .print-section-title {
+            display: block !important;
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+            color: #1a237e !important;
+            margin: 18px 0 6px 0 !important;
+            border: none !important;
+            background: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        .guia-section .print-text {
+            display: block !important;
+            color: #222 !important;
+            font-size: 1.1rem !important;
+            font-weight: 400 !important;
+            margin-bottom: 8px !important;
+            white-space: pre-wrap !important;
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        .dashboard-section, .guia-container, .guia-col, .guia-section {
+            background: none !important;
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .guia-img-box {
+            border: none !important;
+            background: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin-bottom: 0 !important;
+            display: flex !important;
+            justify-content: flex-start !important;
+            align-items: flex-start !important;
+        }
+        .guia-img-box #imagen1-label {
+            display: none !important;
+        }
+        .guia-img-box img {
+            display: block !important;
+            max-width: 100% !important;
+            max-height: 220px !important;
+            border: none !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+        }
+        .guia-section .guia-texto-adicional {
+            border: none !important;
+            background: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 0 10px 0 !important;
+        }
+        .guia-container { flex-direction: column !important; }
+        .guia-col { width: 100% !important; flex: unset !important; }
+        .guia-section.procedimiento, .guia-section.resultados, .guia-section.conclusiones, .guia-section.referencias {
+            order: 100 !important;
+        }
+        .guia-section.instrumento-material { order: 99 !important; }
+        /* Ocultar absolutamente todos los inputs, selects, textareas, labels, botones y elementos de edición en todas las secciones, pero NO ocultar [contenteditable="true"] */
+        .guia-section input,
+        .guia-section select,
+        .guia-section textarea,
+        .guia-section label,
+        .guia-section .guia-label,
+        .guia-section button,
+        .guia-section .no-print {
+            display: none !important;
+            width: 0 !important;
+            min-width: 0 !important;
+            max-width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            background: none !important;
+            box-shadow: none !important;
+        }
+        /* Mostrar el texto de .guia-texto-adicional y .print-text horizontal y normal */
+        .guia-section .guia-texto-adicional,
+        .guia-section .print-text {
+            display: block !important;
+            writing-mode: horizontal-tb !important;
+            text-orientation: mixed !important;
             white-space: pre-wrap !important;
             word-break: break-word !important;
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: #222;
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            letter-spacing: normal !important;
+            line-break: auto !important;
+            color: #222 !important;
+            font-size: 1.1rem !important;
+            font-weight: 400 !important;
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin-bottom: 8px !important;
         }
-        @media print {
-            .guia-texto-adicional {
-                font-size: 1.1rem;
-                line-height: 1.7;
-                color: #222;
-                background: #fff;
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                padding: 16px;
-                margin-bottom: 16px;
-                box-shadow: none;
-                width: 100vw !important;
-                max-width: 100vw !important;
-                box-sizing: border-box !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
+        /* Ocultar solo el botón de descargar como PDF en la impresión/PDF */
+        .no-print,
+        #descargar-pdf-btn,
+        .descargar-pdf-btn,
+        button[onclick*="pdf"],
+        button[onclick*="PDF"] {
+            display: none !important;
         }
+        /* Ocultar solo el bloque de jornadas asignadas en la impresión/PDF */
+        .jornadas-profesor {
+            display: none !important;
+        }
+        /* Ocultar solo el bloque de subir imagen en la impresión/PDF */
+        .guia-section label[for="imagen1"],
+        .guia-section input#imagen1,
+        .guia-img-box,
+        #imagen1-label {
+            display: none !important;
+        }
+    }
     </style>
 </head>
 <body>
-    <div style="padding: 24px;">
-        <a href="{% url 'dashboard_profesor' %}" style="text-decoration:none;color:#007bff;font-weight:500">&lt; Volver</a>
-        <h2 style="text-align:center;margin-bottom:24px;">Agregar Título</h2>
-        {% if mensaje %}
-            <div class="alert alert-success" style="background:#d4edda;color:#155724;padding:10px 18px;border-radius:6px;margin-bottom:18px;">
-                {{ mensaje }}
-            </div>
-        {% endif %}
-        <div style="clear:both;"></div>
-        <div class="guia-container">
-            <div class="guia-col">
-                <div class="guia-img-box" id="guia-img-box">
-                    <img id="preview-imagen1" src="#" alt="Vista previa" style="display:none;max-width:100%;max-height:160px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin:auto;" />
-                    <span id="imagen1-label" style="display:block;text-align:center;color:#1a237e;font-weight:500;">Imagen 1</span>
+    <div class="dashboard-container">
+        <aside class="dashboard-aside" id="sidebar">
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú"><i class="fa fa-bars"></i></button>
+            <nav>
+                <ul>
+                    <li><a href="/dashboard_profesor/" class="{% if request.path == '/dashboard_profesor/' %}active{% endif %}">Inicio</a></li>
+                    <li><a href="/guias/" class="{% if request.path == '/guias/' %}active{% endif %}">Guías</a></li>
+                    <li><a href="/jornadas/" class="{% if request.path == '/jornadas/' %}active{% endif %}">Jornadas</a></li>
+                    <li><a href="/salones/" class="{% if request.path == '/salones/' %}active{% endif %}">Salones</a></li>
+                    <li><a href="/perfil_profesor/" class="{% if request.path == '/perfil_profesor/' %}active{% endif %}">Perfil</a></li>
+                    <li><a href="/reportes_profesor/">Reportes</a></li>
+                    <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <section class="dashboard-section">
+            <div style="padding: 24px; width:100%; max-width:1200px;">
+                <a href="{% url 'dashboard_profesor' %}" style="text-decoration:none;color:#007bff;font-weight:500">&lt; Volver</a>
+                <div style="display: flex; justify-content: center; align-items: center; margin-bottom:24px;">
+                    <h2 id="editable-title" style="text-align:center; margin:0; cursor:pointer; padding: 4px 12px; border-radius: 8px; transition: background 0.2s;">Agregar Título</h2>
+                    <input id="title-input" type="text" value="Agregar Título" style="display:none; font-size:1.4rem; font-weight:700; text-align:center; margin:0; padding:4px 12px; border-radius:8px; border:2px solid #bfc8d6; outline:none; min-width:220px; max-width:400px; background:#f7f9fc;" />
                 </div>
-                <div class="guia-section">
-                    <label for="imagen1">Subir imagen</label>
-                    <input type="file" id="imagen1" accept="image/*" style="margin-bottom:12px;" onchange="mostrarImagen(event)">
-                </div>
-                <div class="guia-section">
-                    <label>Texto adicional</label>
-                    <div contenteditable="true" class="guia-texto-adicional" style="min-height:100px;border:1px solid #ccc;padding:8px;border-radius:6px;white-space:pre-wrap;word-break:break-word;"></div>
-                </div>
-                <div class="guia-section">
-                    <label>Objetivos</label>
-                    <input type="text" placeholder="Title">
-                    <input type="text" placeholder="Title">
-                    <input type="text" placeholder="Title">
-                </div>
-                <div style="display:flex;gap:16px;">
-                    <div class="guia-section" style="flex:1;">
-                        <label>Materiales <span title="Seleccionar" style="cursor:pointer;">&#9432;</span></label>
+                {% if mensaje %}
+                    <div class="alert alert-success" style="background:#d4edda;color:#155724;padding:10px 18px;border-radius:6px;margin-bottom:18px;">
+                        {{ mensaje }}
+                    </div>
+                {% endif %}
+                <div style="clear:both;"></div>
+                <div class="guia-container">
+                    <div class="guia-col">
+                        <div class="guia-img-box" id="guia-img-box">
+                            <img id="preview-imagen1" src="#" alt="Vista previa" style="display:none;max-width:100%;max-height:160px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin:auto;" />
+                            <span id="imagen1-label" style="display:block;text-align:center;color:#1a237e;font-weight:500;">Imagen 1</span>
+                        </div>
+                        <div class="guia-section">
+                            <label for="imagen1">Subir imagen</label>
+                            <input type="file" id="imagen1" accept="image/*" style="margin-bottom:12px;" onchange="mostrarImagen(event)">
+                        </div>
+                        <div class="guia-section">
+                            <label>Texto adicional</label>
+                            <div contenteditable="true" class="guia-texto-adicional" style="min-height:100px;border:1px solid #ccc;padding:8px;border-radius:6px;white-space:pre-wrap;word-break:break-word;"></div>
+                        </div>
+                        <div class="guia-section">
+                            <label>Objetivos</label>
+                            <input type="text" placeholder="Title">
+                            <input type="text" placeholder="Title">
+                            <input type="text" placeholder="Title">
+                        </div>
+                        <div style="display:flex;gap:16px;">
+                            <div class="guia-section" style="flex:1;">
+                                <label>Materiales <span title="Seleccionar" style="cursor:pointer;">&#9432;</span></label>
+                                <select><option>Seleccionar</option></select>
+                                <input type="text" placeholder="Title">
+                                <input type="text" placeholder="Title">
+                                <input type="text" placeholder="Title">
+                                
+                            </div>
+                            <div class="guia-section" style="flex:1;">
+                            <div class="guia-label">Label</div>
+                            <div class="guia-label">Label</div>
+                        </div>
+                    </div>
+                    <div class="guia-section instrumento-material">
+                        <span class="guia-label">Instrumento o material <i class="fa fa-info-circle" title="Selecciona los instrumentos o materiales adicionales"></i></span>
                         <select><option>Seleccionar</option></select>
                         <input type="text" placeholder="Title">
                         <input type="text" placeholder="Title">
                         <input type="text" placeholder="Title">
                     </div>
-                    <div class="guia-section" style="flex:1;">
-                        <label>Instrumento o Equipo <span title="Seleccionar" style="cursor:pointer;">&#9432;</span></label>
-                        <select><option>Seleccionar</option></select>
-                        <input type="text" placeholder="Title">
-                        <input type="text" placeholder="Title">
+                    </div> <!-- cierre de la sección de Materiales -->
+                        <!-- ...resto del código... -->
+                       
+                    <div class="guia-col">
+                        <div class="guia-section procedimiento">
+                            <label>Procedimiento / Metodología</label>
+                            <textarea rows="6" placeholder="Procedimiento / Metodología"></textarea>
+                        </div>
+                        <div class="guia-section resultados">
+                            <label>Resultados Esperados</label>
+                            <textarea rows="3" placeholder="Resultados Esperados"></textarea>
+                        </div>
+                        <div class="guia-section conclusiones">
+                            <label>Conclusiones</label>
+                            <textarea rows="3" placeholder="Conclusiones"></textarea>
+                        </div>
+                        <div class="guia-section referencias">
+                            <label>Referencias</label>
+                            <textarea rows="3" placeholder="Referencias"></textarea>
+                        </div>
+                        <button onclick="descargarPDF()" class="no-print" style="display:block;margin:32px auto 0 auto;padding:8px 18px;background:#007bff;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:500;">Descargar como PDF</button>
+                        <div class="jornadas-profesor" style="margin-top: 32px; text-align:left;">
+                            <h3>Jornadas asignadas</h3>
+                            {% if jornadas %}
+                                <ul class="jornadas-list">
+                                    {% for jornada in jornadas %}
+                                        <li class="jornada-item">
+                                            <button class="jornada-toggle" onclick="toggleSalones('salones-{{ jornada.id }}')">
+                                                <strong>{{ jornada.nombre }}</strong> - {{ jornada.fecha }}
+                                            </button>
+                                            <div id="salones-{{ jornada.id }}" class="salones-jornada" style="display:none; margin-left:20px;">
+                                                <h4>Salones asignados:</h4>
+                                                {% if jornada.salones.all %}
+                                                    <ul>
+                                                        {% for salon in jornada.salones.all %}
+                                                            <li>
+                                                                <a href="{% url 'salon_estudiantes' salon.id jornada.id %}">{{ salon.nombre }}{% if salon.ubicacion %} ({{ salon.ubicacion }}){% endif %}</a>
+                                                                <form method="post" enctype="multipart/form-data" style="margin-top:18px;" onsubmit="return setTituloHidden(this)">
+                                                                    {% csrf_token %}
+                                                                    <label for="archivo_guia">Subir archivo final de la guía (PDF, Word, etc):</label>
+                                                                    <input type="file" name="archivo_guia" id="archivo_guia" accept=".pdf,.doc,.docx,.odt" required>
+                                                                    <input type="hidden" name="salon_id" value="{{ salon.id }}">
+                                                                    <input type="hidden" name="titulo" id="hidden-titulo-{{ salon.id }}" value="Agregar Título">
+                                                                    <button type="submit" name="asignar_guia" value="{{ salon.id }}" style="background:#28a745;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.95em;">Subir y asignar guía a este salón</button>
+                                                                </form>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <em>No hay salones asignados.</em>
+                                                {% endif %}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No tienes jornadas asignadas.</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-                <div class="guia-section">
-                    <label>Reactivos <span title="Seleccionar" style="cursor:pointer;">&#9432;</span></label>
-                    <select><option>Seleccionar</option></select>
-                </div>
-                <div class="guia-labels">
-                    <div class="guia-label">Label</div>
-                    <div class="guia-label">Label</div>
-                    <div class="guia-label">Label</div>
-                    <div class="guia-label">Label</div>
-                    <div class="guia-label">Label</div>
-                </div>
             </div>
-            <div class="guia-col">
-                <div class="guia-section">
-                    <label>Procedimiento / Metodología</label>
-                    <textarea rows="6" placeholder="Procedimiento / Metodología"></textarea>
-                </div>
-                <div class="guia-section">
-                    <label>Resultados Esperados</label>
-                    <textarea rows="3" placeholder="Resultados Esperados"></textarea>
-                </div>
-                <div class="guia-section">
-                    <label>Conclusiones</label>
-                    <textarea rows="3" placeholder="Conclusiones"></textarea>
-                </div>
-                <div class="guia-section">
-                    <label>Referencias</label>
-                    <textarea rows="3" placeholder="Referencias"></textarea>
-                </div>
-                <button onclick="window.print()" class="no-print" style="display:block;margin:32px auto 0 auto;padding:8px 18px;background:#007bff;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:500;">Descargar como PDF</button>
-                <div class="jornadas-profesor" style="margin-top: 32px; text-align:left;">
-                    <h3>Jornadas asignadas</h3>
-                    {% if jornadas %}
-                        <ul class="jornadas-list">
-                            {% for jornada in jornadas %}
-                                <li class="jornada-item">
-                                    <button class="jornada-toggle" onclick="toggleSalones('salones-{{ jornada.id }}')">
-                                        <strong>{{ jornada.nombre }}</strong> - {{ jornada.fecha }}
-                                    </button>
-                                    <div id="salones-{{ jornada.id }}" class="salones-jornada" style="display:none; margin-left:20px;">
-                                        <h4>Salones asignados:</h4>
-                                        {% if jornada.salones.all %}
-                                            <ul>
-                                                {% for salon in jornada.salones.all %}
-                                                    <li>
-                                                        <a href="{% url 'salon_estudiantes' salon.id jornada.id %}">{{ salon.nombre }}{% if salon.ubicacion %} ({{ salon.ubicacion }}){% endif %}</a>
-                                                        <form method="post" enctype="multipart/form-data" style="margin-top:18px;">
-                                                            {% csrf_token %}
-                                                            <label for="archivo_guia">Subir archivo final de la guía (PDF, Word, etc):</label>
-                                                            <input type="file" name="archivo_guia" id="archivo_guia" accept=".pdf,.doc,.docx,.odt" required>
-                                                            <input type="hidden" name="salon_id" value="{{ salon.id }}">
-                                                            <button type="submit" name="asignar_guia" value="{{ salon.id }}" style="background:#28a745;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.95em;">Subir y asignar guía a este salón</button>
-                                                        </form>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <em>No hay salones asignados.</em>
-                                        {% endif %}
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No tienes jornadas asignadas.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
     <script>
         function mostrarImagen(event) {
@@ -366,7 +803,6 @@
                 label.style.display = 'block';
             }
         }
-
         function toggleSalones(id) {
             var el = document.getElementById(id);
             if (el.style.display === "none") {
@@ -375,6 +811,112 @@
                 el.style.display = "none";
             }
         }
+        const editableTitle = document.getElementById('editable-title');
+        const titleInput = document.getElementById('title-input');
+        editableTitle.addEventListener('click', function() {
+            editableTitle.style.display = 'none';
+            titleInput.style.display = 'inline-block';
+            titleInput.focus();
+            titleInput.select();
+        });
+        titleInput.addEventListener('blur', function() {
+            editableTitle.textContent = titleInput.value || 'Agregar Título';
+            editableTitle.style.display = 'block';
+            titleInput.style.display = 'none';
+        });
+        titleInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                titleInput.blur();
+            }
+        });
+        function descargarPDF() {
+            // Oculta el input y muestra el título antes de imprimir
+            const editableTitle = document.getElementById('editable-title');
+            const titleInput = document.getElementById('title-input');
+            if (titleInput.style.display !== 'none') {
+                editableTitle.textContent = titleInput.value || 'Agregar Título';
+                editableTitle.style.display = 'block';
+                titleInput.style.display = 'none';
+            }
+            // Mostrar valores de inputs y textareas como texto plano para impresión, junto a los títulos de sección
+            document.querySelectorAll('.guia-section').forEach(function(section) {
+                // Elimina títulos y textos previos de impresión
+                section.querySelectorAll('.print-section-title, .print-text').forEach(e => e.remove());
+                // Busca el label o .guia-label para usar como título
+                let label = section.querySelector('label, .guia-label, span.guia-label');
+                if (label) {
+                    let h3 = document.createElement('h3');
+                    h3.className = 'print-section-title';
+                    h3.textContent = label.textContent.replace(/\s+\*/g, '').trim();
+                    section.appendChild(h3);
+                }
+                // Inputs de texto
+                section.querySelectorAll('input[type="text"]').forEach(function(input) {
+                    let span = document.createElement('span');
+                    span.className = 'print-text';
+                    span.textContent = input.value;
+                    section.appendChild(span);
+                });
+                // Textareas
+                section.querySelectorAll('textarea').forEach(function(textarea) {
+                    let span = document.createElement('span');
+                    span.className = 'print-text';
+                    span.textContent = textarea.value;
+                    section.appendChild(span);
+                });
+                // Selects
+                section.querySelectorAll('select').forEach(function(select) {
+                    let span = document.createElement('span');
+                    span.className = 'print-text';
+                    span.textContent = select.options[select.selectedIndex]?.text || '';
+                    section.appendChild(span);
+                });
+                // Contenteditable (ej: texto adicional)
+                section.querySelectorAll('[contenteditable="true"]').forEach(function(div) {
+                    let span = document.createElement('span');
+                    span.className = 'print-text';
+                    span.textContent = div.innerText;
+                    section.appendChild(span);
+                });
+            });
+            // Cambia el título de la ventana temporalmente
+            const originalTitle = document.title;
+            const guiaTitle = editableTitle.textContent.trim() || 'Guía';
+            document.title = guiaTitle;
+            window.print();
+            setTimeout(function() {
+                document.title = originalTitle;
+            }, 1000);
+        }
+        function setTituloHidden(form) {
+            // Busca el input hidden de título dentro del formulario
+            var input = form.querySelector('input[name="titulo"]');
+            var titleInput = document.getElementById('title-input');
+            input.value = titleInput.value || 'Guía sin título';
+            return true;
+        }
+        // Hamburguesa responsive
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation(); // Evita que el click se propague y cierre el menú inmediatamente
+            sidebar.classList.toggle('open');
+        });
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                // No cerrar si el click es en el botón o dentro del botón
+                if (!sidebar.contains(e.target) && e.target !== menuToggle && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        document.querySelectorAll('.dashboard-aside a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
     </script>
 </body>
 </html>

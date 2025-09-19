@@ -1,20 +1,33 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block title %}Detalle del Informe{% endblock %}
 {% block content %}
-<div class="informe-detalle-container">
-    <h2>Detalle del Informe</h2>
+<div class="detalle-container" style="max-width:600px;margin:40px auto;background:#fff;border-radius:16px;padding:32px 24px;box-shadow:0 4px 24px rgba(60,72,88,0.13);border:2px solid #1976d2;">
+    <h2 style="color:#1a237e;">Detalle del Informe</h2>
     <p><strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}</p>
-    <p><strong>Químico usado:</strong> {{ informe.quimico.nombre }}</p>
-    <p><strong>Nota:</strong></p>
-    <div class="informe-detalle-nota">{{ informe.nota }}</div>
+    <p><strong>Químico:</strong> {{ informe.quimico.nombre }}</p>
+    {% if informe.guia %}
+    <p><strong>Guía:</strong> {{ informe.guia.titulo }}</p>
+    {% endif %}
+    <p><strong>Nota:</strong> {{ informe.nota }}</p>
     {% if informe.imagen %}
-    <div class="informe-detalle-imagen">
-        <img src="{{ informe.imagen.url }}" alt="Foto cuaderno">
+    <div style="margin:18px 0;text-align:center;">
+        <img src="{{ informe.imagen.url }}" alt="Evidencia" style="max-width:100%;max-height:250px;border:2px solid #1976d2;border-radius:8px;">
     </div>
     {% endif %}
-    <div class="informe-detalle-actions">
-        <a href="/cuaderno/">&larr; Volver al cuaderno</a>
-        <a href="{% url 'descargar_informe_pdf' informe.id %}">Descargar PDF</a>
-    </div>
+    <hr>
+    <h3 style="color:#3949ab;">Retroalimentación del docente</h3>
+    {% if request.user.profile.role == 'profesor' %}
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="retroalimentacion" rows="4" style="width:100%;border-radius:8px;">{{ informe.retroalimentacion }}</textarea><br>
+            <button type="submit">Guardar retroalimentación</button>
+        </form>
+    {% else %}
+        {% if informe.retroalimentacion %}
+            <div style="background:#f7f9fc;border:1.5px solid #e3e6ea;padding:12px 16px;border-radius:8px;">{{ informe.retroalimentacion }}</div>
+        {% else %}
+            <div style="color:#888;">Aún no hay retroalimentación.</div>
+        {% endif %}
+    {% endif %}
 </div>
 {% endblock %}

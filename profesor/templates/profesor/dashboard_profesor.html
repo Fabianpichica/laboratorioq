@@ -5,24 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Profesor</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
+        .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
+        .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
+        .profesor-sidebar nav { width: 100%; }
+        .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
+        .profesor-sidebar li { margin-bottom: 8px; width: 100%; }
+        .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
+        .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
+        .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
+        .profesor-main-content { margin-left: 240px; padding: 48px 32px 32px 32px; width: 100%; }
+        .profesor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .profesor-header h1 { color: #1976d2; font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: 1px; }
+        .profesor-header .profesor-user { font-size: 1.1rem; color: #1976d2; background: #fff; border-radius: 20px; padding: 8px 18px; box-shadow: 0 2px 8px rgba(25,118,210,0.07); }
+        .jornadas-profesor { margin-top: 32px; }
+        .jornadas-list { list-style: none; padding: 0; margin: 0; }
+        .jornada-item { margin-bottom: 18px; }
+        .jornada-toggle { background: #fff; color: #1976d2; border: none; border-radius: 8px; padding: 10px 22px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 2px 8px rgba(25,118,210,0.08); margin-bottom: 8px; transition: background 0.2s, color 0.2s; }
+        .jornada-toggle:hover { background: #e3e6ea; color: #1565c0; }
+        .salones-jornada ul { margin: 0; padding-left: 18px; }
+        .salones-jornada li { margin-bottom: 6px; }
+        @media (max-width: 900px) { .profesor-main-content { padding: 32px 8px 8px 8px; } .profesor-sidebar { width: 100px; } .profesor-main-content { margin-left: 100px; } }
+    </style>
+    <script>
+        function toggleSalones(id) {
+            var el = document.getElementById(id);
+            if (el.style.display === "none") {
+                el.style.display = "block";
+            } else {
+                el.style.display = "none";
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="profesor-dashboard-wrapper">
         <aside class="profesor-sidebar">
-            <div class="sidebar-title">Panel de Profesor</div>
+            <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Profesor</div>
             <nav>
                 <ul>
-                    <li class="active"><span class="icon">🏠</span> Inicio</li>
-                    <li><a href="{% url 'guias_profesor' %}"><span class="icon">📄</span> Guías</a></li>
-                    <li><span class="icon">📦</span> Materiales</li>
-                    <li><a href="{% url 'resultados_por_guia' %}"><span class="icon">🧪</span> Resultados por Guía</a></li>
-                    <li><span class="icon">📊</span> Reportes</li>
-                    <li><span class="icon">👤</span> Perfil</li>
-                    <li><span class="icon">🚪</span> Cerrar sesión</li>
+                    <li class="active"><i class="fa-solid fa-house icon"></i>Inicio</li>
+                    <li><a href="{% url 'guias_profesor' %}"><i class="fa-solid fa-book icon"></i>Guías</a></li>
+                    <li><a href="#"><i class="fa-solid fa-boxes-stacked icon"></i>Materiales</a></li>
+                    <li><a href="{% url 'resultados_por_guia' %}"><i class="fa-solid fa-flask-vial icon"></i>Resultados por Guía</a></li>
+                    <li><a href="#"><i class="fa-solid fa-chart-bar icon"></i>Reportes</a></li>
+                    <li><a href="#"><i class="fa-solid fa-user icon"></i>Perfil</a></li>
+                    <li><a href="/logout/"><i class="fa-solid fa-right-from-bracket icon"></i>Cerrar sesión</a></li>
                 </ul>
             </nav>
         </aside>
-        <section class="profesor-dashboard-section">
+        <main class="profesor-main-content">
+            <div class="profesor-header">
+                <h1><i class="fa-solid fa-chalkboard-user"></i> Dashboard Profesor</h1>
+                <div class="profesor-user"><i class="fa-solid fa-user-shield"></i> Panel de profesor</div>
+            </div>
             <h2>Bienvenido, Profesor</h2>
             <p>Este es tu dashboard. Selecciona una opción del menú lateral para comenzar.</p>
             <div class="jornadas-profesor">
@@ -55,17 +94,7 @@
                     <p>No tienes jornadas asignadas.</p>
                 {% endif %}
             </div>
-            <script>
-                function toggleSalones(id) {
-                    var el = document.getElementById(id);
-                    if (el.style.display === "none") {
-                        el.style.display = "block";
-                    } else {
-                        el.style.display = "none";
-                    }
-                }
-            </script>
-        </section>
+        </main>
     </div>
 </body>
 </html>

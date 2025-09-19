@@ -4,6 +4,128 @@
     <meta charset="UTF-8">
     <title>Guías del Profesor</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #f4f6fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+        }
+        .profesor-dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        .profesor-sidebar {
+            background: #1a237e;
+            color: #fff;
+            width: 240px;
+            padding: 32px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sidebar-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+        .profesor-sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+        .profesor-sidebar nav ul li {
+            width: 100%;
+        }
+        .profesor-sidebar nav ul li a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+        .profesor-sidebar nav ul li.active a,
+        .profesor-sidebar nav ul li a:hover {
+            background: #3949ab;
+            border-left: 4px solid #ffb300;
+        }
+        .profesor-dashboard-section {
+            flex: 1;
+            padding: 48px 40px;
+        }
+        h2 {
+            color: #1a237e;
+            font-size: 2rem;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        h2 i {
+            color: #3949ab;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        li {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(60,72,88,0.08);
+            padding: 22px 20px 16px 20px;
+            font-size: 1.08rem;
+            color: #222;
+            transition: box-shadow 0.2s;
+        }
+        li:hover {
+            box-shadow: 0 4px 16px rgba(60,72,88,0.16);
+        }
+        .guia-titulo {
+            font-weight: 600;
+            color: #3949ab;
+            font-size: 1.15rem;
+        }
+        .guia-desc {
+            color: #444;
+            margin: 6px 0 10px 0;
+        }
+        .guia-download {
+            display: inline-block;
+            margin-top: 8px;
+            background: #ffb300;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-size: 0.98rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .guia-download:hover {
+            background: #ffa000;
+        }
+        @media (max-width: 700px) {
+            .profesor-dashboard-wrapper {
+                flex-direction: column;
+            }
+            .profesor-sidebar {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 16px 0;
+            }
+            .profesor-dashboard-section {
+                padding: 24px 8px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="profesor-dashboard-wrapper">
@@ -17,15 +139,15 @@
             </nav>
         </aside>
         <section class="profesor-dashboard-section">
-            <h2>Guías disponibles</h2>
+            <h2><i class="fas fa-book"></i> Guías disponibles</h2>
             {% if guias %}
                 <ul>
                     {% for guia in guias %}
                         <li>
-                            <strong>{{ guia.titulo }}</strong><br>
-                            {{ guia.descripcion }}<br>
+                            <span class="guia-titulo">{{ guia.titulo }}</span><br>
+                            <span class="guia-desc">{{ guia.descripcion }}</span><br>
                             {% if guia.archivo %}
-                                <a href="{{ guia.archivo.url }}" download>Descargar archivo</a>
+                                <a class="guia-download" href="{{ guia.archivo.url }}" download><i class="fas fa-download"></i> Descargar archivo</a>
                             {% endif %}
                         </li>
                     {% endfor %}

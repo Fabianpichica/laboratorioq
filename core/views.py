@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Profile, Quimico, CuadernoEntry
+from .models import Profile, Quimico, CuadernoEntry, Material, Equipo
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -16,6 +16,8 @@ from reportlab.pdfgen import canvas
 from profesor.models import Estudiante, Guia, Salon
 import requests
 from django.http import JsonResponse
+from django.utils import timezone
+from datetime import timedelta
 
 def login_view(request):
     if request.method == 'POST':
@@ -151,7 +153,13 @@ def cuaderno_aprendiz(request):
 
 @login_required
 def informe_detalle(request, informe_id):
-    informe = CuadernoEntry.objects.get(id=informe_id, aprendiz=request.user)
+    informe = get_object_or_404(CuadernoEntry, id=informe_id)
+    # Solo permitir retroalimentar a profesores
+    if request.method == 'POST' and hasattr(request.user, 'profile') and request.user.profile.role == 'profesor':
+        retro = request.POST.get('retroalimentacion', '').strip()
+        if retro:
+            informe.retroalimentacion = retro
+            informe.save()
     return render(request, 'informe_detalle.html', {'informe': informe})
 
 @login_required
@@ -191,7 +199,7 @@ def materiales_view(request):
         cantidad = request.POST.get('cantidad')
         descripcion = request.POST.get('descripcion')
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
-        if nombre and cantidad:
+        if nombre and cantidad and cantidad.isdigit():
             Quimico.objects.create(
                 nombre=nombre,
                 cantidad=cantidad,
@@ -210,18 +218,63 @@ def eliminar_quimico(request, quimico_id):
 
 @login_required
 def editar_quimico(request, quimico_id):
-    if not hasattr(request.user, 'profile') or request.user.profile.role != 'aprendiz':
-        return redirect('/')
-    quimico = Quimico.objects.get(id=quimico_id)
+    quimico = get_object_or_404(Quimico, id=quimico_id)
     if request.method == 'POST':
         quimico.nombre = request.POST.get('nombre')
         quimico.cantidad = request.POST.get('cantidad')
         quimico.descripcion = request.POST.get('descripcion')
-        fecha_vencimiento = request.POST.get('fecha_vencimiento')
-        quimico.fecha_vencimiento = fecha_vencimiento if fecha_vencimiento else None
+        quimico.fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        if request.FILES.get('ficha_seguridad'):
+            quimico.ficha_seguridad = request.FILES['ficha_seguridad']
+        if request.FILES.get('protocolo_uso'):
+            quimico.protocolo_uso = request.FILES['protocolo_uso']
         quimico.save()
         return redirect('materiales')
     return render(request, 'editar_quimico.html', {'quimico': quimico})
+
+@login_required
+def editar_material(request, material_id):
+    material = get_object_or_404(Material, id=material_id)
+    if request.method == 'POST':
+        material.nombre = request.POST.get('nombre')
+        material.cantidad = request.POST.get('cantidad')
+        material.descripcion = request.POST.get('descripcion')
+        material.ubicacion = request.POST.get('ubicacion')
+        material.fecha_mantenimiento = request.POST.get('fecha_mantenimiento')
+        if request.FILES.get('ficha_seguridad'):
+            material.ficha_seguridad = request.FILES['ficha_seguridad']
+        if request.FILES.get('protocolo_uso'):
+            material.protocolo_uso = request.FILES['protocolo_uso']
+        material.save()
+        return redirect('materiales')
+    return render(request, 'editar_material.html', {'material': material})
+
+@login_required
+def eliminar_material(request, material_id):
+    Material.objects.filter(id=material_id).delete()
+    return redirect('materiales')
+
+@login_required
+def editar_equipo(request, equipo_id):
+    equipo = get_object_or_404(Equipo, id=equipo_id)
+    if request.method == 'POST':
+        equipo.nombre = request.POST.get('nombre')
+        equipo.cantidad = request.POST.get('cantidad')
+        equipo.descripcion = request.POST.get('descripcion')
+        equipo.ubicacion = request.POST.get('ubicacion')
+        equipo.fecha_mantenimiento = request.POST.get('fecha_mantenimiento')
+        if request.FILES.get('ficha_seguridad'):
+            equipo.ficha_seguridad = request.FILES['ficha_seguridad']
+        if request.FILES.get('protocolo_uso'):
+            equipo.protocolo_uso = request.FILES['protocolo_uso']
+        equipo.save()
+        return redirect('materiales')
+    return render(request, 'editar_equipo.html', {'equipo': equipo})
+
+@login_required
+def eliminar_equipo(request, equipo_id):
+    Equipo.objects.filter(id=equipo_id).delete()
+    return redirect('materiales')
 
 @login_required
 def reportes_view(request):
@@ -333,6 +386,97 @@ def buscar_quimico_local(request):
             'cas': '',
         })
     return JsonResponse({'results': results})
+
+@login_required
+def materiales_equipos_view(request):
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'aprendiz':
+        return redirect('/')
+    # CRUD para Químico
+    if request.method == 'POST' and request.POST.get('tipo') == 'quimico':
+        nombre = request.POST.get('nombre')
+        cantidad = request.POST.get('cantidad')
+        descripcion = request.POST.get('descripcion')
+        fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        # Validar que todos los campos requeridos estén presentes y que cantidad sea un número
+        if nombre and cantidad and cantidad.isdigit():
+            # Validar que no exista un químico con el mismo nombre y fecha de vencimiento
+            if not Quimico.objects.filter(nombre=nombre, fecha_vencimiento=fecha_vencimiento).exists():
+                try:
+                    Quimico.objects.create(
+                        nombre=nombre,
+                        cantidad=int(cantidad),
+                        descripcion=descripcion,
+                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
+                    )
+                except Exception as e:
+                    messages.error(request, f"Error al crear químico: {e}")
+            else:
+                messages.error(request, "Ya existe un químico con ese nombre y fecha de vencimiento.")
+        else:
+            messages.error(request, "Por favor, completa todos los campos requeridos y asegúrate de que la cantidad sea un número.")
+    # CRUD para Material
+    if request.method == 'POST' and request.POST.get('tipo') == 'material':
+        nombre = request.POST.get('nombre')
+        cantidad = request.POST.get('cantidad')
+        descripcion = request.POST.get('descripcion')
+        ubicacion = request.POST.get('ubicacion')
+        fecha_mantenimiento = request.POST.get('fecha_mantenimiento')
+        if nombre and cantidad:
+            if not Material.objects.filter(nombre=nombre, ubicacion=ubicacion).exists():
+                Material.objects.create(
+                    nombre=nombre,
+                    cantidad=cantidad,
+                    descripcion=descripcion,
+                    ubicacion=ubicacion,
+                    fecha_mantenimiento=fecha_mantenimiento if fecha_mantenimiento else None
+                )
+    # CRUD para Equipo
+    if request.method == 'POST' and request.POST.get('tipo') == 'equipo':
+        nombre = request.POST.get('nombre')
+        cantidad = request.POST.get('cantidad')
+        descripcion = request.POST.get('descripcion')
+        ubicacion = request.POST.get('ubicacion')
+        fecha_mantenimiento = request.POST.get('fecha_mantenimiento')
+        if nombre and cantidad:
+            if not Equipo.objects.filter(nombre=nombre, ubicacion=ubicacion).exists():
+                Equipo.objects.create(
+                    nombre=nombre,
+                    cantidad=cantidad,
+                    descripcion=descripcion,
+                    ubicacion=ubicacion,
+                    fecha_mantenimiento=fecha_mantenimiento if fecha_mantenimiento else None
+                )
+    materiales = Material.objects.all()
+    equipos = Equipo.objects.all()
+    quimicos = Quimico.objects.all()
+
+    # Alertas de stock bajo y vencimiento
+    alerta_stock_bajo = []
+    alerta_vencimiento = []
+    for quimico in quimicos:
+        if quimico.cantidad is not None and int(quimico.cantidad) <= 5:
+            alerta_stock_bajo.append(quimico)
+        if quimico.fecha_vencimiento and quimico.fecha_vencimiento <= timezone.now().date() + timedelta(days=30):
+            alerta_vencimiento.append(quimico)
+    return render(request, 'materiales.html', {
+        'materiales': materiales,
+        'equipos': equipos,
+        'quimicos': quimicos,
+        'alerta_stock_bajo': alerta_stock_bajo,
+        'alerta_vencimiento': alerta_vencimiento
+    })
+
+def detalle_quimico(request, pk):
+    quimico = get_object_or_404(Quimico, pk=pk)
+    return render(request, 'detalle_quimico.html', {'quimico': quimico})
+
+def detalle_material(request, pk):
+    material = get_object_or_404(Material, pk=pk)
+    return render(request, 'detalle_material.html', {'material': material})
+
+def detalle_equipo(request, pk):
+    equipo = get_object_or_404(Equipo, pk=pk)
+    return render(request, 'detalle_equipo.html', {'equipo': equipo})
 
 def logout_view(request):
     logout(request)

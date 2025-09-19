@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Químico{% endblock %}
+{% block content %}
+<div class="detalle-container">
+    <h2>Ficha Técnica del Químico</h2>
+    <p><strong>Nombre:</strong> {{ quimico.nombre }}</p>
+    <p><strong>Cantidad:</strong> {{ quimico.cantidad }}</p>
+    <p><strong>Descripción:</strong> {{ quimico.descripcion }}</p>
+    <p><strong>Fecha de vencimiento:</strong> {{ quimico.fecha_vencimiento|date:'d/m/Y' }}</p>
+    {% if quimico.qr_code %}
+        <img src="{{ quimico.qr_code.url }}" alt="QR Químico" width="120">
+    {% endif %}
+    {% if quimico.ficha_seguridad %}
+        <p><strong>Ficha de seguridad:</strong> <a href="{{ quimico.ficha_seguridad.url }}" target="_blank">Ver PDF</a></p>
+    {% endif %}
+    {% if quimico.protocolo_uso %}
+        <p><strong>Protocolo de uso:</strong> <a href="{{ quimico.protocolo_uso.url }}" target="_blank">Ver PDF</a></p>
+    {% endif %}
+</div>
+{% endblock %}

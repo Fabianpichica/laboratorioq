@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Material{% endblock %}
+{% block content %}
+<div class="detalle-container">
+    <h2>Ficha Técnica del Material</h2>
+    <p><strong>Nombre:</strong> {{ material.nombre }}</p>
+    <p><strong>Cantidad:</strong> {{ material.cantidad }}</p>
+    <p><strong>Descripción:</strong> {{ material.descripcion }}</p>
+    <p><strong>Ubicación:</strong> {{ material.ubicacion }}</p>
+    <p><strong>Fecha de mantenimiento:</strong> {{ material.fecha_mantenimiento|date:'d/m/Y' }}</p>
+    {% if material.qr_code %}
+        <img src="{{ material.qr_code.url }}" alt="QR Material" width="120">
+    {% endif %}
+    {% if material.ficha_seguridad %}
+        <p><strong>Ficha de seguridad:</strong> <a href="{{ material.ficha_seguridad.url }}" target="_blank">Ver PDF</a></p>
+    {% endif %}
+    {% if material.protocolo_uso %}
+        <p><strong>Protocolo de uso:</strong> <a href="{{ material.protocolo_uso.url }}" target="_blank">Ver PDF</a></p>
+    {% endif %}
+    <!-- Aquí puedes agregar ficha de seguridad y protocolos si tienes los datos -->
+</div>
+{% endblock %}

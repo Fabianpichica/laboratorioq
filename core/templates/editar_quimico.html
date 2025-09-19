@@ -3,7 +3,7 @@
 {% block content %}
 <div class="editar-quimico-container">
     <h2>Editar Químico</h2>
-    <form method="post" class="editar-quimico-form">
+    <form method="post" class="editar-quimico-form" enctype="multipart/form-data">
         {% csrf_token %}
         <label>Nombre:</label>
         <input type="text" name="nombre" value="{{ quimico.nombre }}" required>
@@ -13,6 +13,16 @@
         <input type="text" name="descripcion" value="{{ quimico.descripcion }}">
         <label>Fecha de vencimiento:</label>
         <input type="date" name="fecha_vencimiento" value="{{ quimico.fecha_vencimiento|date:'Y-m-d' }}">
+        <label>Ficha de seguridad (PDF):</label>
+        {% if quimico.ficha_seguridad %}
+            <a href="{{ quimico.ficha_seguridad.url }}" target="_blank">Ver actual</a><br>
+        {% endif %}
+        <input type="file" name="ficha_seguridad" accept="application/pdf">
+        <label>Protocolo de uso (PDF):</label>
+        {% if quimico.protocolo_uso %}
+            <a href="{{ quimico.protocolo_uso.url }}" target="_blank">Ver actual</a><br>
+        {% endif %}
+        <input type="file" name="protocolo_uso" accept="application/pdf">
         <button type="submit">Guardar cambios</button>
         <a href="{% url 'materiales' %}">Cancelar</a>
     </form>

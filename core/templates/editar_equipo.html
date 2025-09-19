@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Editar Equipo{% endblock %}
+{% block content %}
+<div class="detalle-container" style="max-width:600px;margin:40px auto;background:#fff;border-radius:16px;padding:32px 24px;box-shadow:0 4px 24px rgba(60,72,88,0.13);border:2px solid #1976d2;">
+    <h2 style="color:#1a237e;">Editar Equipo</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Nombre:</label>
+        <input type="text" name="nombre" value="{{ equipo.nombre }}" required><br>
+        <label>Cantidad:</label>
+        <input type="number" name="cantidad" value="{{ equipo.cantidad }}" required><br>
+        <label>Descripción:</label>
+        <input type="text" name="descripcion" value="{{ equipo.descripcion }}"><br>
+        <label>Ubicación:</label>
+        <input type="text" name="ubicacion" value="{{ equipo.ubicacion }}"><br>
+        <label>Fecha de mantenimiento:</label>
+        <input type="date" name="fecha_mantenimiento" value="{{ equipo.fecha_mantenimiento|date:'Y-m-d' }}"><br>
+        <label>Ficha de seguridad (PDF):</label>
+        {% if equipo.ficha_seguridad %}
+            <a href="{{ equipo.ficha_seguridad.url }}" target="_blank">Ver actual</a><br>
+        {% endif %}
+        <input type="file" name="ficha_seguridad" accept="application/pdf"><br>
+        <label>Protocolo de uso (PDF):</label>
+        {% if equipo.protocolo_uso %}
+            <a href="{{ equipo.protocolo_uso.url }}" target="_blank">Ver actual</a><br>
+        {% endif %}
+        <input type="file" name="protocolo_uso" accept="application/pdf"><br>
+        <button type="submit">Guardar</button>
+    </form>
+</div>
+{% endblock %}

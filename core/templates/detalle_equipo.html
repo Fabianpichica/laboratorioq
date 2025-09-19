@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Detalle Equipo{% endblock %}
+{% block content %}
+<div class="detalle-container">
+    <h2>Ficha Técnica del Equipo</h2>
+    <p><strong>Nombre:</strong> {{ equipo.nombre }}</p>
+    <p><strong>Cantidad:</strong> {{ equipo.cantidad }}</p>
+    <p><strong>Descripción:</strong> {{ equipo.descripcion }}</p>
+    <p><strong>Ubicación:</strong> {{ equipo.ubicacion }}</p>
+    <p><strong>Fecha de mantenimiento:</strong> {{ equipo.fecha_mantenimiento|date:'d/m/Y' }}</p>
+    {% if equipo.qr_code %}
+        <img src="{{ equipo.qr_code.url }}" alt="QR Equipo" width="120">
+    {% endif %}
+    {% if equipo.ficha_seguridad %}
+        <p><strong>Ficha de seguridad:</strong> <a href="{{ equipo.ficha_seguridad.url }}" target="_blank">Ver PDF</a></p>
+    {% endif %}
+    {% if equipo.protocolo_uso %}
+        <p><strong>Protocolo de uso:</strong> <a href="{{ equipo.protocolo_uso.url }}" target="_blank">Ver PDF</a></p>
+    {% endif %}
+    <!-- Aquí puedes agregar ficha de seguridad y protocolos si tienes los datos -->
+</div>
+{% endblock %}

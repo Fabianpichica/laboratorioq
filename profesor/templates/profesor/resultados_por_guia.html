@@ -1,35 +1,40 @@
 {% extends "profesor/dashboard_profesor.html" %}
 {% block content %}
 <div class="profesor-dashboard-section">
-    <h2>Resultados de estudiantes por guía</h2>
+    <div class="dashboard-header" style="margin-bottom:32px;">
+        <i class="fas fa-clipboard-list" style="font-size:2rem;color:#3949ab;margin-right:16px;"></i>
+        <h2 style="font-size:2rem;color:#1a237e;margin:0;">Resultados de estudiantes por guía</h2>
+    </div>
     {% if guias %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:28px;">
         {% for guia in guias %}
-            <div class="guia-resultados-box" style="margin-bottom:32px;">
-                <h3>{{ guia.titulo }}</h3>
-                <p>{{ guia.descripcion }}</p>
+            <div class="guia-resultados-box" style="background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(60,72,88,0.10);padding:28px 22px 18px 22px;">
+                <h3 style="color:#3949ab;font-size:1.25rem;margin-bottom:8px;display:flex;align-items:center;"><i class="fas fa-book" style="margin-right:8px;"></i> {{ guia.titulo }}</h3>
+                <p style="color:#444;font-size:1rem;margin-bottom:16px;">{{ guia.descripcion }}</p>
                 {% if resultados.guia %}
-                    <ul>
+                    <ul style="padding-left:0;list-style:none;">
                         {% for informe in resultados.guia %}
-                        <li>
+                        <li style="background:#f7f9fc;border-radius:8px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(60,72,88,0.04);">
                             <strong>Estudiante:</strong> {{ informe.aprendiz.username }}<br>
                             <strong>Químico:</strong> {{ informe.quimico.nombre }}<br>
                             <strong>Nota:</strong> {{ informe.nota|truncatechars:80 }}<br>
                             <strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}<br>
                             {% if informe.imagen %}
-                                <a href="{{ informe.imagen.url }}" target="_blank">Ver imagen</a>
+                                <a href="{{ informe.imagen.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-image"></i> Ver imagen</a>
                             {% endif %}
                         </li>
                         {% empty %}
-                        <li>No hay resultados registrados para esta guía.</li>
+                        <li style="color:#888;">No hay resultados registrados para esta guía.</li>
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <p>No hay resultados registrados para esta guía.</p>
+                    <p style="color:#888;">No hay resultados registrados para esta guía.</p>
                 {% endif %}
             </div>
         {% endfor %}
+        </div>
     {% else %}
-        <p>No hay guías asignadas a tus salones.</p>
+        <p style="color:#888;">No hay guías asignadas a tus salones.</p>
     {% endif %}
 </div>
 {% endblock %}

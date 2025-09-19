@@ -1,22 +1,288 @@
-{% extends "dashboard_aprendiz.html" %}
-{% block title %}Evaluaciones{% endblock %}
-{% block content %}
-<div class="evaluaciones-container">
-    <h2>Guías asignadas a tu salón</h2>
-    {% if guias %}
-        <ul class="guias-list">
-            {% for guia in guias %}
-                <li>
-                    <strong>{{ guia.titulo }}</strong><br>
-                    {{ guia.descripcion }}<br>
-                    {% if guia.archivo %}
-                        <a href="{{ guia.archivo.url }}" download>Descargar archivo</a>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No hay guías asignadas a tu salón.</p>
-    {% endif %}
-</div>
-{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluaciones</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
+    }
+    .dashboard-aside {
+        width: 240px;
+        background: #1a237e;
+        color: #fff;
+        padding: 0;
+        min-height: 100vh;
+        box-shadow: 2px 0 12px rgba(40,53,147,0.07);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 10;
+    }
+    .dashboard-aside nav {
+        width: 100%;
+    }
+    .dashboard-aside ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
+    .dashboard-aside li {
+        width: 100%;
+    }
+    .dashboard-aside a {
+        display: block;
+        color: #fff;
+        text-decoration: none;
+        padding: 16px 32px;
+        font-size: 1.1rem;
+        transition: background 0.2s;
+    }
+    .dashboard-aside a:hover, .dashboard-aside .active {
+        background: #3949ab;
+        border-left: 4px solid #ffb300;
+    }
+    .dashboard-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 40px;
+        margin-left: 240px;
+        min-height: 100vh;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .evaluaciones-container {
+        max-width: 600px;
+        margin: 40px auto 0 auto;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(60,72,88,0.13);
+        padding: 38px 36px 32px 36px;
+        border: 2.5px solid #e3e6ea;
+    }
+    .evaluaciones-container h2 {
+        color: #1a237e;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 22px;
+        letter-spacing: 0.5px;
+    }
+    .guias-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    .guias-list li {
+        background: #f7f9fc;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(60,72,88,0.06);
+        padding: 18px 20px 14px 20px;
+        font-size: 1.08rem;
+        color: #222;
+        border: 1.5px solid #e3e6ea;
+        transition: box-shadow 0.2s;
+    }
+    .guias-list li strong {
+        color: #3949ab;
+        font-size: 1.13rem;
+        font-weight: 700;
+    }
+    .guias-list a {
+        display: inline-block;
+        margin-top: 10px;
+        background: #ffb300;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 18px;
+        font-size: 0.98rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+    .guias-list a:hover {
+        background: #ffa000;
+    }
+    @media (max-width: 900px) {
+        .dashboard-container {
+            flex-direction: column;
+        }
+        .dashboard-aside {
+            width: 100vw;
+            min-width: unset;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 56px;
+            height: 56px;
+            box-shadow: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: unset;
+            z-index: 20;
+            overflow-x: auto;
+        }
+        .dashboard-aside nav {
+            width: 100vw;
+        }
+        .dashboard-aside ul {
+            display: none;
+        }
+        .dashboard-aside.open ul {
+            display: flex;
+            position: absolute;
+            top: 56px;
+            left: 0;
+            width: 100vw;
+            flex-direction: column;
+            background: #1a237e;
+            box-shadow: 0 4px 16px rgba(40,53,147,0.13);
+            z-index: 30;
+        }
+        .dashboard-aside.open ul li {
+            width: 100vw;
+        }
+        .dashboard-aside.open ul a {
+            border-bottom: 1px solid #3949ab;
+            border-left: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+        }
+        .dashboard-section {
+            padding: 18px 2vw 8vw 2vw;
+            margin-left: 0;
+            margin-top: 56px;
+            min-width: 0;
+        }
+        .evaluaciones-box, .dashboard-card, .dashboard-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
+            padding: 10px 2vw 10px 2vw !important;
+            min-width: 0;
+        }
+        .menu-toggle {
+            display: block;
+            position: absolute;
+            left: 16px;
+            top: 12px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            z-index: 40;
+            cursor: pointer;
+        }
+    }
+    @media (min-width: 901px) {
+        .menu-toggle {
+            display: none !important;
+        }
+    }
+    @media (max-width: 600px) {
+        .dashboard-section {
+            padding: 4vw 1vw 8vw 1vw;
+        }
+        .evaluaciones-box, .dashboard-card, .dashboard-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
+            padding: 6px 1vw 6px 1vw !important;
+            min-width: 0;
+        }
+        .dashboard-aside a {
+            font-size: 0.92rem;
+            padding: 8px 4px;
+        }
+    }
+    @media (max-width: 400px) {
+        .dashboard-section {
+            padding: 2vw 0 8vw 0;
+        }
+        .evaluaciones-box, .dashboard-card, .dashboard-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
+            padding: 2px 0 2px 0 !important;
+        }
+        .dashboard-aside a {
+            font-size: 0.85rem;
+            padding: 6px 2px;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="dashboard-aside" id="sidebar">
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú"><i class="fa fa-bars"></i></button>
+            <nav>
+                <ul>
+                    <li><a href="/dashboard/" class="{% if request.path == '/dashboard/' %}active{% endif %}">Inicio</a></li>
+                    <li><a href="/evaluaciones/" class="{% if request.path == '/evaluaciones/' %}active{% endif %}">Evaluaciones</a></li>
+                    <li><a href="/perfil/" class="{% if request.path == '/perfil/' %}active{% endif %}">Perfil</a></li>
+                    <li><a href="/cuaderno/" class="{% if request.path == '/cuaderno/' %}active{% endif %}">Cuaderno</a></li>
+                    <li><a href="/materiales/" class="{% if request.path == '/materiales/' %}active{% endif %}">Materiales</a></li>
+                    <li><a href="/reportes/">Reportes</a></li>
+                    <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <section class="dashboard-section">
+            <div class="evaluaciones-container">
+                <h2>Guías asignadas a tu salón</h2>
+                {% if guias %}
+                    <ul class="guias-list">
+                        {% for guia in guias %}
+                            <li>
+                                <strong>{{ guia.titulo }}</strong><br>
+                                <span style="color:#444;">{{ guia.descripcion }}</span><br>
+                                {% if guia.archivo %}
+                                    <a href="{{ guia.archivo.url }}" download><i class="fa-solid fa-download"></i> Descargar archivo</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color:#888;">No hay guías asignadas a tu salón.</p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+    <script>
+    // Hamburguesa responsive
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    if(menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sidebar.classList.toggle('open');
+        });
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && e.target !== menuToggle && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        document.querySelectorAll('.dashboard-aside a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+    }
+    </script>
+</body>
+</html>

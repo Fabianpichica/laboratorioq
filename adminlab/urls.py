@@ -16,4 +16,26 @@ urlpatterns = [
     path('inventario/equipo/agregar/', views.agregar_equipo_admin, name='agregar_equipo_admin'),
     path('inventario/equipo/<int:equipo_id>/editar/', views.editar_equipo_admin, name='editar_equipo_admin'),
     path('inventario/equipo/<int:equipo_id>/eliminar/', views.eliminar_equipo_admin, name='eliminar_equipo_admin'),
+    # CRUD Estudiantes
+    path('estudiantes/', views.estudiantes_admin, name='estudiantes_admin'),
+    path('estudiantes/agregar/', views.agregar_estudiante_admin, name='agregar_estudiante_admin'),
+    path('estudiantes/<int:estudiante_id>/editar/', views.editar_estudiante_admin, name='editar_estudiante_admin'),
+    path('estudiantes/<int:estudiante_id>/eliminar/', views.eliminar_estudiante_admin, name='eliminar_estudiante_admin'),
+    # CRUD Guías
+    path('guias/', views.guias_admin, name='guias_admin'),
+    path('guias/agregar/', views.agregar_guia_admin, name='agregar_guia_admin'),
+    path('guias/<int:guia_id>/editar/', views.editar_guia_admin, name='editar_guia_admin'),
+    path('guias/<int:guia_id>/eliminar/', views.eliminar_guia_admin, name='eliminar_guia_admin'),
+    # CRUD Jornadas
+    path('jornadas/', views.jornadas_admin, name='jornadas_admin'),
+    path('jornadas/agregar/', views.agregar_jornada_admin, name='agregar_jornada_admin'),
+    path('jornadas/<int:jornada_id>/editar/', views.editar_jornada_admin, name='editar_jornada_admin'),
+    path('jornadas/<int:jornada_id>/eliminar/', views.eliminar_jornada_admin, name='eliminar_jornada_admin'),
+    # CRUD Salones
+    path('salones/', views.salones_admin, name='salones_admin'),
+    path('salones/agregar/', views.agregar_salon_admin, name='agregar_salon_admin'),
+    path('salones/<int:salon_id>/editar/', views.editar_salon_admin, name='editar_salon_admin'),
+    path('salones/<int:salon_id>/eliminar/', views.eliminar_salon_admin, name='eliminar_salon_admin'),
+    # CRUD Profesores
+    path('profesores/', views.profesores_admin, name='profesores_admin'),
 ]

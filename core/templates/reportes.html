@@ -1,37 +1,242 @@
-{% extends "base.html" %}
-{% block title %}Reportes de Químicos{% endblock %}
-{% block content %}
-<div class="reportes-container">
-    <h2>Reporte: Químicos más usados</h2>
-    <form method="get" class="reportes-form">
-        <label for="aprendiz">Selecciona aprendiz:</label>
-        <select name="aprendiz" id="aprendiz" onchange="this.form.submit()">
-            {% for user in aprendices %}
-            <option value="{{ user.id }}" {% if user.id == aprendiz_id %}selected{% endif %}>{{ user.username }}</option>
-            {% endfor %}
-        </select>
-    </form>
-    <canvas id="graficaQuimicos" width="600" height="300"></canvas>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
+    }
+    .dashboard-aside {
+        width: 240px;
+        background: #1a237e;
+        color: #fff;
+        padding: 0;
+        min-height: 100vh;
+        box-shadow: 2px 0 12px rgba(40,53,147,0.07);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 10;
+    }
+    .dashboard-aside nav {
+        width: 100%;
+    }
+    .dashboard-aside ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
+    .dashboard-aside li {
+        width: 100%;
+    }
+    .dashboard-aside a {
+        display: block;
+        color: #fff;
+        text-decoration: none;
+        padding: 16px 32px;
+        font-size: 1.1rem;
+        transition: background 0.2s;
+    }
+    .dashboard-aside a:hover, .dashboard-aside .active {
+        background: #3949ab;
+        border-left: 4px solid #ffb300;
+    }
+    .dashboard-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 40px;
+        margin-left: 240px;
+        min-height: 100vh;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+        .dashboard-container {
+            flex-direction: column;
+        }
+        .dashboard-aside {
+            width: 100vw;
+            min-width: unset;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 56px;
+            height: 56px;
+            box-shadow: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: unset;
+            z-index: 20;
+            overflow-x: auto;
+        }
+        .dashboard-aside nav {
+            width: 100vw;
+        }
+        .dashboard-aside ul {
+            display: none;
+        }
+        .dashboard-aside.open ul {
+            display: flex;
+            position: absolute;
+            top: 56px;
+            left: 0;
+            width: 100vw;
+            flex-direction: column;
+            background: #1a237e;
+            box-shadow: 0 4px 16px rgba(40,53,147,0.13);
+            z-index: 30;
+        }
+        .dashboard-aside.open ul li {
+            width: 100vw;
+        }
+        .dashboard-aside.open ul a {
+            border-bottom: 1px solid #3949ab;
+            border-left: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+        }
+        .menu-toggle {
+            display: block;
+            position: absolute;
+            left: 16px;
+            top: 12px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            z-index: 40;
+            cursor: pointer;
+        }
+        .dashboard-section {
+            padding: 4vw 1vw 8vw 1vw;
+            margin-left: 0;
+            margin-top: 56px;
+            min-width: 0;
+        }
+    }
+    @media (max-width: 600px) {
+        .dashboard-section {
+            padding: 4vw 1vw 8vw 1vw;
+        }
+        .dashboard-aside a {
+            font-size: 0.92rem;
+            padding: 8px 4px;
+        }
+    }
+    @media (max-width: 400px) {
+        .dashboard-section {
+            padding: 2vw 0 8vw 0;
+        }
+        .dashboard-aside a {
+            font-size: 0.85rem;
+            padding: 6px 2px;
+        }
+    }
+    @media (min-width: 901px) {
+        .menu-toggle {
+            display: none !important;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="dashboard-aside" id="sidebar">
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú"><i class="fa fa-bars"></i></button>
+            <nav>
+                <ul>
+                    <li><a href="/dashboard/" class="{% if request.path == '/dashboard/' %}active{% endif %}">Inicio</a></li>
+                    <li><a href="/evaluaciones/" class="{% if request.path == '/evaluaciones/' %}active{% endif %}">Evaluaciones</a></li>
+                    <li><a href="/perfil/" class="{% if request.path == '/perfil/' %}active{% endif %}">Perfil</a></li>
+                    <li><a href="/cuaderno/" class="{% if request.path == '/cuaderno/' %}active{% endif %}">Cuaderno</a></li>
+                    <li><a href="/materiales/" class="{% if request.path == '/materiales/' %}active{% endif %}">Materiales</a></li>
+                    <li><a href="/reportes/" class="{% if request.path == '/reportes/' %}active{% endif %}">Reportes</a></li>
+                    <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <section class="dashboard-section">
+            <div class="reportes-container">
+                <h2>Reporte: Químicos más usados</h2>
+                <form method="get" class="reportes-form">
+                    <label for="aprendiz">Selecciona aprendiz:</label>
+                    <select name="aprendiz" id="aprendiz" onchange="this.form.submit()">
+                        {% for user in aprendices %}
+                        <option value="{{ user.id }}" {% if user.id == aprendiz_id %}selected{% endif %}>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <canvas id="graficaQuimicos" width="600" height="300"></canvas>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                    const data = {
+                        labels: {{ labels|safe }},
+                        datasets: [{
+                            label: 'Usos',
+                            data: {{ data|safe }},
+                            backgroundColor: 'rgba(33,33,33,0.7)',
+                            borderColor: 'rgba(33,33,33,1)',
+                            borderWidth: 1
+                        }]
+                    };
+                    const config = {
+                        type: 'bar',
+                        data: data,
+                        options: {
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    };
+                    new Chart(document.getElementById('graficaQuimicos'), config);
+                </script>
+                <hr style="margin:40px 0;">
+                <h2>Panel Analítico Power BI</h2>
+                <div style="width:100%;max-width:900px;margin:0 auto;">
+                    <iframe title="Panel Power BI" width="100%" height="500" src="https://app.powerbi.com/view?r=TU_ENLACE_DE_PANEL" frameborder="0" allowFullScreen="true"></iframe>
+                </div>
+            </div>
+        </section>
+    </div>
     <script>
-        const data = {
-            labels: {{ labels|safe }},
-            datasets: [{
-                label: 'Usos',
-                data: {{ data|safe }},
-                backgroundColor: 'rgba(33,33,33,0.7)',
-                borderColor: 'rgba(33,33,33,1)',
-                borderWidth: 1
-            }]
-        };
-        const config = {
-            type: 'bar',
-            data: data,
-            options: {
-                scales: { y: { beginAtZero: true } }
+    // Hamburguesa responsive
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    if(menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sidebar.classList.toggle('open');
+        });
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+                if (!sidebar.contains(e.target) && e.target !== menuToggle && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
             }
-        };
-        new Chart(document.getElementById('graficaQuimicos'), config);
+        });
+        document.querySelectorAll('.dashboard-aside a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+    }
     </script>
-</div>
-{% endblock %}
+</body>
+</html>

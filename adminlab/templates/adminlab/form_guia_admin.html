@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ guia|default:'Agregar Guía' }}{% endblock %}
+{% block content %}
+<h2>{% if guia %}Editar Guía{% else %}Agregar Guía{% endif %}</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Título:</label>
+    <input type="text" name="titulo" value="{{ guia.titulo|default:'' }}" required><br>
+    <label>Descripción:</label>
+    <textarea name="descripcion">{{ guia.descripcion|default:'' }}</textarea><br>
+    <label>Archivo (PDF):</label>
+    <input type="file" name="archivo"><br>
+    <label>Salones asignados:</label><br>
+    <select name="salones" multiple>
+        {% for s in salones %}
+        <option value="{{ s.id }}" {% if guia and s in guia.salones.all %}selected{% endif %}>{{ s.nombre }}</option>
+        {% endfor %}
+    </select><br>
+    <button type="submit">Guardar</button>
+    <a href="{% url 'guias_admin' %}">Cancelar</a>
+</form>
+{% endblock %}
