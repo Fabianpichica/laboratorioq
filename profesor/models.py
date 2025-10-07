@@ -35,11 +35,12 @@ class Jornada(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
     fecha = models.DateField()
-    profesor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='jornadas')
+    profesores = models.ManyToManyField(User, related_name='jornadas')
     salones = models.ManyToManyField(Salon, blank=True, related_name='jornadas')
 
     def __str__(self):
-        return f"{self.nombre} ({self.fecha}) - {self.profesor.username}"
+        profesores = ", ".join([p.get_full_name() or p.username for p in self.profesores.all()])
+        return f"{self.nombre} ({self.fecha}) - {profesores if profesores else 'Sin profesores'}"
 
 class Guia(models.Model):
     titulo = models.CharField(max_length=200)

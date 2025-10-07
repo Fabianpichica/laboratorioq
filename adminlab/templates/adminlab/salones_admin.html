@@ -48,7 +48,7 @@
                     <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
                     <li><a href="/adminlab/salones/" class="active"><i class="fa-solid fa-school"></i>Salones</a></li>
                     <li><a href="/adminlab/profesores/"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
-                    <li><a href="/admin/"><i class="fa-solid fa-gears"></i>Admin clásico</a></li>
+                   <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
                 </ul>
             </nav>
         </aside>
@@ -83,64 +83,8 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Sección de gestión y visualización de maestros -->
-            <div class="profesores-section" style="margin-top:48px;">
-                <h2 class="salones-title"><i class="fa-solid fa-chalkboard-teacher"></i> Maestros registrados y asignaciones</h2>
-                <div style="background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(25,118,210,0.07); padding:32px 24px;">
-                    <a href="/admin/auth/user/add/" class="btn-agregar" style="margin-bottom:18px;"><i class="fa-solid fa-user-plus"></i>Registrar Maestro</a>
-                    {% if profesores_info %}
-                        <table class="salones-table">
-                            <thead>
-                                <tr>
-                                    <th>Maestro</th>
-                                    <th>Jornadas</th>
-                                    <th>Salones asignados</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for pinfo in profesores_info %}
-                                    <tr>
-                                        <td><i class="fa-solid fa-user-tie"></i> {{ pinfo.profesor.get_full_name|default:pinfo.profesor.username }}</td>
-                                        <td>
-                                            {% if pinfo.jornadas %}
-                                                <ul style="margin:0;padding-left:18px;">
-                                                    {% for jinfo in pinfo.jornadas %}
-                                                        <li><b>{{ jinfo.jornada.nombre }}</b> <span style="color:#1976d2;">({{ jinfo.jornada.fecha }})</span></li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% else %}
-                                                <em>Sin jornadas</em>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if pinfo.jornadas %}
-                                                <ul style="margin:0;padding-left:18px;">
-                                                    {% for jinfo in pinfo.jornadas %}
-                                                        <li>
-                                                            <b>{{ jinfo.jornada.nombre }}</b>:
-                                                            {% if jinfo.salones %}
-                                                                {% for s in jinfo.salones %}
-                                                                    <span class="badge" style="background:#e3e6ea;color:#283593;border-radius:6px;padding:3px 10px;margin-right:6px;">{{ s.nombre }}</span>
-                                                                {% endfor %}
-                                                            {% else %}
-                                                                <em>Sin salones</em>
-                                                            {% endif %}
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% else %}
-                                                <em>Sin salones</em>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p>No hay maestros registrados.</p>
-                    {% endif %}
-                </div>
-            </div>
+            
+            
         </main>
     </div>
 </body>

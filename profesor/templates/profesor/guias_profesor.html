@@ -6,135 +6,44 @@
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: #f4f6fa;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-        }
-        .profesor-dashboard-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-        .profesor-sidebar {
-            background: #1a237e;
-            color: #fff;
-            width: 240px;
-            padding: 32px 0 0 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .sidebar-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 40px;
-            letter-spacing: 1px;
-        }
-        .profesor-sidebar nav ul {
-            list-style: none;
-            padding: 0;
-            width: 100%;
-        }
-        .profesor-sidebar nav ul li {
-            width: 100%;
-        }
-        .profesor-sidebar nav ul li a {
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            padding: 16px 32px;
-            font-size: 1.1rem;
-            transition: background 0.2s;
-        }
-        .profesor-sidebar nav ul li.active a,
-        .profesor-sidebar nav ul li a:hover {
-            background: #3949ab;
-            border-left: 4px solid #ffb300;
-        }
-        .profesor-dashboard-section {
-            flex: 1;
-            padding: 48px 40px;
-        }
-        h2 {
-            color: #1a237e;
-            font-size: 2rem;
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        h2 i {
-            color: #3949ab;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-        li {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(60,72,88,0.08);
-            padding: 22px 20px 16px 20px;
-            font-size: 1.08rem;
-            color: #222;
-            transition: box-shadow 0.2s;
-        }
-        li:hover {
-            box-shadow: 0 4px 16px rgba(60,72,88,0.16);
-        }
-        .guia-titulo {
-            font-weight: 600;
-            color: #3949ab;
-            font-size: 1.15rem;
-        }
-        .guia-desc {
-            color: #444;
-            margin: 6px 0 10px 0;
-        }
-        .guia-download {
-            display: inline-block;
-            margin-top: 8px;
-            background: #ffb300;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 18px;
-            font-size: 0.98rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-        .guia-download:hover {
-            background: #ffa000;
-        }
-        @media (max-width: 700px) {
-            .profesor-dashboard-wrapper {
-                flex-direction: column;
-            }
-            .profesor-sidebar {
-                width: 100%;
-                flex-direction: row;
-                justify-content: space-between;
-                padding: 16px 0;
-            }
-            .profesor-dashboard-section {
-                padding: 24px 8px;
-            }
-        }
+    body { background: #f4f6fa; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
+    .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
+    .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
+    .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
+    .profesor-sidebar nav { width: 100%; }
+    .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
+    .profesor-sidebar li { margin-bottom: 8px; width: 70%; }
+    .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
+    .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
+    .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
+    .profesor-dashboard-section { flex: 1; padding: 48px 40px; margin-left: 240px; }
+    @media (max-width: 900px) {
+        .profesor-dashboard-section { padding: 24px 8px; margin-left: 100px; } 
+        .profesor-sidebar { width: 100px; }
+    }
+    @media (max-width: 600px) {
+        .profesor-dashboard-section { padding: 10px; margin-left: 0; }
+        .sidebar-title { font-size: 0.95rem; }
+    }
+    @media (max-width: 400px) {
+        .profesor-dashboard-section { padding: 2vw 0 8vw 0; }
+        .sidebar-title { font-size: 0.85rem; }
+    }
     </style>
 </head>
 <body>
     <div class="profesor-dashboard-wrapper">
         <aside class="profesor-sidebar">
-            <div class="sidebar-title">Panel de Profesor</div>
+            <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Profesor</div>
             <nav>
                 <ul>
-                    <li><a href="/profesor/dashboard/">Inicio</a></li>
-                    <li class="active"><a href="/profesor/guias/">Guías</a></li>
+                    <li class="active"><a href="/profesor/dashboard/"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
+                    <li><a href="/profesor/guias/"><i class="fa-solid fa-book icon"></i>Guías</a></li>
+                    <li><a href="#"><i class="fa-solid fa-boxes-stacked icon"></i>Materiales</a></li>
+                    <li><a href="{% url 'resultados_por_guia' %}"><i class="fa-solid fa-flask-vial icon"></i>Resultados por Guía</a></li>
+                    <li><a href="#"><i class="fa-solid fa-chart-bar icon"></i>Reportes</a></li>
+                    <li><a href="#"><i class="fa-solid fa-user icon"></i>Perfil</a></li>
+                    <li><a href="{% url 'landing' %}"><i class="fa-solid fa-right-from-bracket icon"></i>Cerrar sesión</a></li>
                 </ul>
             </nav>
         </aside>

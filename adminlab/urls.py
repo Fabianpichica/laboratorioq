@@ -38,4 +38,7 @@ urlpatterns = [
     path('salones/<int:salon_id>/eliminar/', views.eliminar_salon_admin, name='eliminar_salon_admin'),
     # CRUD Profesores
     path('profesores/', views.profesores_admin, name='profesores_admin'),
+    path('registrar-profesor/', views.registrar_profesor, name='registrar_profesor'),
+    path('profesores/editar/<int:profesor_id>/', views.editar_profesor, name='editar_profesor'),
+    path('profesores/eliminar/<int:profesor_id>/', views.eliminar_profesor, name='eliminar_profesor'),
 ]

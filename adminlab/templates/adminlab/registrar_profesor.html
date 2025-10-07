@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{% if estudiante %}Editar Estudiante{% else %}Agregar Estudiante{% endif %}</title>
+    <title>Registrar Profesor</title>
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         .admin-dashboard-wrapper { display: flex; min-height: 100vh; }
@@ -39,12 +40,19 @@
             border: 1.5px solid #1976d2;
             outline: none;
         }
+        .form-card input[type="file"] {
+            margin-top: 4px;
+        }
         .form-card .form-actions { display: flex; gap: 16px; margin-top: 10px; }
         .btn-guardar { background: #1976d2; color: #fff; border: none; border-radius: 8px; padding: 10px 28px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
         .btn-guardar:hover { background: #1565c0; }
         .btn-cancelar { background: #fff; color: #1976d2; border: 1.5px solid #1976d2; border-radius: 8px; padding: 10px 22px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: background 0.2s, color 0.2s; display: flex; align-items: center; gap: 8px; }
         .btn-cancelar:hover { background: #e3e6ea; color: #1565c0; }
         @media (max-width: 900px) { .admin-main-content { padding: 32px 8px 8px 8px; } .admin-sidebar { width: 100px; } .admin-main-content { margin-left: 100px; } .form-card { margin: 32px 8px; } }
+        .form-messages { width: 100%; margin-bottom: 18px; }
+        .alert { padding: 12px 18px; border-radius: 8px; margin-bottom: 8px; font-size: 1rem; }
+        .alert-error, .alert-danger { background: #ffebee; color: #c62828; border: 1.5px solid #e57373; }
+        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #81c784; }
     </style>
 </head>
 <body>
@@ -55,77 +63,73 @@
                 <ul>
                     <li><a href="/adminlab/dashboard/"><i class="fa-solid fa-house"></i>Inicio</a></li>
                     <li><a href="/adminlab/inventario/"><i class="fa-solid fa-boxes-stacked"></i>Inventario</a></li>
-                    <li><a href="/adminlab/estudiantes/" class="active"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
+                    <li><a href="/adminlab/estudiantes/"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
                     <li><a href="/adminlab/guias/"><i class="fa-solid fa-book"></i>Guías</a></li>
                     <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
                     <li><a href="/adminlab/salones/"><i class="fa-solid fa-school"></i>Salones</a></li>
-                    
+                    <li><a href="/adminlab/profesores/" class="active"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
+                    <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
                 </ul>
             </nav>
         </aside>
         <main class="admin-main-content">
             <div class="form-card">
-                <h2><i class="fa-solid fa-user-graduate"></i> {% if estudiante %}Editar Estudiante{% else %}Agregar Estudiante{% endif %}</h2>
+                <h2><i class="fa-solid fa-user-tie"></i> Registrar Profesor</h2>
+                {% if messages %}
+                <div class="form-messages">
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div>
-                        <label for="nombre">Nombre</label>
-                        <input type="text" name="nombre" id="nombre" placeholder="Nombre completo" value="{{ estudiante.nombre|default:'' }}" required>
+                        <label for="id_nombre">Nombre completo</label>
+                        {{ form.nombre }}
                     </div>
                     <div>
-                        <label for="documento">Documento</label>
-                        <input type="text" name="documento" id="documento" placeholder="Documento" value="{{ estudiante.documento|default:'' }}" required>
+                        <label for="id_tipo_documento">Tipo de documento</label>
+                        {{ form.tipo_documento }}
                     </div>
                     <div>
-                        <label for="tipo_documento">Tipo de documento</label>
-                        <select name="tipo_documento" id="tipo_documento" required>
-                            <option value="">-- Selecciona --</option>
-                            <option value="CC" {% if estudiante and estudiante.tipo_documento == 'CC' %}selected{% endif %}>Cédula de ciudadanía</option>
-                            <option value="TI" {% if estudiante and estudiante.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de identidad</option>
-                            <option value="CE" {% if estudiante and estudiante.tipo_documento == 'CE' %}selected{% endif %}>Cédula de extranjería</option>
-                        </select>
+                        <label for="id_numero_documento">Número de documento</label>
+                        {{ form.numero_documento }}
                     </div>
                     <div>
-                        <label for="salon">Salón</label>
-                        <select name="salon" id="salon">
-                            <option value="">-- --</option>
-                            {% for s in salones %}
-                                <option value="{{ s.id }}" {% if estudiante and estudiante.salon and estudiante.salon.id == s.id %}selected{% endif %}>{{ s.nombre }}</option>
-                            {% endfor %}
-                        </select>
+                        <label for="id_salones">Salones asignados</label>
+                        {{ form.salones }}
                     </div>
                     <div>
-                        <label for="jornada">Jornada</label>
-                        <select name="jornada" id="jornada">
-                            <option value="">-- --</option>
-                            {% for j in jornadas %}
-                                <option value="{{ j.id }}" {% if estudiante and estudiante.jornada and estudiante.jornada.id == j.id %}selected{% endif %}>{{ j.nombre }}</option>
-                            {% endfor %}
-                        </select>
+                        <label for="id_jornadas">Jornadas asignadas</label>
+                        {{ form.jornadas }}
                     </div>
                     <div>
-                        <label for="correo">Correo</label>
-                        <input type="email" name="correo" id="correo" placeholder="Correo electrónico" value="{{ estudiante.correo|default:'' }}">
+                        <label for="id_password">Contraseña</label>
+                        {{ form.password }}
                     </div>
                     <div>
-                        <label for="telefono">Teléfono</label>
-                        <input type="text" name="telefono" id="telefono" placeholder="Teléfono" value="{{ estudiante.telefono|default:'' }}">
-                    </div>
-                    <div>
-                        <label for="password">Contraseña</label>
-                        <input type="password" name="password" id="password" placeholder="Contraseña" value="{{ estudiante.password|default:'' }}">
-                    </div>
-                    <div>
-                        <label for="foto">Fotografía</label>
-                        <input type="file" name="foto" id="foto" accept="image/*">
+                        <label for="id_fotografia">Fotografía</label>
+                        {{ form.fotografia }}
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn-guardar"><i class="fa-solid fa-check"></i> Guardar</button>
-                        <a href="{% url 'estudiantes_admin' %}" class="btn-cancelar"><i class="fa-solid fa-xmark"></i> Cancelar</a>
+                        <button type="submit" class="btn-guardar"><i class="fa-solid fa-check"></i> Registrar</button>
+                        <a href="{% url 'profesores_admin' %}" class="btn-cancelar"><i class="fa-solid fa-xmark"></i> Cancelar</a>
                     </div>
                 </form>
             </div>
         </main>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('select[multiple]').select2({
+            width: '100%',
+            placeholder: 'Selecciona una o varias opciones',
+            allowClear: true
+        });
+    });
+    </script>
 </body>
 </html>

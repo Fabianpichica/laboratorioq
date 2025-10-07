@@ -13,6 +13,7 @@ class Profile(models.Model):
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    fotografia = models.ImageField(upload_to='profesores/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
@@ -31,17 +32,24 @@ class Quimico(models.Model):
         return self.nombre
 
     def save(self, *args, **kwargs):
-        generating_qr = False
+        # Guardar primero para obtener el ID si es nuevo
         if not self.pk:
-            super().save(*args, **kwargs)  # Guardar primero para obtener el ID
-            generating_qr = True
-        if not self.qr_code or generating_qr:
-            qr = qrcode.make(f"{self.get_absolute_url()}")
+            super().save(*args, **kwargs)
+        # Generar QR si no existe
+        if not self.qr_code:
+            from django.urls import reverse
+            url = self.get_absolute_url()
+            qr = qrcode.make(url)
             buffer = BytesIO()
             qr.save(buffer, format='PNG')
             filename = f"quimico_{self.id}_qr.png"
             self.qr_code.save(filename, File(buffer), save=False)
-        super().save(*args, **kwargs)  # Guardar normalmente
+            # Guardar solo el campo qr_code
+            super().save(update_fields=['qr_code'])
+        else:
+            # Guardar normalmente si no es nuevo
+            if self.pk:
+                super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         from django.urls import reverse

@@ -480,4 +480,4 @@ def detalle_equipo(request, pk):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('landing')

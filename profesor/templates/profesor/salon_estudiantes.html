@@ -6,144 +6,44 @@
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: #f4f6fa;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-        }
-        .profesor-dashboard-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-        .profesor-sidebar {
-            background: #1a237e;
-            color: #fff;
-            width: 240px;
-            padding: 32px 0 0 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .sidebar-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 40px;
-            letter-spacing: 1px;
-        }
-        .profesor-sidebar nav ul {
-            list-style: none;
-            padding: 0;
-            width: 100%;
-        }
-        .profesor-sidebar nav ul li {
-            width: 100%;
-        }
-        .profesor-sidebar nav ul li a {
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            padding: 16px 32px;
-            font-size: 1.1rem;
-            transition: background 0.2s;
-        }
-        .profesor-sidebar nav ul li.active a,
-        .profesor-sidebar nav ul li a:hover {
-            background: #3949ab;
-            border-left: 4px solid #ffb300;
-        }
-        .profesor-dashboard-section {
-            flex: 1;
-            padding: 48px 40px;
-        }
-        .dashboard-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-        .dashboard-header i {
-            font-size: 2rem;
-            color: #3949ab;
-            margin-right: 16px;
-        }
-        .dashboard-header h2 {
-            font-size: 2rem;
-            color: #1a237e;
-            margin: 0;
-        }
-        .salon-estudiantes-list {
-            margin-top: 20px;
-            padding: 0;
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 18px;
-        }
-        .salon-estudiantes-list li {
-            background: #fff;
-            border: 1px solid #e3e6ea;
-            border-radius: 10px;
-            padding: 18px 22px;
-            margin-bottom: 0;
-            font-size: 1rem;
-            box-shadow: 0 1px 6px rgba(60,72,88,0.06);
-        }
-        .guia-entregas-box {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(60,72,88,0.10);
-            padding: 24px 20px 16px 20px;
-            margin-bottom: 24px;
-        }
-        .guia-entregas-box h4 {
-            color: #3949ab;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-        .guia-entregas-box ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        .guia-entregas-box li {
-            margin-bottom: 10px;
-            font-size: 0.98rem;
-        }
-        .entregado {
-            color: #28a745;
-            font-weight: 600;
-        }
-        .no-entregado {
-            color: #e53935;
-            font-weight: 600;
-        }
-        @media (max-width: 900px) {
-            .profesor-dashboard-section {
-                padding: 24px 8px;
-            }
-        }
-        @media (max-width: 600px) {
-            .profesor-dashboard-section {
-                padding: 10px;
-            }
-            .dashboard-header h2 {
-                font-size: 1.2rem;
-            }
-            .sidebar-title {
-                font-size: 0.95rem;
-            }
-            .salon-estudiantes-list li {
-                font-size: 0.95rem;
-                padding: 10px 12px;
-            }
-        }
+    body { background: #f4f6fa; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
+    .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
+    .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
+    .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
+    .profesor-sidebar nav { width: 100%; }
+    .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
+    .profesor-sidebar li { margin-bottom: 8px; width: 70%; }
+    .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
+    .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
+    .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
+    .profesor-dashboard-section { flex: 1; padding: 48px 40px; margin-left: 240px; }
+    .salon-estudiantes-list { margin-top: 20px; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+    .salon-estudiantes-list li { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 18px 22px; margin-bottom: 0; font-size: 1rem; box-shadow: 0 1px 6px rgba(60,72,88,0.06); display: flex; align-items: center; }
+    .estudiante-foto { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-right: 28px; background: #f4f6fa; border: 2px solid #e3e6ea; box-shadow: 0 2px 8px rgba(60,72,88,0.10); }
+    .estudiante-info { flex: 1; }
+    @media (max-width: 900px) {
+        .profesor-dashboard-section { padding: 24px 8px; margin-left: 100px; } 
+        .profesor-sidebar { width: 100px; }
+        .salon-estudiantes-list { grid-template-columns: 1fr; gap: 12px; }
+    }
+    @media (max-width: 600px) {
+        .profesor-dashboard-section { padding: 10px; margin-left: 0; }
+        .sidebar-title { font-size: 0.95rem; }
+        .salon-estudiantes-list { grid-template-columns: 1fr; gap: 8px; }
+    }
+    @media (max-width: 400px) {
+        .profesor-dashboard-section { padding: 2vw 0 8vw 0; }
+        .sidebar-title { font-size: 0.85rem; }
+    }
     </style>
 </head>
 <body>
     <div class="profesor-dashboard-wrapper">
         <aside class="profesor-sidebar">
-            <div class="sidebar-title"><i class="fas fa-flask"></i> Panel de Profesor</div>
+            <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Panel de Profesor</div>
             <nav>
                 <ul>
-                    <li><a href="/profesor/dashboard/"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li><a href="/profesor/dashboard/"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
                 </ul>
             </nav>
         </aside>
@@ -159,15 +59,20 @@
                 <ul class="salon-estudiantes-list">
                     {% for estudiante in estudiantes %}
                         <li>
-                            <strong>{{ estudiante.nombre|default:'Sin nombre' }}</strong><br>
-                            <span style="color:#888;">Documento:</span> {{ estudiante.documento|default:'-' }}<br>
-                            <span style="color:#888;">Tipo:</span> {{ estudiante.get_tipo_documento_display|default:'-' }}<br>
-                            <span style="color:#888;">Jornada:</span>
-                            {% if estudiante.jornada %}
-                                {{ estudiante.jornada.nombre }}
-                            {% else %}
-                                -
+                            {% if estudiante.foto %}
+                                <img src="{{ estudiante.foto.url }}" alt="Foto" class="estudiante-foto">
                             {% endif %}
+                            <div class="estudiante-info">
+                                <strong>{{ estudiante.nombre|default:'Sin nombre' }}</strong><br>
+                                <span style="color:#888;">Documento:</span> {{ estudiante.documento|default:'-' }}<br>
+                                <span style="color:#888;">Tipo:</span> {{ estudiante.get_tipo_documento_display|default:'-' }}<br>
+                                <span style="color:#888;">Jornada:</span>
+                                {% if estudiante.jornada %}
+                                    {{ estudiante.jornada.nombre }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>

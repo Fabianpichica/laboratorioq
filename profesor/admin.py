@@ -2,6 +2,9 @@ from django.contrib import admin
 from .models import Jornada, Salon, Estudiante, Guia
 from django import forms
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from core.models import Profile
 
 class JornadaAdminForm(forms.ModelForm):
     class Meta:
@@ -44,9 +47,9 @@ class GuiaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'fecha_creacion')
     search_fields = ('titulo',)
 
-admin.site.register(Jornada, JornadaAdmin)
-admin.site.register(Salon)
-admin.site.register(Estudiante, EstudianteAdmin)
-admin.site.register(Guia, GuiaAdmin)
-
-# Register your models here.
+@receiver(post_save, sender=User)
+def crear_profile_usuario(sender, instance, created, **kwargs):
+    if created and not hasattr(instance, 'profile'):
+        # Por defecto, asigna rol 'aprendiz' (puedes ajustar según lógica de tu sistema)
+        from core.models import Profile
+        Profile.objects.create(user=instance, role='aprendiz')

@@ -6,6 +6,7 @@
     <title>Dashboard Aprendiz</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
     .dashboard-container {
@@ -198,7 +199,7 @@
                     <li><a href="/cuaderno/" class="{% if request.path == '/cuaderno/' %}active{% endif %}">Cuaderno</a></li>
                     <li><a href="/materiales/" class="{% if request.path == '/materiales/' %}active{% endif %}">Materiales</a></li>
                     <li><a href="/reportes/">Reportes</a></li>
-                    <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+                    <li><a href="{% url 'landing' %}">Cerrar sesión</a></li>
                 </ul>
             </nav>
         </aside>
@@ -209,7 +210,18 @@
             </div>
         </section>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+    // Inicializar Select2 en todos los selectores múltiples (puedes copiar esto a editar_profesor.html y registrar_profesor.html)
+    $(document).ready(function() {
+        $('select[multiple]').select2({
+            width: '100%',
+            placeholder: 'Selecciona una o varias opciones',
+            allowClear: true
+        });
+    });
+
     // Hamburguesa responsive
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');

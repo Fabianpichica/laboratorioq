@@ -7,28 +7,30 @@
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
-        .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
-        .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-        .profesor-sidebar nav { width: 100%; }
-        .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-        .profesor-sidebar li { margin-bottom: 8px; width: 100%; }
-        .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
-        .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
-        .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-        .profesor-main-content { margin-left: 240px; padding: 48px 32px 32px 32px; width: 100%; }
-        .profesor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-        .profesor-header h1 { color: #1976d2; font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: 1px; }
-        .profesor-header .profesor-user { font-size: 1.1rem; color: #1976d2; background: #fff; border-radius: 20px; padding: 8px 18px; box-shadow: 0 2px 8px rgba(25,118,210,0.07); }
-        .jornadas-profesor { margin-top: 32px; }
-        .jornadas-list { list-style: none; padding: 0; margin: 0; }
-        .jornada-item { margin-bottom: 18px; }
-        .jornada-toggle { background: #fff; color: #1976d2; border: none; border-radius: 8px; padding: 10px 22px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 2px 8px rgba(25,118,210,0.08); margin-bottom: 8px; transition: background 0.2s, color 0.2s; }
-        .jornada-toggle:hover { background: #e3e6ea; color: #1565c0; }
-        .salones-jornada ul { margin: 0; padding-left: 18px; }
-        .salones-jornada li { margin-bottom: 6px; }
-        @media (max-width: 900px) { .profesor-main-content { padding: 32px 8px 8px 8px; } .profesor-sidebar { width: 100px; } .profesor-main-content { margin-left: 100px; } }
+    body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
+    .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
+    .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
+    .profesor-sidebar nav { width: 100%; }
+    .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
+    .profesor-sidebar li { margin-bottom: 8px; width: 70%; }
+    .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
+    .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
+    .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
+    .profesor-main-content { margin-left: 240px; padding: 48px 32px 32px 32px; width: 100%; }
+    @media (max-width: 900px) {
+        .profesor-main-content { padding: 32px 8px 8px 8px; } 
+        .profesor-sidebar { width: 100px; } 
+        .profesor-main-content { margin-left: 100px; }
+    }
+    @media (max-width: 600px) {
+        .profesor-main-content { padding: 10px; margin-left: 0; }
+        .sidebar-title { font-size: 0.95rem; }
+    }
+    @media (max-width: 400px) {
+        .profesor-main-content { padding: 2vw 0 8vw 0; }
+        .sidebar-title { font-size: 0.85rem; }
+    }
     </style>
     <script>
         function toggleSalones(id) {
@@ -53,7 +55,7 @@
                     <li><a href="{% url 'resultados_por_guia' %}"><i class="fa-solid fa-flask-vial icon"></i>Resultados por Guía</a></li>
                     <li><a href="#"><i class="fa-solid fa-chart-bar icon"></i>Reportes</a></li>
                     <li><a href="#"><i class="fa-solid fa-user icon"></i>Perfil</a></li>
-                    <li><a href="/logout/"><i class="fa-solid fa-right-from-bracket icon"></i>Cerrar sesión</a></li>
+                    <li><a href="{% url 'landing' %}"><i class="fa-solid fa-right-from-bracket icon"></i>Cerrar sesión</a></li>
                 </ul>
             </nav>
         </aside>

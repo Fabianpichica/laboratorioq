@@ -541,3 +541,56 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9f
     }
 }
 /* --- Fin estilos dashboard_profesor.html --- */
+
+/* --- Responsive para todas las vistas de profesor --- */
+@media (max-width: 900px) {
+  .profesor-dashboard-wrapper { flex-direction: column; }
+  .profesor-sidebar { width: 100vw !important; min-width: unset; flex-direction: row; justify-content: flex-start; align-items: center; min-height: 56px; height: 56px; position: fixed; top: 0; left: 0; right: 0; bottom: unset; z-index: 20; overflow-x: auto; }
+  .profesor-sidebar nav { width: 100vw; }
+  .profesor-sidebar ul { display: flex; flex-direction: row; width: 100vw; justify-content: flex-start; align-items: center; margin: 0; padding: 0 4px; overflow-x: auto; gap: 0; }
+  .profesor-sidebar li { width: auto; flex: 0 0 auto; }
+  .profesor-sidebar a { padding: 10px 10px; font-size: 0.98rem; border-left: none !important; border-bottom: 3px solid transparent; white-space: nowrap; }
+  .profesor-sidebar a:hover, .profesor-sidebar .active { background: #3949ab; border-left: none; border-bottom: 3px solid #ffb300; }
+  .profesor-main-content { margin-left: 0 !important; padding: 18px 2vw 8vw 2vw !important; }
+  .guia-container, .profesor-dashboard-section { flex-direction: column !important; gap: 12px !important; padding: 10px 2vw !important; margin-top: 16px !important; }
+  .guia-col, .dashboard-col { width: 100% !important; min-width: 0 !important; }
+  .guia-section, .dashboard-card { padding: 14px 8px 10px 8px !important; }
+}
+@media (max-width: 600px) {
+  .profesor-main-content { padding: 4vw 1vw 8vw 1vw !important; }
+  .guia-section, .dashboard-card { padding: 8px 2px 6px 2px !important; }
+  .guia-section input, .guia-section select, .guia-section textarea { font-size: 0.95rem !important; padding: 8px 6px !important; }
+  .guia-label, .sidebar-title { font-size: 0.92rem !important; padding: 6px 8px !important; }
+}
+@media (max-width: 400px) {
+  .profesor-main-content { padding: 2vw 0 8vw 0 !important; }
+  .guia-section, .dashboard-card { padding: 2px 0 2px 0 !important; }
+  .sidebar-title { font-size: 0.85rem !important; }
+}
+/* --- Fin responsive profesor --- */
+
+/* --- Responsive profesor unificado --- */
+@media (max-width: 900px) {
+  .profesor-dashboard-wrapper { flex-direction: column; }
+  .profesor-sidebar { width: 100px !important; min-width: 100px !important; }
+  .profesor-main-content, .profesor-dashboard-section { margin-left: 100px !important; padding: 32px 8px 8px 8px !important; }
+  .sidebar-title { font-size: 1rem !important; }
+}
+@media (max-width: 700px) {
+  .profesor-sidebar { width: 100vw !important; min-width: unset !important; flex-direction: row !important; justify-content: flex-start !important; align-items: center !important; min-height: 56px !important; height: 56px !important; position: fixed !important; top: 0; left: 0; right: 0; z-index: 20; overflow-x: auto; }
+  .profesor-sidebar nav ul { display: flex !important; flex-direction: row !important; width: 100vw !important; justify-content: flex-start !important; align-items: center !important; margin: 0 !important; padding: 0 4px !important; overflow-x: auto !important; gap: 0 !important; background: #1a237e !important; }
+  .profesor-sidebar nav ul li { width: auto !important; flex: 0 0 auto !important; }
+  .profesor-sidebar a { padding: 10px 10px !important; font-size: 0.98rem !important; border-left: none !important; border-bottom: 3px solid transparent !important; white-space: nowrap !important; }
+  .profesor-sidebar a:hover, .profesor-sidebar .active { background: #3949ab !important; border-left: none !important; border-bottom: 3px solid #ffb300 !important; }
+  .profesor-main-content, .profesor-dashboard-section { margin-left: 0 !important; margin-top: 56px !important; padding: 18px 2vw 8vw 2vw !important; min-width: 0 !important; }
+}
+@media (max-width: 600px) {
+  .profesor-main-content, .profesor-dashboard-section { padding: 10px !important; margin-left: 0 !important; }
+  .sidebar-title { font-size: 0.95rem !important; }
+  h2 { font-size: 1.2rem !important; }
+}
+@media (max-width: 400px) {
+  .profesor-main-content, .profesor-dashboard-section { padding: 2vw 0 8vw 0 !important; }
+  .sidebar-title { font-size: 0.85rem !important; }
+}
+/* --- Fin responsive profesor unificado --- */

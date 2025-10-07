@@ -3,8 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import Equipo, Material
-from core.models import Quimico
+from core.models import Quimico, Profile
 from profesor.models import Estudiante, Guia, Jornada, Salon
+from .forms import ProfesorCustomForm
 
 @login_required
 def dashboard_admin(request):
@@ -183,6 +184,7 @@ def agregar_estudiante_admin(request):
         correo = request.POST.get('correo')
         telefono = request.POST.get('telefono')
         password = request.POST.get('password')
+        foto = request.FILES.get('foto')
         estudiante = Estudiante.objects.create(
             nombre=nombre,
             documento=documento,
@@ -191,7 +193,8 @@ def agregar_estudiante_admin(request):
             jornada_id=jornada_id if jornada_id else None,
             correo=correo,
             telefono=telefono,
-            password=password
+            password=password,
+            foto=foto
         )
         messages.success(request, 'Estudiante creado correctamente.')
         return redirect('estudiantes_admin')
@@ -213,6 +216,9 @@ def editar_estudiante_admin(request, estudiante_id):
         estudiante.correo = request.POST.get('correo')
         estudiante.telefono = request.POST.get('telefono')
         estudiante.password = request.POST.get('password')
+        foto = request.FILES.get('foto')
+        if foto:
+            estudiante.foto = foto
         estudiante.save()
         messages.success(request, 'Estudiante actualizado correctamente.')
         return redirect('estudiantes_admin')
@@ -360,7 +366,7 @@ def profesores_admin(request):
     profesores = User.objects.filter(is_staff=True)
     profesores_info = []
     for profesor in profesores:
-        jornadas = Jornada.objects.filter(profesor=profesor)
+        jornadas = Jornada.objects.filter(profesores=profesor)
         jornadas_info = []
         for jornada in jornadas:
             salones_jornada = jornada.salones.all()
@@ -409,3 +415,108 @@ def eliminar_salon_admin(request, salon_id):
     salon.delete()
     messages.success(request, 'Salón eliminado correctamente.')
     return redirect('salones_admin')
+
+def registrar_profesor(request):
+    if request.method == 'POST':
+        form = ProfesorCustomForm(request.POST, request.FILES)
+        if form.is_valid():
+            username = form.cleaned_data['numero_documento']
+            password = form.cleaned_data['password']
+            nombre = form.cleaned_data['nombre']
+            tipo_documento = form.cleaned_data['tipo_documento']
+            numero_documento = form.cleaned_data['numero_documento']
+            fotografia = form.cleaned_data['fotografia']
+            salones = form.cleaned_data['salones']
+            jornadas = form.cleaned_data['jornadas']
+            # Validar que el username no exista
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Ya existe un usuario con ese número de documento.')
+                return render(request, 'adminlab/registrar_profesor.html', {'form': form})
+            # Crear usuario y marcar como staff
+            user = User.objects.create_user(username=username, password=password, first_name=nombre)
+            user.is_staff = True
+            user.save()
+            # Crear perfil solo si no existe
+            profile, created = Profile.objects.get_or_create(user=user, defaults={'role': 'profesor'})
+            if not created:
+                profile.role = 'profesor'
+                profile.save()
+            if fotografia:
+                profile.fotografia = fotografia
+                profile.save()
+            # Asignar jornadas (ahora ManyToMany)
+            for jornada in jornadas:
+                jornada.profesores.add(user)
+            # Asignar salones (sin cambios)
+            for salon in salones:
+                salon.save()
+            messages.success(request, 'Profesor registrado correctamente.')
+            return redirect('profesores_admin')
+    else:
+        form = ProfesorCustomForm()
+    return render(request, 'adminlab/registrar_profesor.html', {'form': form})
+
+@login_required
+def editar_profesor(request, profesor_id):
+    if not request.user.is_superuser:
+        return redirect('/')
+    profesor = get_object_or_404(User, id=profesor_id)
+    profile = Profile.objects.get(user=profesor)
+    salones = Salon.objects.all()
+    jornadas = Jornada.objects.all()
+    # Jornadas y salones actuales
+    jornadas_actuales = jornadas.filter(profesores=profesor)
+    salones_actuales = set()
+    for jornada in jornadas_actuales:
+        salones_actuales.update(jornada.salones.all())
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        password = request.POST.get('password')
+        fotografia = request.FILES.get('fotografia')
+        jornadas_ids = request.POST.getlist('jornadas')
+        salones_ids = request.POST.getlist('salones')
+        profesor.first_name = nombre
+        if password:
+            profesor.set_password(password)
+        profesor.save()
+        if fotografia:
+            profile.fotografia = fotografia
+            profile.save()
+        # Actualizar jornadas del profesor
+        profesor.jornadas.set(jornadas_ids)
+        # Para cada jornada, agregar o quitar el profesor según corresponda
+        for jornada in jornadas:
+            if str(jornada.id) in jornadas_ids:
+                jornada.profesores.add(profesor)
+            else:
+                jornada.profesores.remove(profesor)
+        # Actualizar salones: solo agregar el profesor a los salones seleccionados en las jornadas seleccionadas
+        # No sobrescribir los salones de la jornada, solo asegurarse que los salones seleccionados estén en las jornadas seleccionadas
+        for jornada in jornadas:
+            if str(jornada.id) in jornadas_ids:
+                # Para cada salón seleccionado, agregarlo a la jornada si no está
+                for salon in salones:
+                    if str(salon.id) in salones_ids:
+                        jornada.salones.add(salon)
+                # Opcional: quitar los salones que ya no están seleccionados SOLO para este profesor
+                # (No se elimina ningún salón de la jornada, solo se agregan los nuevos)
+                jornada.save()
+        messages.success(request, 'Profesor actualizado correctamente.')
+        return redirect('profesores_admin')
+    return render(request, 'adminlab/editar_profesor.html', {
+        'profesor': profesor,
+        'profile': profile,
+        'salones': salones,
+        'jornadas': jornadas,
+        'jornadas_actuales': jornadas_actuales,
+        'salones_actuales': salones_actuales
+    })
+
+@login_required
+def eliminar_profesor(request, profesor_id):
+    if not request.user.is_superuser:
+        return redirect('/')
+    profesor = get_object_or_404(User, id=profesor_id)
+    profesor.delete()
+    messages.success(request, 'Profesor eliminado correctamente.')
+    return redirect('profesores_admin')

@@ -46,7 +46,7 @@
                     <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
                     <li><a href="/adminlab/salones/"><i class="fa-solid fa-school"></i>Salones</a></li>
                     <li><a href="/adminlab/profesores/" class="active"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
-                    <li><a href="/admin/"><i class="fa-solid fa-gears"></i>Admin clásico</a></li>
+                    <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
                 </ul>
             </nav>
         </aside>
@@ -56,13 +56,14 @@
                 <div class="admin-user"><i class="fa-solid fa-user-shield"></i> Panel de profesores</div>
             </div>
             <div class="profesores-section">
-                <a href="/admin/auth/user/add/" class="btn-agregar"><i class="fa-solid fa-user-plus"></i>Registrar Profesor</a>
+                <a href="{% url 'registrar_profesor' %}" class="btn-agregar"><i class="fa-solid fa-user-plus"></i>Registrar Profesor</a>
                 <table class="profesores-table">
                     <thead>
                         <tr>
                             <th>Profesor</th>
                             <th>Jornadas</th>
                             <th>Salones asignados</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,6 +100,19 @@
                                 {% else %}
                                     <em>Sin salones</em>
                                 {% endif %}
+                            </td>
+                            <td style="text-align:center;">
+                                {% with profile=pinfo.profesor.profile %}
+                                    {% if profile.fotografia %}
+                                        <img src="{{ profile.fotografia.url }}" alt="Foto" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
+                                    {% else %}
+                                        <span style="color:#aaa;font-size:0.9em;">Sin foto</span>
+                                    {% endif %}
+                                {% endwith %}
+                                <div style="margin-top:8px;">
+                                    <a href="{% url 'editar_profesor' pinfo.profesor.id %}" class="btn-editar" style="margin-right:8px;"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
+                                    <a href="{% url 'eliminar_profesor' pinfo.profesor.id %}" class="btn-eliminar" onclick="return confirm('¿Eliminar este profesor?');"><i class="fa-solid fa-trash"></i> Eliminar</a>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
