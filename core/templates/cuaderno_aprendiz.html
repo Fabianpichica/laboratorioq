@@ -311,12 +311,13 @@
                     <form method="post" enctype="multipart/form-data" class="cuaderno-form">
                         {% csrf_token %}
                         <label for="quimico">Químico utilizado:</label>
-                        <select name="quimico" id="quimico" required>
+                        <select id="quimicoSelect">
                             <option value="">Selecciona un químico</option>
                             {% for quimico in quimicos %}
-                            <option value="{{ quimico.id }}" {% if quimico.id == quimico_usado_id %}selected{% endif %}>{{ quimico.nombre }}</option>
+                            <option value="{{ quimico.id }}">{{ quimico.nombre }}</option>
                             {% endfor %}
                         </select>
+                        <div id="quimicosSeleccionados" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;"></div>
                         <label for="guia">Guía asociada:</label>
                         <select name="guia" id="guia">
                             <option value="">Selecciona una guía (opcional)</option>
@@ -357,7 +358,8 @@
                         {% for informe in informes %}
                         <li>
                             <a href="{% url 'informe_detalle' informe.id %}">
-                                {{ informe.fecha|date:'d/m/Y H:i' }} - {{ informe.quimico.nombre }}
+                                {{ informe.fecha|date:'d/m/Y H:i' }}<br>
+                                <strong>Químico(s):</strong> {{ informe.quimico.nombre }}
                                 {% if informe.guia %}<br><span style="font-size:0.95em;color:#3949ab;">Guía: {{ informe.guia.titulo }}</span>{% endif %}
                             </a>
                         </li>
@@ -391,6 +393,32 @@
                     sidebar.classList.remove('open');
                 }
             });
+        });
+    }
+
+    // Selección dinámica de químicos (similar a materiales en guia_form.html)
+    const quimicoSelect = document.getElementById('quimicoSelect');
+    const quimicosSeleccionados = document.getElementById('quimicosSeleccionados');
+    if (quimicoSelect) {
+        quimicoSelect.addEventListener('change', function() {
+            const selectedOption = quimicoSelect.options[quimicoSelect.selectedIndex];
+            if (selectedOption.value) {
+                if (!document.getElementById('quimico-'+selectedOption.value)) {
+                    const div = document.createElement('div');
+                    div.className = 'material-quimico-box';
+                    div.id = 'quimico-'+selectedOption.value;
+                    div.style = 'background:#e3e6ea;color:#3949ab;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 2px 8px rgba(60,72,88,0.08);';
+                    div.innerHTML = `<span>${selectedOption.text}</span> <button type="button" style="background:none;border:none;color:#d32f2f;font-size:1.1rem;cursor:pointer;font-weight:700;" title="Eliminar" onclick="this.parentNode.remove(); document.getElementById('input-quimico-${selectedOption.value}').remove();">&times;</button>`;
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'quimicos[]';
+                    input.value = selectedOption.value;
+                    input.id = 'input-quimico-'+selectedOption.value;
+                    div.appendChild(input);
+                    quimicosSeleccionados.appendChild(div);
+                }
+                quimicoSelect.selectedIndex = 0;
+            }
         });
     }
     </script>

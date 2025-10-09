@@ -471,7 +471,7 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9f
     margin: 0;
 }
 .profesor-sidebar nav ul li {
-    padding: 14px 24px;
+    padding: 14px 32px;
     cursor: pointer;
     display: flex;
     align-items: center;

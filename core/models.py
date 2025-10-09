@@ -135,7 +135,7 @@ class Equipo(models.Model):
 
 class CuadernoEntry(models.Model):
     aprendiz = models.ForeignKey(User, on_delete=models.CASCADE)
-    quimico = models.ForeignKey(Quimico, on_delete=models.CASCADE)
+    quimicos = models.ManyToManyField(Quimico)
     guia = models.ForeignKey(Guia, on_delete=models.SET_NULL, null=True, blank=True, related_name='resultados')
     nota = models.TextField(blank=True)
     imagen = models.ImageField(upload_to='cuadernos/', blank=True, null=True)

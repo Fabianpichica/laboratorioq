@@ -108,15 +108,9 @@ def cuaderno_aprendiz(request):
         if request.method == 'POST':
             nota = request.POST.get('nota')
             foto = request.FILES.get('foto')
-            quimico_id = request.POST.get('quimico')
+            quimico_ids = request.POST.getlist('quimicos[]')
             guia_id = request.POST.get('guia')
-            quimico_usado = None
             guia_usada = None
-            if quimico_id:
-                try:
-                    quimico_usado = Quimico.objects.get(id=quimico_id)
-                except Quimico.DoesNotExist:
-                    quimico_usado = None
             if guia_id:
                 try:
                     guia_usada = Guia.objects.get(id=guia_id)
@@ -129,22 +123,25 @@ def cuaderno_aprendiz(request):
                 filename = fs.save(f"{request.user.username}_cuaderno_{foto.name}", foto)
                 imagen_url = fs.url(filename)
                 imagen_file = f"cuadernos/{filename.split('/')[-1]}"
-            entry = CuadernoEntry.objects.create(
+            # Crear una sola entrada y asociar todos los químicos seleccionados
+            cuaderno_entry = CuadernoEntry.objects.create(
                 aprendiz=request.user,
-                quimico=quimico_usado,
                 guia=guia_usada,
                 nota=nota,
                 imagen=imagen_file if imagen_file else None
             )
+            for quimico_id in quimico_ids:
+                try:
+                    quimico_usado = Quimico.objects.get(id=quimico_id)
+                    cuaderno_entry.quimicos.add(quimico_usado)
+                except Quimico.DoesNotExist:
+                    pass
             informes = CuadernoEntry.objects.filter(aprendiz=request.user).order_by('-fecha')
             return render(request, 'cuaderno_aprendiz.html', {
                 'nota': nota,
                 'imagen_url': imagen_url,
                 'quimicos': quimicos,
-                'quimico_usado': quimico_usado,
-                'quimico_usado_id': quimico_usado.id if quimico_usado else None,
                 'guias': guias,
-                'guia_usada_id': guia_usada.id if guia_usada else None,
                 'informes': informes
             })
         return render(request, 'cuaderno_aprendiz.html', {'quimicos': quimicos, 'guias': guias, 'informes': informes})
@@ -287,10 +284,10 @@ def reportes_view(request):
         aprendiz = request.user if hasattr(request.user, 'profile') and request.user.profile.role == 'aprendiz' else aprendices.first()
     # Top 5 químicos más usados por el aprendiz
     quimicos_count = (CuadernoEntry.objects.filter(aprendiz=aprendiz)
-                      .values('quimico__nombre')
-                      .annotate(total=Count('quimico'))
+                      .values('quimicos__nombre')
+                      .annotate(total=Count('quimicos'))
                       .order_by('-total')[:5])
-    labels = [q['quimico__nombre'] for q in quimicos_count]
+    labels = [q['quimicos__nombre'] for q in quimicos_count]
     data = [q['total'] for q in quimicos_count]
     return render(request, 'reportes.html', {
         'labels': labels,

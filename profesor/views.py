@@ -18,6 +18,16 @@ def salon_estudiantes(request, salon_id, jornada_id=None):
     else:
         estudiantes = salon.estudiantes.all()
         jornada = None
+    # Guardar retroalimentación si se envía el formulario
+    if request.method == 'POST' and 'informe_id' in request.POST:
+        informe_id = request.POST.get('informe_id')
+        retroalimentacion = request.POST.get('retroalimentacion', '').strip()
+        informe = CuadernoEntry.objects.filter(id=informe_id).first()
+        if informe:
+            informe.retroalimentacion = retroalimentacion if retroalimentacion else None
+            informe.save()
+        # Redirigir para evitar reenvío del formulario
+        return redirect(request.path_info)
     # Guías asignadas a este salón
     guias = salon.guias_asignadas.all()
     # Para cada guía, obtener dict de aprendiz: informe (o None)
