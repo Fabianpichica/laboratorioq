@@ -6,6 +6,9 @@ from .models import Equipo, Material
 from core.models import Quimico, Profile
 from profesor.models import Estudiante, Guia, Jornada, Salon
 from .forms import ProfesorCustomForm
+import json
+import os
+from googletrans import Translator
 
 @login_required
 def dashboard_admin(request):
@@ -46,9 +49,47 @@ def agregar_quimico_admin(request):
         cantidad = request.POST.get('cantidad')
         descripcion = request.POST.get('descripcion')
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        quimicos = Quimico.objects.all()  # Para mostrar en caso de error
+        # Traducción de nombre si existe en quimicos_es.json, si no, traducir automáticamente
+        ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
+        nombre_es = None
+        try:
+            with open(ruta_json, 'r', encoding='utf-8') as f:
+                traducciones = json.load(f)
+            nombre_es = traducciones.get(nombre.strip().lower())
+        except Exception:
+            nombre_es = None
+        # Si no hay traducción o es igual al original, forzar traducción automática
+        if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+            try:
+                translator = Translator()
+                nombre_es = translator.translate(nombre, src='en', dest='es').text
+                # Si la traducción automática falla o no cambia, forzar español
+                if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+                    nombre_es = nombre
+            except Exception:
+                nombre_es = nombre
+        # Si el nombre traducido sigue en inglés, forzar español manualmente
+        if nombre_es and nombre_es.strip().lower() == nombre.strip().lower():
+            # Si el nombre tiene palabras en inglés comunes, traducirlas manualmente
+            traducciones_manual = {'water': 'agua', 'sodium': 'sodio', 'chloride': 'cloruro', 'acid': 'ácido', 'hydrogen': 'hidrógeno', 'oxygen': 'oxígeno'}
+            for eng, esp in traducciones_manual.items():
+                nombre_es = nombre_es.replace(eng, esp)
+        # Validación para cantidad
+        if cantidad is None or cantidad == '':
+            messages.error(request, 'El campo cantidad es obligatorio y debe ser un número.')
+            return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        try:
+            cantidad_int = int(cantidad)
+            if cantidad_int < 0:
+                messages.error(request, 'La cantidad debe ser un número positivo.')
+                return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        except ValueError:
+            messages.error(request, 'La cantidad debe ser un número válido.')
+            return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
         Quimico.objects.create(
-            nombre=nombre,
-            cantidad=cantidad,
+            nombre=nombre_es,
+            cantidad=cantidad_int,
             descripcion=descripcion,
             fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
         )
@@ -89,9 +130,21 @@ def agregar_material_admin(request):
         nombre = request.POST.get('nombre')
         cantidad = request.POST.get('cantidad')
         descripcion = request.POST.get('descripcion')
+        # Validación para cantidad
+        if cantidad is None or cantidad == '':
+            messages.error(request, 'El campo cantidad es obligatorio y debe ser un número.')
+            return render(request, 'adminlab/form_material_admin.html', {})
+        try:
+            cantidad_int = int(cantidad)
+            if cantidad_int < 0:
+                messages.error(request, 'La cantidad debe ser un número positivo.')
+                return render(request, 'adminlab/form_material_admin.html', {})
+        except ValueError:
+            messages.error(request, 'La cantidad debe ser un número válido.')
+            return render(request, 'adminlab/form_material_admin.html', {})
         Material.objects.create(
             nombre=nombre,
-            cantidad=cantidad,
+            cantidad=cantidad_int,
             descripcion=descripcion
         )
         messages.success(request, 'Material agregado correctamente.')
@@ -105,8 +158,21 @@ def editar_material_admin(request, material_id):
     material = get_object_or_404(Material, id=material_id)
     if request.method == 'POST':
         material.nombre = request.POST.get('nombre')
-        material.cantidad = request.POST.get('cantidad')
+        cantidad = request.POST.get('cantidad')
         material.descripcion = request.POST.get('descripcion')
+        # Validación para cantidad
+        if cantidad is None or cantidad == '':
+            messages.error(request, 'El campo cantidad es obligatorio y debe ser un número.')
+            return render(request, 'adminlab/form_material_admin.html', {'material': material})
+        try:
+            cantidad_int = int(cantidad)
+            if cantidad_int < 0:
+                messages.error(request, 'La cantidad debe ser un número positivo.')
+                return render(request, 'adminlab/form_material_admin.html', {'material': material})
+        except ValueError:
+            messages.error(request, 'La cantidad debe ser un número válido.')
+            return render(request, 'adminlab/form_material_admin.html', {'material': material})
+        material.cantidad = cantidad_int
         material.save()
         messages.success(request, 'Material editado correctamente.')
         return redirect('inventario_admin')
@@ -129,9 +195,21 @@ def agregar_equipo_admin(request):
         nombre = request.POST.get('nombre')
         cantidad = request.POST.get('cantidad')
         descripcion = request.POST.get('descripcion')
+        # Validación para cantidad
+        if cantidad is None or cantidad == '':
+            messages.error(request, 'El campo cantidad es obligatorio y debe ser un número.')
+            return render(request, 'adminlab/form_equipo_admin.html', {})
+        try:
+            cantidad_int = int(cantidad)
+            if cantidad_int < 0:
+                messages.error(request, 'La cantidad debe ser un número positivo.')
+                return render(request, 'adminlab/form_equipo_admin.html', {})
+        except ValueError:
+            messages.error(request, 'La cantidad debe ser un número válido.')
+            return render(request, 'adminlab/form_equipo_admin.html', {})
         Equipo.objects.create(
             nombre=nombre,
-            cantidad=cantidad,
+            cantidad=cantidad_int,
             descripcion=descripcion
         )
         messages.success(request, 'Equipo agregado correctamente.')
@@ -145,8 +223,21 @@ def editar_equipo_admin(request, equipo_id):
     equipo = get_object_or_404(Equipo, id=equipo_id)
     if request.method == 'POST':
         equipo.nombre = request.POST.get('nombre')
-        equipo.cantidad = request.POST.get('cantidad')
+        cantidad = request.POST.get('cantidad')
         equipo.descripcion = request.POST.get('descripcion')
+        # Validación para cantidad
+        if cantidad is None or cantidad == '':
+            messages.error(request, 'El campo cantidad es obligatorio y debe ser un número.')
+            return render(request, 'adminlab/form_equipo_admin.html', {'equipo': equipo})
+        try:
+            cantidad_int = int(cantidad)
+            if cantidad_int < 0:
+                messages.error(request, 'La cantidad debe ser un número positivo.')
+                return render(request, 'adminlab/form_equipo_admin.html', {'equipo': equipo})
+        except ValueError:
+            messages.error(request, 'La cantidad debe ser un número válido.')
+            return render(request, 'adminlab/form_equipo_admin.html', {'equipo': equipo})
+        equipo.cantidad = cantidad_int
         equipo.save()
         messages.success(request, 'Equipo editado correctamente.')
         return redirect('inventario_admin')
@@ -160,6 +251,125 @@ def eliminar_equipo_admin(request, equipo_id):
     equipo.delete()
     messages.success(request, 'Equipo eliminado correctamente.')
     return redirect('inventario_admin')
+
+@login_required
+def reactivos_admin(request):
+    if not request.user.is_superuser:
+        return redirect('/')
+    from core.models import Quimico
+    quimicos = Quimico.objects.all()
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        cantidad = request.POST.get('cantidad')
+        descripcion = request.POST.get('descripcion')
+        fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        quimicos = Quimico.objects.all()  # Para mostrar en caso de error
+        # Traducción de nombre si existe en quimicos_es.json, si no, traducir automáticamente
+        ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
+        nombre_es = None
+        try:
+            with open(ruta_json, 'r', encoding='utf-8') as f:
+                traducciones = json.load(f)
+            nombre_es = traducciones.get(nombre.strip().lower())
+        except Exception:
+            nombre_es = None
+        # Si no hay traducción o es igual al original, forzar traducción automática
+        if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+            try:
+                translator = Translator()
+                nombre_es = translator.translate(nombre, src='en', dest='es').text
+                # Si la traducción automática falla o no cambia, forzar español
+                if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+                    nombre_es = nombre
+            except Exception:
+                nombre_es = nombre
+        # Si el nombre traducido sigue en inglés, forzar español manualmente
+        if nombre_es and nombre_es.strip().lower() == nombre.strip().lower():
+            # Si el nombre tiene palabras en inglés comunes, traducirlas manualmente
+            traducciones_manual = {'water': 'agua', 'sodium': 'sodio', 'chloride': 'cloruro', 'acid': 'ácido', 'hydrogen': 'hidrógeno', 'oxygen': 'oxígeno'}
+            for eng, esp in traducciones_manual.items():
+                nombre_es = nombre_es.replace(eng, esp)
+        # Validación para cantidad
+        if cantidad is None or cantidad == '':
+            messages.error(request, 'El campo cantidad es obligatorio y debe ser un número.')
+            return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        try:
+            cantidad_int = int(cantidad)
+            if cantidad_int < 0:
+                messages.error(request, 'La cantidad debe ser un número positivo.')
+                return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        except ValueError:
+            messages.error(request, 'La cantidad debe ser un número válido.')
+            return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        Quimico.objects.create(
+            nombre=nombre_es,
+            cantidad=cantidad_int,
+            descripcion=descripcion,
+            fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
+        )
+        messages.success(request, 'Reactivo agregado correctamente.')
+        return redirect('reactivos_admin')
+    return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+
+@login_required
+def materiales_admin(request):
+    if not request.user.is_superuser:
+        return redirect('/')
+    materiales = Material.objects.all()
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        cantidad = request.POST.get('cantidad')
+        descripcion = request.POST.get('descripcion')
+        # Validación para cantidad
+        if cantidad is None or cantidad == '':
+            messages.error(request, 'El campo cantidad es obligatorio y debe ser un número.')
+            return render(request, 'adminlab/materiales.html', {'materiales': materiales})
+        try:
+            cantidad_int = int(cantidad)
+            if cantidad_int < 0:
+                messages.error(request, 'La cantidad debe ser un número positivo.')
+                return render(request, 'adminlab/materiales.html', {'materiales': materiales})
+        except ValueError:
+            messages.error(request, 'La cantidad debe ser un número válido.')
+            return render(request, 'adminlab/materiales.html', {'materiales': materiales})
+        Material.objects.create(
+            nombre=nombre,
+            cantidad=cantidad_int,
+            descripcion=descripcion
+        )
+        messages.success(request, 'Material agregado correctamente.')
+        return redirect('materiales_admin')
+    return render(request, 'adminlab/materiales.html', {'materiales': materiales})
+
+@login_required
+def equipos_admin(request):
+    if not request.user.is_superuser:
+        return redirect('/')
+    equipos = Equipo.objects.all()
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        cantidad = request.POST.get('cantidad')
+        descripcion = request.POST.get('descripcion')
+        # Validación para cantidad
+        if cantidad is None or cantidad == '':
+            messages.error(request, 'El campo cantidad es obligatorio y debe ser un número.')
+            return render(request, 'adminlab/equipos.html', {'equipos': equipos})
+        try:
+            cantidad_int = int(cantidad)
+            if cantidad_int < 0:
+                messages.error(request, 'La cantidad debe ser un número positivo.')
+                return render(request, 'adminlab/equipos.html', {'equipos': equipos})
+        except ValueError:
+            messages.error(request, 'La cantidad debe ser un número válido.')
+            return render(request, 'adminlab/equipos.html', {'equipos': equipos})
+        Equipo.objects.create(
+            nombre=nombre,
+            cantidad=cantidad_int,
+            descripcion=descripcion
+        )
+        messages.success(request, 'Equipo agregado correctamente.')
+        return redirect('equipos_admin')
+    return render(request, 'adminlab/equipos.html', {'equipos': equipos})
 
 # --- CRUD ESTUDIANTE ---
 @login_required
@@ -185,6 +395,11 @@ def agregar_estudiante_admin(request):
         telefono = request.POST.get('telefono')
         password = request.POST.get('password')
         foto = request.FILES.get('foto')
+        # Crear usuario Django para el estudiante
+        user = User.objects.create_user(username=documento, password=password, first_name=nombre, email=correo)
+        # Verificar si el perfil ya existe antes de crearlo
+        if not Profile.objects.filter(user=user).exists():
+            Profile.objects.create(user=user, role='aprendiz')
         estudiante = Estudiante.objects.create(
             nombre=nombre,
             documento=documento,
@@ -312,14 +527,14 @@ def agregar_jornada_admin(request):
         jornada = Jornada.objects.create(
             nombre=nombre,
             descripcion=descripcion,
-            fecha=fecha,
-            profesor_id=profesor_id
+            fecha=fecha
         )
+        if profesor_id:
+            jornada.profesores.add(profesor_id)
         salon_ids = request.POST.getlist('salones')
         if salon_ids:
             jornada.salones.set(salon_ids)
         messages.success(request, 'Jornada creada correctamente.')
-        return redirect('jornadas_admin')
     return render(request, 'adminlab/form_jornada_admin.html', {'salones': salones, 'profesores': profesores})
 
 @login_required

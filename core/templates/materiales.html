@@ -50,7 +50,7 @@
         transition: background 0.2s;
     }
     .dashboard-aside a:hover, .dashboard-aside .active {
-        background: #3949ab;
+        background:  #1976d2;
         border-left: 4px solid #ffb300;
     }
     .dashboard-section {
@@ -385,100 +385,6 @@
                         </tr>
                         {% empty %}
                         <tr><td colspan="6" style="text-align:center;color:#888;">No hay químicos registrados.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <h2>Gestión de Materiales</h2>
-                <form class="materiales-form" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="tipo" value="material">
-                    <input type="text" name="nombre" placeholder="Nombre del material">
-                    <input type="number" name="cantidad" placeholder="Cantidad">
-                    <input type="text" name="descripcion" placeholder="Descripción">
-                    <input type="text" name="ubicacion" placeholder="Ubicación">
-                    <input type="date" name="fecha_mantenimiento" placeholder="Fecha de mantenimiento">
-                    <input type="submit" value="Añadir Material">
-                </form>
-                <table class="materiales-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Cantidad</th>
-                            <th>Descripción</th>
-                            <th>Ubicación</th>
-                            <th>Fecha de mantenimiento</th>
-                            <th>QR</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for material in materiales %}
-                        <tr>
-                            <td>{{ material.nombre }}</td>
-                            <td>{{ material.cantidad }}</td>
-                            <td>{{ material.descripcion }}</td>
-                            <td>{{ material.ubicacion }}</td>
-                            <td>{{ material.fecha_mantenimiento|date:'M. d, Y' }}</td>
-                            <td>
-                                {% if material.qr_code %}
-                                    <img src="{{ material.qr_code.url }}" alt="QR Material" width="60"><br>
-                                    <a href="{{ material.qr_code.url }}" download>Descargar</a>
-                                {% else %}
-                                    No generado
-                                {% endif %}
-                                <br>
-                                <a href="{% url 'editar_material' material.id %}">Editar</a> |
-                                <a href="{% url 'eliminar_material' material.id %}">Eliminar</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="6" style="text-align:center;color:#888;">No hay materiales registrados.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <h2>Gestión de Equipos</h2>
-                <form class="materiales-form" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="tipo" value="equipo">
-                    <input type="text" name="nombre" placeholder="Nombre del equipo">
-                    <input type="number" name="cantidad" placeholder="Cantidad">
-                    <input type="text" name="descripcion" placeholder="Descripción">
-                    <input type="text" name="ubicacion" placeholder="Ubicación">
-                    <input type="date" name="fecha_mantenimiento" placeholder="Fecha de mantenimiento">
-                    <input type="submit" value="Añadir Equipo">
-                </form>
-                <table class="materiales-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Cantidad</th>
-                            <th>Descripción</th>
-                            <th>Ubicación</th>
-                            <th>Fecha de mantenimiento</th>
-                            <th>QR</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for equipo in equipos %}
-                        <tr>
-                            <td>{{ equipo.nombre }}</td>
-                            <td>{{ equipo.cantidad }}</td>
-                            <td>{{ equipo.descripcion }}</td>
-                            <td>{{ equipo.ubicacion }}</td>
-                            <td>{{ equipo.fecha_mantenimiento|date:'M. d, Y' }}</td>
-                            <td>
-                                {% if equipo.qr_code %}
-                                    <img src="{{ equipo.qr_code.url }}" alt="QR Equipo" width="60"><br>
-                                    <a href="{{ equipo.qr_code.url }}" download>Descargar</a>
-                                {% else %}
-                                    No generado
-                                {% endif %}
-                                <br>
-                                <a href="{% url 'editar_equipo' equipo.id %}">Editar</a> |
-                                <a href="{% url 'eliminar_equipo' equipo.id %}">Eliminar</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="6" style="text-align:center;color:#888;">No hay equipos registrados.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

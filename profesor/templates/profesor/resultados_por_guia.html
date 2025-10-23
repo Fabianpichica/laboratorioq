@@ -1,55 +1,78 @@
-{% extends "profesor/dashboard_profesor.html" %}
-{% block content %}
-<div class="profesor-dashboard-section">
-    <div class="dashboard-header" style="margin-bottom:32px;">
-        <i class="fas fa-clipboard-list" style="font-size:2rem;color:#3949ab;margin-right:16px;"></i>
-        <h2 style="font-size:2rem;color:#1a237e;margin:0;">Resultados de estudiantes por guía</h2>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados por Guía</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f4f6fa; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
+        .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
+        .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
+        .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
+        .profesor-sidebar nav { width: 100%; }
+        .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
+        .profesor-sidebar li { margin-bottom: 8px; width: 70%; }
+        .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
+        .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
+        .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
+        .profesor-dashboard-section { flex: 1; padding: 48px 40px; margin-left: 240px; }
+        .guia-entregas-box { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 1px 6px rgba(60,72,88,0.06); }
+        .guia-entregas-box h4 { color: #283593; margin-bottom: 10px; }
+        .guia-entregas-box ul { list-style: none; padding: 0; }
+        .guia-entregas-box li { margin-bottom: 12px; }
+        .entregado { color: #388e3c; font-weight: 600; }
+        .no-entregado { color: #d32f2f; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="profesor-dashboard-wrapper">
+        <aside class="profesor-sidebar">
+            <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Panel de Profesor</div>
+            <nav>
+                <ul>
+                    <li><a href="/profesor/dashboard/"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <section class="profesor-dashboard-section">
+            <h3 style="color:#1a237e;font-size:1.15rem;margin-bottom:18px;"><i class="fas fa-book"></i> Guías asignadas por salón</h3>
+            {% for salon_info in salones_info %}
+                <div class="guia-entregas-box">
+                    <h3 style="color:#283593;">{{ salon_info.salon.nombre }}</h3>
+                    {% for guia_info in salon_info.guias_info %}
+                        <div style="margin-bottom:18px;">
+                            <h4>{{ guia_info.guia.titulo }}</h4>
+                            <ul>
+                                {% for estudiante, informe in guia_info.entregas.items %}
+                                    <li>
+                                        <strong>{{ estudiante.nombre|default:'Sin nombre' }}</strong>:
+                                        {% if informe %}
+                                            <span class="entregado"><i class="fas fa-check-circle"></i> Entregado</span>
+                                            <br><strong>Nota:</strong> {{ informe.nota|truncatechars:80 }}
+                                            <br><strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}
+                                            {% if informe.imagen %}<br><a href="{{ informe.imagen.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-image"></i> Ver imagen</a>{% endif %}
+                                            <form method="post" style="margin-top:10px;">
+                                                {% csrf_token %}
+                                                <label for="retroalimentacion_{{ informe.id }}" style="font-weight:600;color:#3949ab;">Retroalimentación:</label>
+                                                <textarea name="retroalimentacion" id="retroalimentacion_{{ informe.id }}" rows="2" style="width:100%;border-radius:8px;margin-bottom:6px;">{{ informe.retroalimentacion }}</textarea>
+                                                <input type="hidden" name="informe_id" value="{{ informe.id }}">
+                                                <button type="submit" style="background:#1976d2;color:#fff;border:none;padding:4px 14px;border-radius:6px;font-weight:600;">Guardar</button>
+                                            </form>
+                                            {% if informe.retroalimentacion %}
+                                                <div style="background:#f7f9fc;border:1.5px solid #e3e6ea;padding:8px 12px;border-radius:8px;margin-top:6px;">{{ informe.retroalimentacion }}</div>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="no-entregado"><i class="fas fa-times-circle"></i> No entregado</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </section>
     </div>
-    {% if guias %}
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:28px;">
-        {% for guia in guias %}
-            <div class="guia-resultados-box">
-                <h3 class="guia-titulo"><i class="fas fa-book" style="margin-right:8px;"></i> {{ guia.titulo }}</h3>
-                <p class="guia-descripcion">{{ guia.descripcion }}</p>
-                {% if resultados.guia %}
-                    <ul class="resultados-lista">
-                        {% for informe in resultados.guia %}
-                        <li class="resultado-item">
-                            <strong>Estudiante:</strong> {{ informe.aprendiz.username }}<br>
-                            <strong>Químico:</strong> {{ informe.quimico.nombre }}<br>
-                            <strong>Nota:</strong> {{ informe.nota|truncatechars:80 }}<br>
-                            <strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}<br>
-                            {% if informe.imagen %}
-                                <a href="{{ informe.imagen.url }}" target="_blank" class="ver-imagen"><i class="fas fa-image"></i> Ver imagen</a>
-                            {% endif %}
-                        </li>
-                        {% empty %}
-                        <li class="no-resultados">No hay resultados registrados para esta guía.</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="no-resultados">No hay resultados registrados para esta guía.</p>
-                {% endif %}
-            </div>
-        {% endfor %}
-        </div>
-    {% else %}
-        <p class="no-guias">No hay guías asignadas a tus salones.</p>
-    {% endif %}
-</div> 
-<style>
-@media (max-width: 900px) {
-    .profesor-main-content { padding: 32px 8px 8px 8px !important; } 
-    .profesor-sidebar { width: 100px !important; } 
-    .profesor-main-content { margin-left: 100px !important; }
-}
-@media (max-width: 600px) {
-    .profesor-main-content { padding: 10px !important; margin-left: 0 !important; }
-    .sidebar-title { font-size: 0.95rem !important; }
-}
-@media (max-width: 400px) {
-    .profesor-main-content { padding: 2vw 0 8vw 0 !important; }
-    .sidebar-title { font-size: 0.85rem !important; }
-}
-</style>
-{% endblock %}
+</body>
+</html>

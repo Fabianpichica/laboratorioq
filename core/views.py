@@ -197,12 +197,81 @@ def materiales_view(request):
         descripcion = request.POST.get('descripcion')
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
         if nombre and cantidad and cantidad.isdigit():
-            Quimico.objects.create(
-                nombre=nombre,
-                cantidad=cantidad,
-                descripcion=descripcion,
-                fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
-            )
+            # Traducción de nombre si existe en quimicos_es.json, si no, traducir automáticamente
+            import os, json
+            from googletrans import Translator
+            ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
+            nombre_es = None
+            try:
+                with open(ruta_json, 'r', encoding='utf-8') as f:
+                    traducciones = json.load(f)
+                nombre_es = traducciones.get(nombre.strip().lower())
+            except Exception:
+                nombre_es = None
+            # Si no hay traducción o es igual al original, forzar traducción automática
+            if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+                try:
+                    translator = Translator()
+                    nombre_es = translator.translate(nombre, src='en', dest='es').text
+                    if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+                        nombre_es = nombre
+                except Exception:
+                    nombre_es = nombre
+            # Si el nombre traducido sigue en inglés, forzar español manualmente
+            if nombre_es and nombre_es.strip().lower() == nombre.strip().lower():
+                # Ampliar el diccionario manual para más casos
+                traducciones_manual = {
+                    'water': 'agua', 'sodium': 'sodio', 'chloride': 'cloruro', 'acid': 'ácido',
+                    'hydrogen': 'hidrógeno', 'oxygen': 'oxígeno', 'molecular': 'molecular',
+                    'carbon': 'carbono', 'nitrogen': 'nitrógeno', 'potassium': 'potasio',
+                    'calcium': 'calcio', 'magnesium': 'magnesio', 'iron': 'hierro',
+                    'sulfur': 'azufre', 'phosphorus': 'fósforo', 'silver': 'plata',
+                    'gold': 'oro', 'copper': 'cobre', 'zinc': 'zinc', 'lead': 'plomo',
+                    'mercury': 'mercurio', 'bromide': 'bromuro', 'fluoride': 'fluoruro',
+                    'iodide': 'yoduro', 'lithium': 'litio', 'barium': 'bario',
+                    'strontium': 'estroncio', 'chromium': 'cromo', 'manganese': 'manganeso',
+                    'nickel': 'níquel', 'cobalt': 'cobalto', 'tin': 'estaño',
+                    'antimony': 'antimonio', 'arsenic': 'arsénico', 'selenium': 'selenio',
+                    'tellurium': 'telurio', 'platinum': 'platino', 'uranium': 'uranio',
+                    'thorium': 'torio', 'radium': 'radio', 'radon': 'radón',
+                    'neon': 'neón', 'argon': 'argón', 'krypton': 'criptón',
+                    'xenon': 'xenón', 'seaborgium': 'seaborgio', 'molybdenum': 'molibdeno',
+                    'vanadium': 'vanadio', 'tungsten': 'wolframio', 'ruthenium': 'rutenio',
+                    'rhodium': 'rodio', 'palladium': 'paladio', 'cadmium': 'cadmio',
+                    'indium': 'indio', 'thallium': 'talio', 'bismuth': 'bismuto',
+                    'polonium': 'polonio', 'astatine': 'astato', 'francium': 'francio',
+                    'actinium': 'actinio', 'protactinium': 'protactinio', 'neptunium': 'neptunio',
+                    'plutonium': 'plutonio', 'americium': 'americio', 'curium': 'curio',
+                    'berkelium': 'berkelio', 'californium': 'californio', 'einsteinium': 'einsteinio',
+                    'fermium': 'fermio', 'mendelevium': 'mendelevio', 'nobelium': 'nobelio',
+                    'lawrencium': 'laurencio', 'rutherfordium': 'rutherfordio', 'dubnium': 'dubnio',
+                    'bohrium': 'bohrio', 'hassium': 'hassio', 'meitnerium': 'meitnerio',
+                    'darmstadtium': 'darmstadtio', 'roentgenium': 'roentgenio', 'copernicium': 'copernicio',
+                    'nihonium': 'nihonio', 'flerovium': 'flerovio', 'moscovium': 'moscovio',
+                    'livermorium': 'livermorio', 'tennessine': 'tenesino', 'oganesson': 'oganesón',
+                    'molecular hydrogen': 'hidrógeno molecular', 'molecular oxygen': 'oxígeno molecular',
+                    'molecular nitrogen': 'nitrógeno molecular', 'molecular chlorine': 'cloro molecular',
+                    'molecular fluorine': 'flúor molecular', 'molecular iodine': 'yodo molecular',
+                    'molecular bromine': 'bromo molecular'
+                }
+                for eng, esp in traducciones_manual.items():
+                    nombre_es = nombre_es.replace(eng, esp)
+            # Validar que no exista un químico con el mismo nombre y fecha de vencimiento
+            filtro = {'nombre': nombre_es}
+            if fecha_vencimiento:
+                filtro['fecha_vencimiento'] = fecha_vencimiento
+            if not Quimico.objects.filter(**filtro).exists():
+                try:
+                    Quimico.objects.create(
+                        nombre=nombre_es,
+                        cantidad=cantidad,
+                        descripcion=descripcion,
+                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
+                    )
+                except Exception as e:
+                    messages.error(request, f"Error al crear químico: {e}")
+            else:
+                messages.error(request, "Ya existe un químico con ese nombre y fecha de vencimiento.")
     quimicos = Quimico.objects.all()
     return render(request, 'materiales.html', {'quimicos': quimicos})
 
@@ -276,7 +345,11 @@ def eliminar_equipo(request, equipo_id):
 @login_required
 def reportes_view(request):
     User = get_user_model()
-    aprendices = User.objects.filter(profile__role='aprendiz')
+    # Solo mostrar el aprendiz actual si el usuario es aprendiz
+    if hasattr(request.user, 'profile') and request.user.profile.role == 'aprendiz':
+        aprendices = User.objects.filter(id=request.user.id)
+    else:
+        aprendices = User.objects.filter(profile__role='aprendiz')
     aprendiz_id = request.GET.get('aprendiz')
     if aprendiz_id:
         aprendiz = User.objects.get(id=aprendiz_id)
@@ -396,11 +469,71 @@ def materiales_equipos_view(request):
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
         # Validar que todos los campos requeridos estén presentes y que cantidad sea un número
         if nombre and cantidad and cantidad.isdigit():
-            # Validar que no exista un químico con el mismo nombre y fecha de vencimiento
-            if not Quimico.objects.filter(nombre=nombre, fecha_vencimiento=fecha_vencimiento).exists():
+            # Traducción de nombre si existe en quimicos_es.json, si no, traducir automáticamente
+            import os, json
+            from googletrans import Translator
+            ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
+            nombre_es = None
+            try:
+                with open(ruta_json, 'r', encoding='utf-8') as f:
+                    traducciones = json.load(f)
+                nombre_es = traducciones.get(nombre.strip().lower())
+            except Exception:
+                nombre_es = None
+            # Si no hay traducción o es igual al original, forzar traducción automática
+            if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+                try:
+                    translator = Translator()
+                    nombre_es = translator.translate(nombre, src='en', dest='es').text
+                    if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+                        nombre_es = nombre
+                except Exception:
+                    nombre_es = nombre
+            # Si el nombre traducido sigue en inglés, forzar español manualmente
+            if nombre_es and nombre_es.strip().lower() == nombre.strip().lower():
+                traducciones_manual = {
+                    'water': 'agua', 'sodium': 'sodio', 'chloride': 'cloruro', 'acid': 'ácido',
+                    'hydrogen': 'hidrógeno', 'oxygen': 'oxígeno', 'molecular': 'molecular',
+                    'carbon': 'carbono', 'nitrogen': 'nitrógeno', 'potassium': 'potasio',
+                    'calcium': 'calcio', 'magnesium': 'magnesio', 'iron': 'hierro',
+                    'sulfur': 'azufre', 'phosphorus': 'fósforo', 'silver': 'plata',
+                    'gold': 'oro', 'copper': 'cobre', 'zinc': 'zinc', 'lead': 'plomo',
+                    'mercury': 'mercurio', 'bromide': 'bromuro', 'fluoride': 'fluoruro',
+                    'iodide': 'yoduro', 'lithium': 'litio', 'barium': 'bario',
+                    'strontium': 'estroncio', 'chromium': 'cromo', 'manganese': 'manganeso',
+                    'nickel': 'níquel', 'cobalt': 'cobalto', 'tin': 'estaño',
+                    'antimony': 'antimonio', 'arsenic': 'arsénico', 'selenium': 'selenio',
+                    'tellurium': 'telurio', 'platinum': 'platino', 'uranium': 'uranio',
+                    'thorium': 'torio', 'radium': 'radio', 'radon': 'radón',
+                    'neon': 'neón', 'argon': 'argón', 'krypton': 'criptón',
+                    'xenon': 'xenón', 'seaborgium': 'seaborgio', 'molybdenum': 'molibdeno',
+                    'vanadium': 'vanadio', 'tungsten': 'wolframio', 'ruthenium': 'rutenio',
+                    'rhodium': 'rodio', 'palladium': 'paladio', 'cadmium': 'cadmio',
+                    'indium': 'indio', 'thallium': 'talio', 'bismuth': 'bismuto',
+                    'polonium': 'polonio', 'astatine': 'astato', 'francium': 'francio',
+                    'actinium': 'actinio', 'protactinium': 'protactinio', 'neptunium': 'neptunio',
+                    'plutonium': 'plutonio', 'americium': 'americio', 'curium': 'curio',
+                    'berkelium': 'berkelio', 'californium': 'californio', 'einsteinium': 'einsteinio',
+                    'fermium': 'fermio', 'mendelevium': 'mendelevio', 'nobelium': 'nobelio',
+                    'lawrencium': 'laurencio', 'rutherfordium': 'rutherfordio', 'dubnium': 'dubnio',
+                    'bohrium': 'bohrio', 'hassium': 'hassio', 'meitnerium': 'meitnerio',
+                    'darmstadtium': 'darmstadtio', 'roentgenium': 'roentgenio', 'copernicium': 'copernicio',
+                    'nihonium': 'nihonio', 'flerovium': 'flerovio', 'moscovium': 'moscovio',
+                    'livermorium': 'livermorio', 'tennessine': 'tenesino', 'oganesson': 'oganesón',
+                    'molecular hydrogen': 'hidrógeno molecular', 'molecular oxygen': 'oxígeno molecular',
+                    'molecular nitrogen': 'nitrógeno molecular', 'molecular chlorine': 'cloro molecular',
+                    'molecular fluorine': 'flúor molecular', 'molecular iodine': 'yodo molecular',
+                    'molecular bromine': 'bromo molecular'
+                }
+                for eng, esp in traducciones_manual.items():
+                    nombre_es = nombre_es.replace(eng, esp)
+            filtro = {'nombre': nombre_es}
+            if fecha_vencimiento:
+                filtro['fecha_vencimiento'] = fecha_vencimiento
+            if not Quimico.objects.filter(**filtro).exists():
                 try:
                     Quimico.objects.create(
-                        nombre=nombre,
+                        nombre=nombre_es,
                         cantidad=int(cantidad),
                         descripcion=descripcion,
                         fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None

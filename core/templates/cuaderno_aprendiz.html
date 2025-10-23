@@ -50,7 +50,7 @@
         transition: background 0.2s;
     }
     .dashboard-aside a:hover, .dashboard-aside .active {
-        background: #3949ab;
+        background:  #1976d2;
         border-left: 4px solid #ffb300;
     }
     .dashboard-section {
@@ -311,15 +311,23 @@
                     <form method="post" enctype="multipart/form-data" class="cuaderno-form">
                         {% csrf_token %}
                         <label for="quimico">Químico utilizado:</label>
+                        <input type="text" id="busquedaQuimico" placeholder="Buscar químico..." autocomplete="off" style="width:100%;margin-bottom:8px;padding:8px 12px;border-radius:8px;border:1.5px solid #bfc8d6;font-size:1rem;">
+                        <ul id="listaQuimicos" style="display:none;position:absolute;z-index:1000;background:#fff;border:1.5px solid #bfc8d6;border-radius:8px;width:100%;max-height:180px;overflow-y:auto;box-shadow:0 2px 8px rgba(60,72,88,0.13);margin-top:-8px;"></ul>
+                        <div id="quimicosSeleccionados" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;"></div>
                         <select id="quimicoSelect">
                             <option value="">Selecciona un químico</option>
                             {% for quimico in quimicos %}
                             <option value="{{ quimico.id }}">{{ quimico.nombre }}</option>
                             {% endfor %}
                         </select>
-                        <div id="quimicosSeleccionados" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;"></div>
                         <label for="guia">Guía asociada:</label>
-                        <select name="guia" id="guia">
+                        <div style="position:relative;width:100%;">
+                            <input type="text" id="busquedaGuia" placeholder="Buscar guía..." autocomplete="off" style="width:100%;margin-bottom:8px;padding:8px 12px;border-radius:8px;border:1.5px solid #bfc8d6;font-size:1rem;box-shadow:0 1px 4px rgba(60,72,88,0.08);transition:box-shadow 0.2s;">
+                            <ul id="listaGuias" style="display:none;position:absolute;left:0;top:40px;z-index:1000;background:#fff;border:1.5px solid #bfc8d6;border-radius:10px;width:100%;max-height:180px;overflow-y:auto;box-shadow:0 4px 16px rgba(60,72,88,0.13);margin-top:0;padding:0;">
+                            </ul>
+                        </div>
+                        <div id="guiaSeleccionada" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+                        <select id="guiaSelect" name="guia" style="display:none;">
                             <option value="">Selecciona una guía (opcional)</option>
                             {% for guia in guias %}
                             <option value="{{ guia.id }}" {% if guia.id == guia_usada_id %}selected{% endif %}>{{ guia.titulo }}</option>
@@ -327,8 +335,8 @@
                         </select>
                         <label for="nota">Nota:</label>
                         <textarea name="nota" id="nota" rows="6" placeholder="Describe el experimento..."></textarea>
-                        <label for="foto">Cargar foto:</label>
-                        <input type="file" id="foto" name="foto" accept="image/*">
+                        <label for="foto">Cargar archivo (imagen, PDF o Word):</label>
+                        <input type="file" id="foto" name="foto" accept="image/*,.pdf,.doc,.docx,.odt,.rtf,.txt">
                         <button type="submit">Guardar</button>
                     </form>
                     {% if imagen_url %}
@@ -421,6 +429,160 @@
             }
         });
     }
+
+    // Filtro de búsqueda para químicos
+    const busquedaQuimico = document.getElementById('busquedaQuimico');
+    if (busquedaQuimico && quimicoSelect) {
+        busquedaQuimico.addEventListener('input', function() {
+            const filtro = busquedaQuimico.value.toLowerCase();
+            for (let i = 0; i < quimicoSelect.options.length; i++) {
+                const option = quimicoSelect.options[i];
+                if (i === 0) { // Siempre mostrar la opción por defecto
+                    option.style.display = '';
+                    continue;
+                }
+                if (option.text.toLowerCase().includes(filtro)) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    // --- Autocompletado de químicos ---
+    const listaQuimicos = document.createElement('ul');
+    listaQuimicos.id = 'listaQuimicos';
+    listaQuimicos.style.display = 'none';
+    busquedaQuimico.parentNode.insertBefore(listaQuimicos, busquedaQuimico.nextSibling);
+
+    // Obtener los químicos del select (ya renderizados por Django)
+    let quimicos = [];
+    for (let i = 1; i < quimicoSelect.options.length; i++) {
+        quimicos.push({
+            id: quimicoSelect.options[i].value,
+            nombre: quimicoSelect.options[i].text
+        });
+    }
+    quimicoSelect.style.display = 'none'; // Ocultar el select tradicional
+
+    function renderListaQuimicos(filtro) {
+        listaQuimicos.innerHTML = '';
+        const filtrados = quimicos.filter(q => q.nombre.toLowerCase().includes(filtro.toLowerCase()));
+        filtrados.forEach(q => {
+            if (!document.getElementById('quimico-'+q.id)) {
+                const li = document.createElement('li');
+                li.textContent = q.nombre;
+                li.style = 'padding:8px 14px;cursor:pointer;';
+                li.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    agregarQuimico(q.id, q.nombre);
+                    listaQuimicos.style.display = 'none';
+                    busquedaQuimico.value = '';
+                });
+                listaQuimicos.appendChild(li);
+            }
+        });
+        listaQuimicos.style.display = filtrados.length > 0 ? 'block' : 'none';
+    }
+
+    busquedaQuimico.addEventListener('input', function() {
+        const filtro = busquedaQuimico.value.trim();
+        if (filtro.length > 0) {
+            renderListaQuimicos(filtro);
+        } else {
+            listaQuimicos.style.display = 'none';
+        }
+    });
+
+    busquedaQuimico.addEventListener('focus', function() {
+        if (busquedaQuimico.value.trim().length > 0) {
+            renderListaQuimicos(busquedaQuimico.value.trim());
+        }
+    });
+
+    busquedaQuimico.addEventListener('blur', function() {
+        setTimeout(() => { listaQuimicos.style.display = 'none'; }, 120);
+    });
+
+    function agregarQuimico(id, nombre) {
+        if (!document.getElementById('quimico-'+id)) {
+            const div = document.createElement('div');
+            div.className = 'material-quimico-box';
+            div.id = 'quimico-'+id;
+            div.style = 'background:#e3e6ea;color:#3949ab;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 2px 8px rgba(60,72,88,0.08);';
+            div.innerHTML = `<span>${nombre}</span> <button type="button" style="background:none;border:none;color:#d32f2f;font-size:1.1rem;cursor:pointer;font-weight:700;" title="Eliminar" onclick="this.parentNode.remove(); document.getElementById('input-quimico-'+id).remove();">&times;</button>`;
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'quimicos[]';
+            input.value = id;
+            input.id = 'input-quimico-'+id;
+            div.appendChild(input);
+            document.getElementById('quimicosSeleccionados').appendChild(div);
+        }
+    }
+
+    // Filtro de búsqueda para guías
+    const busquedaGuia = document.getElementById('busquedaGuia');
+    const listaGuias = document.getElementById('listaGuias');
+    const guiaSelect = document.getElementById('guiaSelect');
+    const guiaSeleccionada = document.getElementById('guiaSeleccionada');
+    let guias = [];
+    for (let i = 1; i < guiaSelect.options.length; i++) {
+        guias.push({
+            id: guiaSelect.options[i].value,
+            titulo: guiaSelect.options[i].text
+        });
+    }
+    function renderListaGuias(filtro) {
+        listaGuias.innerHTML = '';
+        const filtradas = guias.filter(g => g.titulo.toLowerCase().includes(filtro.toLowerCase()));
+        filtradas.forEach(g => {
+            if (!document.getElementById('guia-'+g.id)) {
+                const li = document.createElement('li');
+                li.textContent = g.titulo;
+                li.style = 'padding:10px 18px;cursor:pointer;border-bottom:1px solid #e3e6ea;background:#fff;list-style:none;font-size:1.07rem;transition:background 0.18s;';
+                li.onmouseover = function() { li.style.background = '#e3e6ea'; };
+                li.onmouseout = function() { li.style.background = '#fff'; };
+                li.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    agregarGuia(g.id, g.titulo);
+                    listaGuias.style.display = 'none';
+                    busquedaGuia.value = '';
+                });
+                listaGuias.appendChild(li);
+            }
+        });
+        if (listaGuias.lastChild) listaGuias.lastChild.style.borderBottom = 'none';
+        listaGuias.style.display = filtradas.length > 0 ? 'block' : 'none';
+    }
+    busquedaGuia.addEventListener('input', function() {
+        const filtro = busquedaGuia.value.trim();
+        renderListaGuias(filtro);
+    });
+    busquedaGuia.addEventListener('focus', function() {
+        renderListaGuias(busquedaGuia.value.trim());
+    });
+    busquedaGuia.addEventListener('blur', function() {
+        setTimeout(() => { listaGuias.style.display = 'none'; }, 120);
+    });
+    function agregarGuia(id, titulo) {
+        guiaSeleccionada.innerHTML = '';
+        if (!document.getElementById('guia-'+id)) {
+            const div = document.createElement('div');
+            div.className = 'material-quimico-box';
+            div.id = 'guia-'+id;
+            div.style = 'background:#e3e6ea;color:#3949ab;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 2px 8px rgba(60,72,88,0.08);margin-bottom:8px;';
+            div.innerHTML = `<span>${titulo}</span> <button type="button" style="background:none;border:none;color:#d32f2f;font-size:1.1rem;cursor:pointer;font-weight:700;" title="Eliminar" onclick="this.parentNode.remove(); guiaSelect.value='';">&times;</button>`;
+            guiaSeleccionada.appendChild(div);
+            guiaSelect.value = id;
+        }
+    }
+    if (guiaSelect.value) {
+        const selectedOption = guiaSelect.options[guiaSelect.selectedIndex];
+        agregarGuia(selectedOption.value, selectedOption.text);
+    }
+    guiaSelect.style.display = 'none';
     </script>
 </body>
 </html>

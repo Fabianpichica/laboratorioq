@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Jornada, Salon, Estudiante, Guia
 from django.contrib.auth.models import User
-from core.models import CuadernoEntry, Quimico, Material, Equipo
+from core.models import CuadernoEntry, Quimico
+from adminlab.models import Material, Equipo
 
 @login_required
 def dashboard_profesor(request):
@@ -83,19 +84,37 @@ def resultados_por_guia(request):
     # Solo profesores
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'profesor':
         return redirect('/')
-    # Obtener jornadas y salones del profesor
     jornadas = Jornada.objects.filter(profesores=request.user)
     salones = Salon.objects.filter(jornadas__profesores=request.user).distinct()
-    guias = Guia.objects.filter(salones__in=salones).distinct()
-    resultados = {}
-    for guia in guias:
-        # Entradas de cuaderno asociadas a la guía
-        informes = CuadernoEntry.objects.filter(guia=guia).select_related('aprendiz', 'quimico').order_by('-fecha')
-        resultados[guia] = informes
+    salones_info = []
+    for salon in salones:
+        estudiantes = salon.estudiantes.all()
+        guias = Guia.objects.filter(salones=salon).distinct()
+        guias_info = []
+        for guia in guias:
+            entregas = {}
+            for estudiante in estudiantes:
+                user = User.objects.filter(username=estudiante.documento).first()
+                informe = None
+                if user:
+                    informe = CuadernoEntry.objects.filter(aprendiz=user, guia=guia).first()
+                entregas[estudiante] = informe
+            guias_info.append({'guia': guia, 'entregas': entregas})
+        salones_info.append({'salon': salon, 'guias_info': guias_info})
     return render(request, 'profesor/resultados_por_guia.html', {
-        'guias': guias,
-        'resultados': resultados,
+        'salones_info': salones_info,
         'jornadas': jornadas
     })
 
-# Create your views here.
+@login_required
+def materiales_profesor(request):
+    from adminlab.models import Material, Equipo
+    from core.models import Quimico
+    materiales = Material.objects.all()
+    equipos = Equipo.objects.all()
+    quimicos = Quimico.objects.all()
+    return render(request, 'profesor/materiales.html', {
+        'materiales': materiales,
+        'equipos': equipos,
+        'quimicos': quimicos,
+    })

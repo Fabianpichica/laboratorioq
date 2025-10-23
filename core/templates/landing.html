@@ -1,12 +1,211 @@
-{% extends "base.html" %}
-{% block title %}Bienvenido - Laboratorio{% endblock %}
-{% block content %}
-<div class="landing-container">
-    <h2>¡Bienvenido al Laboratorio Virtual!</h2>
-    <p>Accede a tu espacio de aprendizaje, gestiona tus cursos y recursos, y mantén tus notas y materiales organizados.</p>
-    <div>
-        <a href="/login/">Iniciar sesión</a>
-        <a href="/register/">Registrarse</a>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido - Laboratorio</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f6fb;
+        }
+        .landing-flex {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background: #f4f6fb;
+            width: 100vw;
+            overflow-x: hidden;
+        }
+        .landing-img {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+            min-height: 100vh;
+            position: relative;
+            width: 100vw;
+        }
+        .landing-img img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            max-width: none;
+            max-height: none;
+            display: block;
+        }
+        .landing-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            pointer-events: none;
+            z-index: 2;
+            padding-right: 6vw;
+        }
+        .landing-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            max-width: 420px;
+            width: 100%;
+            padding: 48px 40px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.92);
+            z-index: 2;
+            pointer-events: auto;
+        }
+        .landing-content h1 {
+            font-size: 3.2rem;
+            font-weight: 900;
+            margin-bottom: 0;
+            color: #181828;
+            line-height: 1.1;
+        }
+        .landing-content h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 18px;
+            color: #222;
+            letter-spacing: -1px;
+        }
+        .landing-content p {
+            font-size: 1.25rem;
+            color: #222;
+            margin-bottom: 32px;
+        }
+        .landing-content .landing-buttons {
+            display: flex;
+            gap: 18px;
+        }
+        .landing-content a {
+            background: #d6f3f7;
+            color: #181828;
+            font-weight: 700;
+            font-size: 1.15rem;
+            border-radius: 10px;
+            padding: 12px 32px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
+            border: none;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+        .landing-content a:last-child {
+            background: #e5e0fa;
+        }
+        @media (max-width: 1100px) {
+            .landing-overlay { padding-right: 2vw; }
+            .landing-content { max-width: 340px; padding: 32px 18px; }
+        }
+        @media (max-width: 900px) {
+            .landing-flex { flex-direction: column; }
+            .landing-img, .landing-content { min-height: unset; width: 100vw; }
+            .landing-img img { height: 180px; width: 100vw; object-fit: cover; }
+            .landing-overlay { justify-content: center !important; padding-right: 0 !important; }
+            .landing-content {
+                max-width: 96vw !important;
+                padding: 16px 2vw !important;
+                align-items: center !important;
+                text-align: center !important;
+                border-radius: 14px;
+                margin-top: -40px;
+                margin-bottom: 16px;
+            }
+            .landing-content h1, .landing-content h2, .landing-content p {
+                text-align: center !important;
+                align-self: center !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            .landing-content .landing-buttons {
+                flex-direction: column;
+                gap: 10px !important;
+                width: 100%;
+                align-items: center;
+            }
+            .landing-content a {
+                width: 100%;
+                min-width: 0;
+                font-size: 1.05rem !important;
+                padding: 12px 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box;
+            }
+        }
+        @media (max-width: 600px) {
+            .landing-content {
+                padding: 18px 6vw !important;
+                border-radius: 12px;
+                margin-top: -30px;
+                max-width: 98vw !important;
+            }
+            .landing-content h1 {
+                font-size: 1.45rem !important;
+            }
+            .landing-content h2 {
+                font-size: 1.15rem !important;
+            }
+            .landing-content p {
+                font-size: 1.05rem !important;
+            }
+            .landing-img img {
+                height: 520px !important;
+                object-fit: cover !important;
+                object-position: top center !important;
+            }
+            .landing-content .landing-buttons a {
+                font-size: 1.15rem !important;
+                padding: 14px 0 !important;
+                margin-bottom: 6px;
+            }
+        }
+        @media (max-width: 400px) {
+            .landing-content {
+                padding: 8px 2vw !important;
+                border-radius: 6px;
+                margin-top: -12px;
+            }
+            .landing-content h1 {
+                font-size: 1.15rem !important;
+            }
+            .landing-content h2 {
+                font-size: 0.95rem !important;
+            }
+            .landing-content p {
+                font-size: 0.9rem !important;
+            }
+            .landing-img img {
+                height: 178px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="landing-flex">
+    <div class="landing-img">
+        <img src="/static/img/landing-lab.png" alt="Ilustración laboratorio">
+        <div class="landing-overlay">
+            <div class="landing-content">
+                <h1>Bienvenidos</h1>
+                <h2>Al Laboratorio</h2>
+                <p>Accede a tu espacio de aprendizaje, gestiona tus cursos, recursos, y manten en orden tus notas y materiales</p>
+                <div class="landing-buttons">
+                    <a href="/login/">Inicia sesión</a>
+                    <a href="/register/">Regístrate</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-{% endblock %}
+</body>
+</html>

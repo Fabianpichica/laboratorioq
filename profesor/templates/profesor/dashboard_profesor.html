@@ -49,9 +49,9 @@
             <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Profesor</div>
             <nav>
                 <ul>
-                    <li class="active"><i class="fa-solid fa-house icon"></i>Inicio</li>
+                    <li><a href="{% url 'dashboard_profesor' %}"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
                     <li><a href="{% url 'guias_profesor' %}"><i class="fa-solid fa-book icon"></i>Guías</a></li>
-                    <li><a href="#"><i class="fa-solid fa-boxes-stacked icon"></i>Materiales</a></li>
+                    <li><a href="{% url 'materiales_profesor' %}"><i class="fa-solid fa-boxes-stacked icon"></i>Materiales</a></li>
                     <li><a href="{% url 'resultados_por_guia' %}"><i class="fa-solid fa-flask-vial icon"></i>Resultados por Guía</a></li>
                     <li><a href="#"><i class="fa-solid fa-chart-bar icon"></i>Reportes</a></li>
                     <li><a href="#"><i class="fa-solid fa-user icon"></i>Perfil</a></li>

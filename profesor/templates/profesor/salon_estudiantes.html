@@ -43,7 +43,13 @@
             <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Panel de Profesor</div>
             <nav>
                 <ul>
-                    <li><a href="/profesor/dashboard/"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
+                    <li><a href="{% url 'dashboard_profesor' %}"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
+                    <li><a href="{% url 'guias_profesor' %}"><i class="fa-solid fa-book icon"></i>Guías</a></li>
+                    <li><a href="{% url 'materiales_profesor' %}"><i class="fa-solid fa-boxes-stacked icon"></i>Materiales</a></li>
+                    <li><a href="{% url 'resultados_por_guia' %}"><i class="fa-solid fa-flask-vial icon"></i>Resultados por Guía</a></li>
+                    <li><a href="#"><i class="fa-solid fa-chart-bar icon"></i>Reportes</a></li>
+                    <li><a href="#"><i class="fa-solid fa-user icon"></i>Perfil</a></li>
+                    <li><a href="{% url 'landing' %}"><i class="fa-solid fa-right-from-bracket icon"></i>Cerrar sesión</a></li>
                 </ul>
             </nav>
         </aside>
@@ -52,12 +58,17 @@
                 <i class="fas fa-users"></i>
                 <h2>Estudiantes en el salón: {{ salon.nombre }}</h2>
             </div>
+            <form method="get" style="margin-bottom:18px;">
+                <input type="text" name="q" placeholder="Buscar estudiante por nombre o documento" value="{{ request.GET.q|default:'' }}" style="padding:8px 14px;border-radius:8px;border:1.5px solid #e3e6ea;width:320px;max-width:100%;font-size:1rem;">
+                <button type="submit" style="background:#1976d2;color:#fff;border:none;padding:7px 18px;border-radius:6px;font-weight:600;margin-left:8px;">Buscar</button>
+            </form>
             {% if jornada %}
                 <h3 style="color:#3949ab;font-size:1.1rem;margin-bottom:18px;">Jornada: {{ jornada.nombre }} ({{ jornada.fecha }})</h3>
             {% endif %}
             {% if estudiantes %}
                 <ul class="salon-estudiantes-list">
                     {% for estudiante in estudiantes %}
+                        {% if not request.GET.q or request.GET.q|lower in estudiante.nombre|lower or request.GET.q in estudiante.documento %}
                         <li>
                             {% if estudiante.foto %}
                                 <img src="{{ estudiante.foto.url }}" alt="Foto" class="estudiante-foto">
@@ -74,42 +85,9 @@
                                 {% endif %}
                             </div>
                         </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
-                {% if guias_info %}
-                    <hr style="margin:32px 0;">
-                    <h3 style="color:#1a237e;font-size:1.15rem;margin-bottom:18px;"><i class="fas fa-book"></i> Guías asignadas a este salón</h3>
-                    {% for guia_info in guias_info %}
-                        <div class="guia-entregas-box">
-                            <h4>{{ guia_info.guia.titulo }}</h4>
-                            <ul>
-                                {% for estudiante, informe in guia_info.entregas.items %}
-                                    <li>
-                                        <strong>{{ estudiante.nombre|default:'Sin nombre' }}</strong>:
-                                        {% if informe %}
-                                            <span class="entregado"><i class="fas fa-check-circle"></i> Entregado</span>
-                                            <br><strong>Nota:</strong> {{ informe.nota|truncatechars:80 }}
-                                            <br><strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}
-                                            {% if informe.imagen %}<br><a href="{{ informe.imagen.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-image"></i> Ver imagen</a>{% endif %}
-                                            <form method="post" style="margin-top:10px;">
-                                                {% csrf_token %}
-                                                <label for="retroalimentacion_{{ informe.id }}" style="font-weight:600;color:#3949ab;">Retroalimentación:</label>
-                                                <textarea name="retroalimentacion" id="retroalimentacion_{{ informe.id }}" rows="2" style="width:100%;border-radius:8px;margin-bottom:6px;">{{ informe.retroalimentacion }}</textarea>
-                                                <input type="hidden" name="informe_id" value="{{ informe.id }}">
-                                                <button type="submit" style="background:#1976d2;color:#fff;border:none;padding:4px 14px;border-radius:6px;font-weight:600;">Guardar</button>
-                                            </form>
-                                            {% if informe.retroalimentacion %}
-                                                <div style="background:#f7f9fc;border:1.5px solid #e3e6ea;padding:8px 12px;border-radius:8px;margin-top:6px;">{{ informe.retroalimentacion }}</div>
-                                            {% endif %}
-                                        {% else %}
-                                            <span class="no-entregado"><i class="fas fa-times-circle"></i> No entregado</span>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endfor %}
-                {% endif %}
             {% else %}
                 <p style="color:#888;">No hay estudiantes asignados a este salón y jornada.</p>
             {% endif %}

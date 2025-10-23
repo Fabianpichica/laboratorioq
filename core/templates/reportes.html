@@ -50,7 +50,7 @@
         transition: background 0.2s;
     }
     .dashboard-aside a:hover, .dashboard-aside .active {
-        background: #3949ab;
+        background:  #1976d2
         border-left: 4px solid #ffb300;
     }
     .dashboard-section {
@@ -178,9 +178,13 @@
                 <form method="get" class="reportes-form">
                     <label for="aprendiz">Selecciona aprendiz:</label>
                     <select name="aprendiz" id="aprendiz" onchange="this.form.submit()">
-                        {% for user in aprendices %}
-                        <option value="{{ user.id }}" {% if user.id == aprendiz_id %}selected{% endif %}>{{ user.username }}</option>
-                        {% endfor %}
+                        {% if request.user.profile.role == 'aprendiz' %}
+                            <option value="{{ request.user.id }}" selected>{{ request.user.username }}</option>
+                        {% else %}
+                            {% for user in aprendices %}
+                                <option value="{{ user.id }}" {% if user.id == aprendiz_id %}selected{% endif %}>{{ user.username }}</option>
+                            {% endfor %}
+                        {% endif %}
                     </select>
                 </form>
                 <canvas id="graficaQuimicos" width="600" height="300"></canvas>
@@ -206,10 +210,6 @@
                     new Chart(document.getElementById('graficaQuimicos'), config);
                 </script>
                 <hr style="margin:40px 0;">
-                <h2>Panel Analítico Power BI</h2>
-                <div style="width:100%;max-width:900px;margin:0 auto;">
-                    <iframe title="Panel Power BI" width="100%" height="500" src="https://app.powerbi.com/view?r=TU_ENLACE_DE_PANEL" frameborder="0" allowFullScreen="true"></iframe>
-                </div>
             </div>
         </section>
     </div>

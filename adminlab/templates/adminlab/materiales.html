@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Materiales</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        .admin-dashboard-wrapper { display: flex; min-height: 100vh; }
+        .admin-sidebar { width: 250px; background: linear-gradient(180deg, #283593 0%, #1976d2 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(40,53,147,0.08); }
+        .admin-sidebar h2 { font-size: 2rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
+        .admin-sidebar nav { width: 100%; }
+        .admin-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
+        .admin-sidebar li { margin-bottom: 8px; width: 100%; }
+        .admin-sidebar a { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; }
+        .admin-sidebar a i { margin-right: 12px; font-size: 1.2rem; }
+        .admin-sidebar a:hover, .admin-sidebar a.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
+        .admin-main-content {
+            margin-left: 250px;
+            padding: 48px 32px 32px 32px;
+            width: 100%;
+            background: linear-gradient(120deg, #e3f2fd 0%, #f4f6fb 100%);
+        }
+        .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .admin-header h1 { color: #283593; font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: 1px; }
+        .admin-header .admin-user { font-size: 1.1rem; color: #1976d2; background: #fff; border-radius: 20px; padding: 8px 18px; box-shadow: 0 2px 8px rgba(25,118,210,0.07); }
+        .materiales-container {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(40,53,147,0.08);
+            padding: 38px 32px 32px 32px;
+            margin-top: 18px;
+        }
+        .materiales-container h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1976d2;
+            margin-bottom: 28px;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #e3f2fd;
+            padding-bottom: 10px;
+        }
+        .materiales-form {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 32px;
+        }
+        .materiales-form input[type="text"],
+        .materiales-form input[type="number"] {
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1.5px solid #b3c2e0;
+            font-size: 1.1rem;
+            background: #f4f6fb;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
+            outline: none;
+            transition: border 0.2s;
+            flex: 1 1 180px;
+        }
+        .materiales-form input:focus {
+            border-color: #1976d2;
+        }
+        .materiales-form input[type="submit"] {
+            background: linear-gradient(90deg, #1976d2 0%, #64b5f6 100%);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.15rem;
+            border-radius: 10px;
+            padding: 14px 32px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .materiales-form input[type="submit"]:hover {
+            background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%);
+        }
+        .materiales-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            background: #f4f6fb;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
+        }
+        .materiales-table th {
+            background: #1976d2;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 16px 8px;
+            border-bottom: 2px solid #e3f2fd;
+        }
+        .materiales-table td {
+            padding: 14px 8px;
+            font-size: 1rem;
+            color: #222;
+            border-bottom: 1px solid #e3f2fd;
+        }
+        .materiales-table tr:nth-child(even) {
+            background: #e3f2fd;
+        }
+        .materiales-table tr:hover {
+            background: #bbdefb;
+        }
+        .materiales-table a {
+            color: #1976d2;
+            font-weight: 600;
+            text-decoration: underline;
+            margin: 0 6px;
+            transition: color 0.2s;
+        }
+        .materiales-table a:hover {
+            color: #1565c0;
+        }
+        @media (max-width: 900px) {
+            .admin-main-content { padding: 32px 4px 8px 4px; margin-left: 100px; }
+            .admin-sidebar { width: 100px; }
+            .materiales-container { padding: 18px 6px 18px 6px; }
+            .materiales-form { gap: 8px; }
+            .materiales-table th, .materiales-table td { font-size: 0.95rem; padding: 8px 4px; }
+        }
+        @media (max-width: 600px) {
+            .admin-main-content { margin-left: 0; padding: 8px 2px; }
+            .admin-sidebar { display: none; }
+            .materiales-container { padding: 8px 2px; }
+            .materiales-form { flex-direction: column; gap: 6px; }
+            .materiales-form input[type="text"], .materiales-form input[type="number"] { font-size: 0.95rem; padding: 10px 8px; }
+            .materiales-form input[type="submit"] { font-size: 1rem; padding: 10px 0; }
+            .materiales-table th, .materiales-table td { font-size: 0.9rem; padding: 6px 2px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard-wrapper">
+        <aside class="admin-sidebar">
+            <h2><i class="fa-solid fa-flask-vial"></i> AdminLab</h2>
+            <nav>
+                <ul>
+                    <li><a href="/adminlab/dashboard/"><i class="fa-solid fa-house"></i>Inicio</a></li>
+                    <li><a href="/adminlab/inventario/"><i class="fa-solid fa-boxes-stacked"></i>Inventario</a></li>
+                    <li><a href="/adminlab/reactivos/"><i class="fa-solid fa-flask"></i>Reactivos Químicos</a></li>
+                    <li><a href="/adminlab/materiales/" class="active"><i class="fa-solid fa-cubes"></i>Materiales</a></li>
+                    <li><a href="/adminlab/equipos/"><i class="fa-solid fa-microscope"></i>Equipos</a></li>
+                    <li><a href="/adminlab/estudiantes/"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
+                    <li><a href="/adminlab/guias/"><i class="fa-solid fa-book"></i>Guías</a></li>
+                    <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
+                    <li><a href="/adminlab/salones/"><i class="fa-solid fa-school"></i>Salones</a></li>
+                    <li><a href="/adminlab/profesores/"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
+                    <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="admin-main-content">
+            <div class="admin-header">
+                <h1><i class="fa-solid fa-cubes"></i> Materiales</h1>
+                <div class="admin-user"><i class="fa-solid fa-user-shield"></i> Panel de inventario</div>
+            </div>
+            <div class="materiales-container">
+                <h2>Gestión de Materiales</h2>
+                <form class="materiales-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="tipo" value="material">
+                    <input type="text" name="nombre" placeholder="Nombre del material">
+                    <input type="number" name="cantidad" placeholder="Cantidad">
+                    <input type="text" name="descripcion" placeholder="Descripción">
+                    <input type="submit" value="Añadir Material">
+                </form>
+                <table class="materiales-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material in materiales %}
+                        <tr>
+                            <td>{{ material.nombre }}</td>
+                            <td>{{ material.cantidad }}</td>
+                            <td>{{ material.descripcion }}</td>
+                            <td>
+                                <a href="{% url 'editar_material_admin' material.id %}">Editar</a> |
+                                <a href="{% url 'eliminar_material_admin' material.id %}">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" style="text-align:center;color:#888;">No hay materiales registrados.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

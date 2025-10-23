@@ -399,38 +399,6 @@ main {
 }
 /* Estos estilos corresponden a informe_detalle.html */
 
-/* Estilos extraídos de landing.html */
-.landing-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-}
-.landing-container h2 {
-    margin-bottom: 1rem;
-}
-.landing-container p {
-    margin-bottom: 2rem;
-    max-width: 500px;
-    text-align: center;
-}
-.landing-container a {
-    padding: 0.7rem 2rem;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-right: 1rem;
-}
-.landing-container a[href="/login/"] {
-    background: #1976d2;
-}
-.landing-container a[href="/register/"] {
-    background: #43a047;
-    margin-right: 0;
-}
-/* Estos estilos corresponden a landing.html */
-
 /* Estilos extraídos de base.html */
 .base-footer {
     background: #222;
@@ -538,6 +506,14 @@ body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9f
     }
     .sidebar-title {
         font-size: 0.95rem;
+    }
+}
+@media (max-width: 400px) {
+    .profesor-dashboard-section {
+        padding: 2vw 0 8vw 0;
+    }
+    .sidebar-title {
+        font-size: 0.85rem;
     }
 }
 /* --- Fin estilos dashboard_profesor.html --- */
