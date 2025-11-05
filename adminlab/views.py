@@ -9,6 +9,7 @@ from .forms import ProfesorCustomForm
 import json
 import os
 from googletrans import Translator
+from datetime import datetime, timedelta
 
 @login_required
 def dashboard_admin(request):
@@ -258,6 +259,8 @@ def reactivos_admin(request):
         return redirect('/')
     from core.models import Quimico
     quimicos = Quimico.objects.all()
+    # Calcular la fecha límite de vencimiento (hoy + 30 días)
+    limite_vencimiento = datetime.now().date() + timedelta(days=30)
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         cantidad = request.POST.get('cantidad')
@@ -309,7 +312,7 @@ def reactivos_admin(request):
         )
         messages.success(request, 'Reactivo agregado correctamente.')
         return redirect('reactivos_admin')
-    return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+    return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos, 'limite_vencimiento': limite_vencimiento})
 
 @login_required
 def materiales_admin(request):

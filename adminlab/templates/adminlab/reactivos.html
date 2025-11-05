@@ -38,10 +38,7 @@
             letter-spacing: 0.5px;
         }
         .materiales-form {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
+            display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
         }
         .materiales-form input[type="text"],
         .materiales-form input[type="number"],
@@ -140,6 +137,38 @@
             </div>
             <div class="materiales-container">
                 <h2>Gestión de Reactivos Químicos</h2>
+                {% if quimicos %}
+                    {% with quimicos_bajo_stock=quimicos|dictsort:"cantidad" %}
+                        {% with bajo_stock=quimicos_bajo_stock|dictsort:"cantidad" %}
+                            {% if bajo_stock %}
+                                <div style="background:#fffde7;border:1.5px solid #ffb300;padding:18px 28px;margin-bottom:18px;border-radius:14px;color:#795548;font-weight:600;">
+                                    <span style="font-size:1.15em;"><i class="fa-solid fa-triangle-exclamation" style="color:#ffb300;margin-right:10px;"></i>¡Atención! Los siguientes químicos tienen <b>stock bajo</b> (≤ 5):</span>
+                                    <ul style="margin:10px 0 0 18px;">
+                                        {% for quimico in bajo_stock %}
+                                            {% if quimico.cantidad|default:0 <= 5 %}
+                                                <li>{{ quimico.nombre }} <span style="color:#b26a00;">(Cantidad: {{ quimico.cantidad }})</span></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                        {% with vencen_pronto=quimicos_bajo_stock %}
+                            {% if vencen_pronto %}
+                                <div style="background:#e3f2fd;border:1.5px solid #1976d2;padding:18px 28px;margin-bottom:18px;border-radius:14px;color:#1976d2;font-weight:600;">
+                                    <span style="font-size:1.15em;"><i class="fa-solid fa-clock" style="color:#1976d2;margin-right:10px;"></i>¡Aviso! Los siguientes químicos <b>vencen pronto</b> (en 30 días o menos):</span>
+                                    <ul style="margin:10px 0 0 18px;">
+                                        {% for quimico in vencen_pronto %}
+                                            {% if quimico.fecha_vencimiento and quimico.fecha_vencimiento <= limite_vencimiento %}
+                                                <li>{{ quimico.nombre }} <span style="color:#0d47a1;">(Vence: {{ quimico.fecha_vencimiento|date:'d/m/Y' }})</span></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    {% endwith %}
+                {% endif %}
                 <form class="materiales-form" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="tipo" value="quimico">
@@ -154,6 +183,7 @@
                     <thead>
                         <tr>
                             <th>Nombre</th>
+                            <th>CAS</th>
                             <th>Cantidad</th>
                             <th>Descripción</th>
                             <th>Fecha de vencimiento</th>
@@ -165,6 +195,7 @@
                         {% for quimico in quimicos %}
                         <tr>
                             <td>{{ quimico.nombre }}</td>
+                            <td>{{ quimico.cas }}</td>
                             <td>{{ quimico.cantidad }}</td>
                             <td>{{ quimico.descripcion }}</td>
                             <td>{{ quimico.fecha_vencimiento|date:'M. d, Y' }}</td>
@@ -182,7 +213,7 @@
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="6" style="text-align:center;color:#888;">No hay reactivos registrados.</td></tr>
+                        <tr><td colspan="7" style="text-align:center;color:#888;">No hay reactivos registrados.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

@@ -20,6 +20,7 @@ class Profile(models.Model):
 
 class Quimico(models.Model):
     nombre = models.CharField(max_length=100)
+    cas = models.CharField(max_length=32, blank=True, null=True)  # Nuevo campo para el número CAS
     cantidad = models.PositiveIntegerField()
     descripcion = models.TextField(blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)

@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from core.views import buscar_quimico_local
+from .views import traducir_quimico
 
 urlpatterns = [
     path('', views.landing_view, name='landing'),
@@ -26,4 +27,5 @@ urlpatterns = [
     path('detalle/quimico/<int:pk>/', views.detalle_quimico, name='detalle_quimico'),
     path('detalle/material/<int:pk>/', views.detalle_material, name='detalle_material'),
     path('detalle/equipo/<int:pk>/', views.detalle_equipo, name='detalle_equipo'),
+    path('traducir-quimico/', traducir_quimico, name='traducir_quimico'),
 ]

@@ -18,6 +18,22 @@ import requests
 from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
+import pubchempy as pcp
+import os, json
+import unicodedata
+import logging
+
+logger = logging.getLogger(__name__)
+
+def normalizar_nombre(nombre):
+    nombre = nombre.strip().lower()
+    nombre = ''.join(c for c in unicodedata.normalize('NFD', nombre) if unicodedata.category(c) != 'Mn')
+    return nombre
+
+try:
+    from googletrans import Translator
+except ImportError:
+    Translator = None
 
 def login_view(request):
     if request.method == 'POST':
@@ -196,77 +212,80 @@ def materiales_view(request):
         cantidad = request.POST.get('cantidad')
         descripcion = request.POST.get('descripcion')
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        cas_form = request.POST.get('cas', '').strip()
         if nombre and cantidad and cantidad.isdigit():
-            # Traducción de nombre si existe en quimicos_es.json, si no, traducir automáticamente
             import os, json
-            from googletrans import Translator
-            ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
-            nombre_es = None
+            nombre_es = nombre.strip()
+            # Traducir automáticamente a español si el nombre está en inglés
             try:
-                with open(ruta_json, 'r', encoding='utf-8') as f:
-                    traducciones = json.load(f)
-                nombre_es = traducciones.get(nombre.strip().lower())
+                from googletrans import Translator
+                translator = Translator()
+                nombre_traducido = translator.translate(nombre_es, src='en', dest='es').text
+                if nombre_traducido and nombre_traducido.lower() != nombre_es.lower():
+                    nombre_es = nombre_traducido
             except Exception:
-                nombre_es = None
-            # Si no hay traducción o es igual al original, forzar traducción automática
-            if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
+                pass
+            # Si la traducción automática falla, consultar el archivo local como respaldo
+            if nombre_es.lower() == nombre.strip().lower():
+                ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
                 try:
-                    translator = Translator()
-                    nombre_es = translator.translate(nombre, src='en', dest='es').text
-                    if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
-                        nombre_es = nombre
+                    with open(ruta_json, 'r', encoding='utf-8') as f:
+                        traducciones = json.load(f)
+                    nombre_traducido = traducciones.get(nombre_es.lower())
+                    if nombre_traducido:
+                        nombre_es = nombre_traducido
                 except Exception:
-                    nombre_es = nombre
-            # Si el nombre traducido sigue en inglés, forzar español manualmente
-            if nombre_es and nombre_es.strip().lower() == nombre.strip().lower():
-                # Ampliar el diccionario manual para más casos
-                traducciones_manual = {
-                    'water': 'agua', 'sodium': 'sodio', 'chloride': 'cloruro', 'acid': 'ácido',
-                    'hydrogen': 'hidrógeno', 'oxygen': 'oxígeno', 'molecular': 'molecular',
-                    'carbon': 'carbono', 'nitrogen': 'nitrógeno', 'potassium': 'potasio',
-                    'calcium': 'calcio', 'magnesium': 'magnesio', 'iron': 'hierro',
-                    'sulfur': 'azufre', 'phosphorus': 'fósforo', 'silver': 'plata',
-                    'gold': 'oro', 'copper': 'cobre', 'zinc': 'zinc', 'lead': 'plomo',
-                    'mercury': 'mercurio', 'bromide': 'bromuro', 'fluoride': 'fluoruro',
-                    'iodide': 'yoduro', 'lithium': 'litio', 'barium': 'bario',
-                    'strontium': 'estroncio', 'chromium': 'cromo', 'manganese': 'manganeso',
-                    'nickel': 'níquel', 'cobalt': 'cobalto', 'tin': 'estaño',
-                    'antimony': 'antimonio', 'arsenic': 'arsénico', 'selenium': 'selenio',
-                    'tellurium': 'telurio', 'platinum': 'platino', 'uranium': 'uranio',
-                    'thorium': 'torio', 'radium': 'radio', 'radon': 'radón',
-                    'neon': 'neón', 'argon': 'argón', 'krypton': 'criptón',
-                    'xenon': 'xenón', 'seaborgium': 'seaborgio', 'molybdenum': 'molibdeno',
-                    'vanadium': 'vanadio', 'tungsten': 'wolframio', 'ruthenium': 'rutenio',
-                    'rhodium': 'rodio', 'palladium': 'paladio', 'cadmium': 'cadmio',
-                    'indium': 'indio', 'thallium': 'talio', 'bismuth': 'bismuto',
-                    'polonium': 'polonio', 'astatine': 'astato', 'francium': 'francio',
-                    'actinium': 'actinio', 'protactinium': 'protactinio', 'neptunium': 'neptunio',
-                    'plutonium': 'plutonio', 'americium': 'americio', 'curium': 'curio',
-                    'berkelium': 'berkelio', 'californium': 'californio', 'einsteinium': 'einsteinio',
-                    'fermium': 'fermio', 'mendelevium': 'mendelevio', 'nobelium': 'nobelio',
-                    'lawrencium': 'laurencio', 'rutherfordium': 'rutherfordio', 'dubnium': 'dubnio',
-                    'bohrium': 'bohrio', 'hassium': 'hassio', 'meitnerium': 'meitnerio',
-                    'darmstadtium': 'darmstadtio', 'roentgenium': 'roentgenio', 'copernicium': 'copernicio',
-                    'nihonium': 'nihonio', 'flerovium': 'flerovio', 'moscovium': 'moscovio',
-                    'livermorium': 'livermorio', 'tennessine': 'tenesino', 'oganesson': 'oganesón',
-                    'molecular hydrogen': 'hidrógeno molecular', 'molecular oxygen': 'oxígeno molecular',
-                    'molecular nitrogen': 'nitrógeno molecular', 'molecular chlorine': 'cloro molecular',
-                    'molecular fluorine': 'flúor molecular', 'molecular iodine': 'yodo molecular',
-                    'molecular bromine': 'bromo molecular'
-                }
-                for eng, esp in traducciones_manual.items():
-                    nombre_es = nombre_es.replace(eng, esp)
-            # Validar que no exista un químico con el mismo nombre y fecha de vencimiento
+                    pass
+            cas = cas_form if cas_form else ''
+            # Buscar CAS en PubChem solo si no viene del formulario
+            if not cas:
+                try:
+                    results = pcp.get_compounds(nombre_es, 'name')
+                    if results:
+                        compound = results[0]
+                        cas_list = [x for x in compound.synonyms if x.count('-') == 2 and x.replace('-', '').isdigit()]
+                        if cas_list:
+                            cas = cas_list[0]
+                except Exception:
+                    cas = ''
+            # Si no se encontró en PubChem, buscar en el archivo local
+            if not cas:
+                ruta_cas = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_cas.json')
+                try:
+                    with open(ruta_cas, 'r', encoding='utf-8') as f:
+                        cas_dict = json.load(f)
+                    # Buscar por nombre en español y en inglés normalizados
+                    nombre_norm_es = normalizar_nombre(nombre_es)
+                    nombre_norm_en = normalizar_nombre(nombre.strip())
+                    variantes = [
+                        nombre_es.strip().lower(),
+                        nombre_norm_es,
+                        nombre_norm_en,
+                        nombre_norm_en.replace(' ', ''),
+                        nombre_norm_es.replace(' ', ''),
+                        nombre_es.replace('í', 'i').replace('ó', 'o').replace('é', 'e').replace('á', 'a').replace('ú', 'u').lower(),
+                        nombre_es.lower(),
+                        ''.join(c for c in unicodedata.normalize('NFD', nombre_es.lower()) if unicodedata.category(c) != 'Mn'),
+                    ]
+                    for v in variantes:
+                        if not cas:
+                            cas = cas_dict.get(v, '')
+                    print(f"[DEBUG] Nombre original: {nombre}, nombre_es: {nombre_es}, variantes: {variantes}, CAS encontrado: {cas}")
+                except Exception:
+                    cas = ''
             filtro = {'nombre': nombre_es}
             if fecha_vencimiento:
                 filtro['fecha_vencimiento'] = fecha_vencimiento
             if not Quimico.objects.filter(**filtro).exists():
+                print(f"[DEBUG] Antes de guardar: nombre_es={nombre_es}, CAS={cas if cas else 'No disponible'}")
+                print(f"[DEBUG] GUARDANDO: nombre_es={nombre_es}, CAS={cas if cas else 'No disponible'}, cantidad={cantidad}, descripcion={descripcion}, fecha_vencimiento={fecha_vencimiento}")
                 try:
                     Quimico.objects.create(
                         nombre=nombre_es,
                         cantidad=cantidad,
                         descripcion=descripcion,
-                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
+                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None,
+                        cas=cas if cas else 'No disponible'
                     )
                 except Exception as e:
                     messages.error(request, f"Error al crear químico: {e}")
@@ -290,6 +309,27 @@ def editar_quimico(request, quimico_id):
         quimico.cantidad = request.POST.get('cantidad')
         quimico.descripcion = request.POST.get('descripcion')
         quimico.fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        # Actualizar CAS automáticamente si cambia el nombre usando PubChem y respaldo local
+        cas = ''
+        try:
+            results = pcp.get_compounds(quimico.nombre.strip(), 'name')
+            if results:
+                compound = results[0]
+                cas_list = [x for x in compound.synonyms if x.count('-') == 2 and x.replace('-', '').isdigit()]
+                if cas_list:
+                    cas = cas_list[0]
+        except Exception:
+            cas = ''
+        if not cas:
+            import os, json
+            ruta_cas = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_cas.json')
+            try:
+                with open(ruta_cas, 'r', encoding='utf-8') as f:
+                    cas_dict = json.load(f)
+                cas = cas_dict.get(quimico.nombre.lower(), '')
+            except Exception:
+                cas = ''
+        quimico.cas = cas
         if request.FILES.get('ficha_seguridad'):
             quimico.ficha_seguridad = request.FILES['ficha_seguridad']
         if request.FILES.get('protocolo_uso'):
@@ -356,12 +396,14 @@ def reportes_view(request):
     else:
         aprendiz = request.user if hasattr(request.user, 'profile') and request.user.profile.role == 'aprendiz' else aprendices.first()
     # Top 5 químicos más usados por el aprendiz
-    quimicos_count = (CuadernoEntry.objects.filter(aprendiz=aprendiz)
-                      .values('quimicos__nombre')
-                      .annotate(total=Count('quimicos'))
-                      .order_by('-total')[:5])
-    labels = [q['quimicos__nombre'] for q in quimicos_count]
-    data = [q['total'] for q in quimicos_count]
+    quimicos_count = (
+        Quimico.objects
+        .filter(cuadernoentry__aprendiz=aprendiz)
+        .annotate(total=Count('cuadernoentry'))
+        .order_by('-total')[:5]
+    )
+    labels = [q.nombre for q in quimicos_count]
+    data = [q.total for q in quimicos_count]
     return render(request, 'reportes.html', {
         'labels': labels,
         'data': data,
@@ -469,64 +511,31 @@ def materiales_equipos_view(request):
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
         # Validar que todos los campos requeridos estén presentes y que cantidad sea un número
         if nombre and cantidad and cantidad.isdigit():
-            # Traducción de nombre si existe en quimicos_es.json, si no, traducir automáticamente
+            # Traducción de nombre si existe en quimicos_es.json (opcional, solo si se requiere para visualización, no para CAS)
             import os, json
-            from googletrans import Translator
             ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
             nombre_es = None
+            cas = ''
             try:
                 with open(ruta_json, 'r', encoding='utf-8') as f:
                     traducciones = json.load(f)
                 nombre_es = traducciones.get(nombre.strip().lower())
             except Exception:
                 nombre_es = None
-            # Si no hay traducción o es igual al original, forzar traducción automática
+            # Si no hay traducción o es igual al original, usar el nombre original
             if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
-                try:
-                    translator = Translator()
-                    nombre_es = translator.translate(nombre, src='en', dest='es').text
-                    if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
-                        nombre_es = nombre
-                except Exception:
-                    nombre_es = nombre
-            # Si el nombre traducido sigue en inglés, forzar español manualmente
-            if nombre_es and nombre_es.strip().lower() == nombre.strip().lower():
-                traducciones_manual = {
-                    'water': 'agua', 'sodium': 'sodio', 'chloride': 'cloruro', 'acid': 'ácido',
-                    'hydrogen': 'hidrógeno', 'oxygen': 'oxígeno', 'molecular': 'molecular',
-                    'carbon': 'carbono', 'nitrogen': 'nitrógeno', 'potassium': 'potasio',
-                    'calcium': 'calcio', 'magnesium': 'magnesio', 'iron': 'hierro',
-                    'sulfur': 'azufre', 'phosphorus': 'fósforo', 'silver': 'plata',
-                    'gold': 'oro', 'copper': 'cobre', 'zinc': 'zinc', 'lead': 'plomo',
-                    'mercury': 'mercurio', 'bromide': 'bromuro', 'fluoride': 'fluoruro',
-                    'iodide': 'yoduro', 'lithium': 'litio', 'barium': 'bario',
-                    'strontium': 'estroncio', 'chromium': 'cromo', 'manganese': 'manganeso',
-                    'nickel': 'níquel', 'cobalt': 'cobalto', 'tin': 'estaño',
-                    'antimony': 'antimonio', 'arsenic': 'arsénico', 'selenium': 'selenio',
-                    'tellurium': 'telurio', 'platinum': 'platino', 'uranium': 'uranio',
-                    'thorium': 'torio', 'radium': 'radio', 'radon': 'radón',
-                    'neon': 'neón', 'argon': 'argón', 'krypton': 'criptón',
-                    'xenon': 'xenón', 'seaborgium': 'seaborgio', 'molybdenum': 'molibdeno',
-                    'vanadium': 'vanadio', 'tungsten': 'wolframio', 'ruthenium': 'rutenio',
-                    'rhodium': 'rodio', 'palladium': 'paladio', 'cadmium': 'cadmio',
-                    'indium': 'indio', 'thallium': 'talio', 'bismuth': 'bismuto',
-                    'polonium': 'polonio', 'astatine': 'astato', 'francium': 'francio',
-                    'actinium': 'actinio', 'protactinium': 'protactinio', 'neptunium': 'neptunio',
-                    'plutonium': 'plutonio', 'americium': 'americio', 'curium': 'curio',
-                    'berkelium': 'berkelio', 'californium': 'californio', 'einsteinium': 'einsteinio',
-                    'fermium': 'fermio', 'mendelevium': 'mendelevio', 'nobelium': 'nobelio',
-                    'lawrencium': 'laurencio', 'rutherfordium': 'rutherfordio', 'dubnium': 'dubnio',
-                    'bohrium': 'bohrio', 'hassium': 'hassio', 'meitnerium': 'meitnerio',
-                    'darmstadtium': 'darmstadtio', 'roentgenium': 'roentgenio', 'copernicium': 'copernicio',
-                    'nihonium': 'nihonio', 'flerovium': 'flerovio', 'moscovium': 'moscovio',
-                    'livermorium': 'livermorio', 'tennessine': 'tenesino', 'oganesson': 'oganesón',
-                    'molecular hydrogen': 'hidrógeno molecular', 'molecular oxygen': 'oxígeno molecular',
-                    'molecular nitrogen': 'nitrógeno molecular', 'molecular chlorine': 'cloro molecular',
-                    'molecular fluorine': 'flúor molecular', 'molecular iodine': 'yodo molecular',
-                    'molecular bromine': 'bromo molecular'
-                }
-                for eng, esp in traducciones_manual.items():
-                    nombre_es = nombre_es.replace(eng, esp)
+                nombre_es = nombre.strip()
+            # Buscar CAS en PubChem
+            import pubchempy as pcp
+            try:
+                results = pcp.get_compounds(nombre_es, 'name')
+                if results:
+                    compound = results[0]
+                    cas_list = [x for x in compound.synonyms if x.count('-') == 2 and x.replace('-', '').isdigit()]
+                    if cas_list:
+                        cas = cas_list[0]
+            except Exception:
+                cas = ''
             filtro = {'nombre': nombre_es}
             if fecha_vencimiento:
                 filtro['fecha_vencimiento'] = fecha_vencimiento
@@ -536,7 +545,8 @@ def materiales_equipos_view(request):
                         nombre=nombre_es,
                         cantidad=int(cantidad),
                         descripcion=descripcion,
-                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
+                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None,
+                        cas=cas
                     )
                 except Exception as e:
                     messages.error(request, f"Error al crear químico: {e}")
@@ -611,3 +621,24 @@ def detalle_equipo(request, pk):
 def logout_view(request):
     logout(request)
     return redirect('landing')
+
+@login_required
+def traducir_quimico(request):
+    nombre = request.GET.get('nombre', '').strip().lower()
+    nombre_es = None
+    ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
+    try:
+        with open(ruta_json, 'r', encoding='utf-8') as f:
+            traducciones = json.load(f)
+        nombre_es = traducciones.get(nombre)
+    except Exception:
+        nombre_es = None
+    if not nombre_es and Translator:
+        try:
+            translator = Translator()
+            nombre_es = translator.translate(nombre, src='en', dest='es').text
+        except Exception:
+            nombre_es = nombre
+    if not nombre_es:
+        nombre_es = nombre
+    return JsonResponse({'nombre_es': nombre_es})

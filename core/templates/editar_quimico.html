@@ -13,6 +13,8 @@
         <input type="text" name="descripcion" value="{{ quimico.descripcion }}">
         <label>Fecha de vencimiento:</label>
         <input type="date" name="fecha_vencimiento" value="{{ quimico.fecha_vencimiento|date:'Y-m-d' }}">
+        <label>CAS:</label>
+        <input type="text" value="{{ quimico.cas }}" readonly style="background:#f7f7f7;color:#3949ab;font-weight:700;">
         <label>Ficha de seguridad (PDF):</label>
         {% if quimico.ficha_seguridad %}
             <a href="{{ quimico.ficha_seguridad.url }}" target="_blank">Ver actual</a><br>
