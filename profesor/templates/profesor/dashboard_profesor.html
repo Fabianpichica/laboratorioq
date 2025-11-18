@@ -1,102 +1,52 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Profesor</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-    body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-    .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
-    .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
-    .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-    .profesor-sidebar nav { width: 100%; }
-    .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-    .profesor-sidebar li { margin-bottom: 8px; width: 70%; }
-    .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
-    .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
-    .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-    .profesor-main-content { margin-left: 240px; padding: 48px 32px 32px 32px; width: 100%; }
-    @media (max-width: 900px) {
-        .profesor-main-content { padding: 32px 8px 8px 8px; } 
-        .profesor-sidebar { width: 100px; } 
-        .profesor-main-content { margin-left: 100px; }
-    }
-    @media (max-width: 600px) {
-        .profesor-main-content { padding: 10px; margin-left: 0; }
-        .sidebar-title { font-size: 0.95rem; }
-    }
-    @media (max-width: 400px) {
-        .profesor-main-content { padding: 2vw 0 8vw 0; }
-        .sidebar-title { font-size: 0.85rem; }
-    }
-    </style>
-    <script>
-        function toggleSalones(id) {
-            var el = document.getElementById(id);
-            if (el.style.display === "none") {
-                el.style.display = "block";
-            } else {
-                el.style.display = "none";
-            }
-        }
-    </script>
-</head>
-<body>
-    <div class="profesor-dashboard-wrapper">
-        <aside class="profesor-sidebar">
-            <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Profesor</div>
-            <nav>
-                <ul>
-                    <li><a href="{% url 'dashboard_profesor' %}"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
-                    <li><a href="{% url 'guias_profesor' %}"><i class="fa-solid fa-book icon"></i>Guías</a></li>
-                    <li><a href="{% url 'materiales_profesor' %}"><i class="fa-solid fa-boxes-stacked icon"></i>Materiales</a></li>
-                    <li><a href="{% url 'resultados_por_guia' %}"><i class="fa-solid fa-flask-vial icon"></i>Resultados por Guía</a></li>
-                    <li><a href="#"><i class="fa-solid fa-chart-bar icon"></i>Reportes</a></li>
-                    <li><a href="#"><i class="fa-solid fa-user icon"></i>Perfil</a></li>
-                    <li><a href="{% url 'landing' %}"><i class="fa-solid fa-right-from-bracket icon"></i>Cerrar sesión</a></li>
+{% extends 'profesor/base.html' %}
+{% load static %}
+{% block content %}
+<main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
+    <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
+        <h1 style="font-size:2.1rem;font-weight:800;margin-bottom:12px;"><i class="fa-solid fa-chalkboard-user"></i> Dashboard Profesor</h1>
+        <div style="color:#3949ab;font-weight:600;margin-bottom:18px;"><i class="fa-solid fa-user-shield"></i> Panel de profesor</div>
+        <h2 style="font-size:1.4rem;font-weight:700;">Bienvenido, Profesor</h2>
+        <p>Este es tu dashboard. Selecciona una opción del menú superior para comenzar.</p>
+        <div class="jornadas-profesor" style="margin-top: 32px;">
+            <h3>Jornadas asignadas</h3>
+            {% if jornadas %}
+                <ul class="jornadas-list" style="list-style:none;padding:0;">
+                    {% for jornada in jornadas %}
+                        <li class="jornada-item" style="margin-bottom:12px;">
+                            <button class="jornada-toggle" onclick="toggleSalones('salones-{{ jornada.id }}')" style="background:#e3e6ea;color:#3949ab;padding:6px 14px;border-radius:8px;border:none;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(60,72,88,0.08);">
+                                <strong>{{ jornada.nombre }}</strong> - {{ jornada.fecha }}
+                            </button>
+                            <div id="salones-{{ jornada.id }}" class="salones-jornada" style="display:none; margin-left:20px; margin-top:8px;">
+                                <h4 style="margin-bottom:6px;">Salones asignados:</h4>
+                                {% if jornada.salones.all %}
+                                    <ul style="padding-left:18px;">
+                                        {% for salon in jornada.salones.all %}
+                                            <li style="margin-bottom:4px;">
+                                                <a href="{% url 'salon_estudiantes' salon.id jornada.id %}" style="color:#1976d2;font-weight:500;text-decoration:underline;">{{ salon.nombre }}{% if salon.ubicacion %} ({{ salon.ubicacion }}){% endif %}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <em>No hay salones asignados.</em>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
                 </ul>
-            </nav>
-        </aside>
-        <main class="profesor-main-content">
-            <div class="profesor-header">
-                <h1><i class="fa-solid fa-chalkboard-user"></i> Dashboard Profesor</h1>
-                <div class="profesor-user"><i class="fa-solid fa-user-shield"></i> Panel de profesor</div>
-            </div>
-            <h2>Bienvenido, Profesor</h2>
-            <p>Este es tu dashboard. Selecciona una opción del menú lateral para comenzar.</p>
-            <div class="jornadas-profesor">
-                <h3>Jornadas asignadas</h3>
-                {% if jornadas %}
-                    <ul class="jornadas-list">
-                        {% for jornada in jornadas %}
-                            <li class="jornada-item">
-                                <button class="jornada-toggle" onclick="toggleSalones('salones-{{ jornada.id }}')">
-                                    <strong>{{ jornada.nombre }}</strong> - {{ jornada.fecha }}
-                                </button>
-                                <div id="salones-{{ jornada.id }}" class="salones-jornada" style="display:none; margin-left:20px;">
-                                    <h4>Salones asignados:</h4>
-                                    {% if jornada.salones.all %}
-                                        <ul>
-                                            {% for salon in jornada.salones.all %}
-                                                <li>
-                                                    <a href="{% url 'salon_estudiantes' salon.id jornada.id %}">{{ salon.nombre }}{% if salon.ubicacion %} ({{ salon.ubicacion }}){% endif %}</a>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% else %}
-                                        <em>No hay salones asignados.</em>
-                                    {% endif %}
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>No tienes jornadas asignadas.</p>
-                {% endif %}
-            </div>
-        </main>
+            {% else %}
+                <p>No tienes jornadas asignadas.</p>
+            {% endif %}
+        </div>
     </div>
-</body>
-</html>
+</main>
+<script>
+function toggleSalones(id) {
+    var el = document.getElementById(id);
+    if (el.style.display === "none" || el.style.display === "") {
+        el.style.display = "block";
+    } else {
+        el.style.display = "none";
+    }
+}
+</script>
+{% endblock %}

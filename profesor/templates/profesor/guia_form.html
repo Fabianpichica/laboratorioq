@@ -1,664 +1,333 @@
+{% extends 'profesor/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Agregar Guía</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-    body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-    .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
-    .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
-    .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-    .profesor-sidebar nav { width: 100%; }
-    .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-    .profesor-sidebar li { margin-bottom: 8px; width: 70%; }
-    .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
-    .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
-    .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-    .profesor-main-content { margin-left: 240px; padding: 48px 32px 32px 32px; width: 100%; }
-    @media (max-width: 900px) { .profesor-main-content { padding: 32px 8px 8px 8px; } .profesor-sidebar { width: 100px; } .profesor-main-content { margin-left: 100px; } }
-    .dashboard-container {
-        display: flex;
-        min-height: 100vh;
-        background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
-    }
-    .dashboard-aside {
-        width: 240px;
-        background: #1a237e;
-        color: #fff;
-        padding: 0;
-        min-height: 100vh;
-        box-shadow: 2px 0 12px rgba(40,53,147,0.07);
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        z-index: 10;
-    }
-    .dashboard-aside nav {
-        width: 100%;
-    }
-    .dashboard-aside ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-    }
-    .dashboard-aside li {
-        width: 100%;
-    }
-    .dashboard-aside a {
-        display: block;
-        color: #fff;
-        text-decoration: none;
-        padding: 16px 32px;
-        font-size: 1.1rem;
-        transition: background 0.2s;
-    }
-    .dashboard-aside a:hover, .dashboard-aside .active {
-        background: #3949ab;
-        border-left: 4px solid #ffb300;
-    }
-    .dashboard-section {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 48px 40px;
-        margin-left: 240px;
-        min-height: 100vh;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    @media (max-width: 900px) {
+{% block content %}
+    <main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
+        <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom:24px;">
+        <title>Agregar Guía</title>
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        .profesor-main-content { margin: 0 auto; padding: 48px 32px 32px 32px; width: 100%; }
+        @media (max-width: 900px) { .profesor-main-content { padding: 32px 8px 8px 8px; } }
         .dashboard-container {
-            flex-direction: column;
-        }
-        .dashboard-aside {
-            width: 100vw;
-            min-width: unset;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 56px;
-            height: 56px;
-            box-shadow: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: unset;
-            z-index: 20;
-            overflow-x: visible;
-            background: #1a237e;
-        }
-        .dashboard-aside nav {
-            width: 100vw;
-        }
-        .dashboard-aside ul {
             display: flex;
-            flex-direction: row;
-            width: 100vw;
-            justify-content: flex-start;
-            align-items: center;
-            margin: 0;
-            padding: 0 4px;
-            overflow-x: auto;
-            gap: 0;
-            background: #1a237e;
-        }
-        .dashboard-aside li {
-            width: auto;
-            flex: 0 0 auto;
-        }
-        .dashboard-aside a {
-            padding: 10px 10px;
-            font-size: 0.98rem;
-            border-left: none !important;
-            border-bottom: 3px solid transparent;
-            white-space: nowrap;
-        }
-        .dashboard-aside a:hover, .dashboard-aside .active {
-            background: #3949ab;
-            border-left: none;
-            border-bottom: 3px solid #ffb300;
+            min-height: 100vh;
+            background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
         }
         .dashboard-section {
-            padding: 18px 2vw 8vw 2vw;
-            margin-left: 0;
-            margin-top: 56px;
-            min-width: 0;
-        }
-        .guia-container {
-            flex-direction: column;
-            gap: 12px;
-            padding: 10px 2vw;
-            margin-top: 16px;
-        }
-        .menu-toggle {
-            display: block;
-        }
-        .dashboard-aside ul {
-            display: none;
-        }
-        .dashboard-aside.open ul {
+            flex: 1;
             display: flex;
-            position: absolute;
-            top: 56px;
-            left: 0;
-            width: 100vw;
             flex-direction: column;
-            background: #1a237e;
-            box-shadow: 0 4px 16px rgba(40,53,147,0.13);
-            z-index: 30;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 40px;
+            margin: 0 auto;
+            min-height: 100vh;
+            width: 100%;
+            box-sizing: border-box;
         }
-        .dashboard-aside.open ul li {
-            width: 100vw;
+        @media (max-width: 900px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            .dashboard-section {
+                padding: 18px 2vw 8vw 2vw;
+                margin-top: 56px;
+                min-width: 0;
+            }
+            .guia-container {
+                flex-direction: column;
+                gap: 12px;
+                padding: 10px 2vw;
+                margin-top: 16px;
+            }
         }
-        .dashboard-aside.open ul a {
-            border-bottom: 1px solid #3949ab;
-            border-left: none;
-            padding: 16px 32px;
-            font-size: 1.1rem;
+        @media (max-width: 600px) {
+            .dashboard-section {
+                padding: 4vw 1vw 8vw 1vw;
+            }
+            .guia-container {
+                padding: 4px 0;
+            }
+            .guia-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
+                padding: 6px 1vw 6px 1vw !important;
+                min-width: 0;
+            }
         }
-    }
-    @media (max-width: 600px) {
-        .dashboard-section {
-            padding: 4vw 1vw 8vw 1vw;
+        @media (max-width: 400px) {
+            .dashboard-section {
+                padding: 2vw 0 8vw 0;
+            }
+            .guia-container {
+                padding: 2px 0;
+            }
+            .guia-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
+                padding: 2px 0 2px 0 !important;
+            }
         }
         .guia-container {
-            padding: 4px 0;
+            display: flex;
+            flex-direction: row;
+            gap: 32px;
+            padding: 48px 40px 40px 40px;
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(60,72,88,0.13);
+            margin-top: 48px;
+            border: 2.5px solid #e3e6ea;
+            transition: box-shadow 0.2s;
         }
-        .guia-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
-            padding: 6px 1vw 6px 1vw !important;
-            min-width: 0;
+        .guia-container:hover {
+            box-shadow: 0 12px 40px rgba(60,72,88,0.18);
         }
-        .dashboard-aside a {
-            font-size: 0.92rem;
-            padding: 8px 4px;
+        .guia-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
         }
         .guia-img-box {
-            height: 110px;
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
+            border: 2.5px dashed #bfc8d6;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            transition: border 0.2s;
         }
-        .guia-section input, .guia-section textarea, .guia-section select {
-            font-size: 0.98rem;
-            padding: 8px 8px;
+        .guia-img-box:hover {
+            border: 2.5px solid #3949ab;
         }
-        .guia-label {
-            font-size: 0.92rem;
-            padding: 6px 10px;
+        .guia-section {
+            background: linear-gradient(120deg, #f7f9fc 80%, #e3e6ea 100%);
+            border-radius: 18px;
+            box-shadow: 0 4px 18px rgba(60,72,88,0.13);
+            padding: 22px 22px 14px 22px;
+            margin-bottom: 22px;
+            border: 2px solid #d1d9e6;
+            transition: box-shadow 0.2s, border 0.2s, background 0.2s;
+            position: relative;
+        }
+        .guia-section:hover {
+            box-shadow: 0 8px 32px rgba(60,72,88,0.18);
+            border: 2px solid #1976d2;
+            background: linear-gradient(120deg, #e3e6ea 60%, #f7f9fc 100%);
+        }
+        .guia-section label {
+            color: #1a237e;
+            font-size: 1.13rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: block;
+            letter-spacing: 0.7px;
+            text-shadow: 0 1px 0 #fff, 0 1.5px 2px #bfc8d6;
+        }
+        .guia-section input[type="text"],
+        .guia-section select,
+        .guia-section textarea {
+            border: 2px solid #bfc8d6;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 1.13rem;
+            margin-bottom: 12px;
+            background: #f7f9fc;
+            box-shadow: 0 2px 8px rgba(60,72,88,0.06);
+            transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+            color: #222;
+        }
+        .guia-section input[type="text"]:focus,
+        .guia-section select:focus,
+        .guia-section textarea:focus {
+            border: 2px solid #3949ab;
+            outline: none;
+            box-shadow: 0 4px 16px rgba(25,118,210,0.13);
+            background: #e3e6ea;
+        }
+        .guia-section select {
+            min-width: 120px;
+            max-width: 100%;
+            background: linear-gradient(90deg, #f7f9fc 80%, #e3e6ea 100%);
+            color: #3949ab;
+            font-weight: 600;
+        }
+        .guia-section input[type="file"] {
+            background: #f7f9fc;
+            border: 1.5px dashed #bfc8d6;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: #3949ab;
+            transition: border 0.2s;
+        }
+        .guia-section input[type="file"]:hover {
+            border: 1.5px solid #3949ab;
+            background: #e3e6ea;
+        }
+        .guia-section .guia-label {
+            background: linear-gradient(90deg, #e3e6ea 60%, #f7f9fc 100%);
+            color: #3949ab;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(60,72,88,0.08);
+            font-size: 1.07rem;
+            letter-spacing: 0.5px;
+        }
+        .guia-section:last-child {
+            margin-bottom: 0;
+        }
+        .guia-section select:disabled,
+        .guia-section input:disabled,
+        .guia-section textarea:disabled {
+            background: #e3e6ea;
+            color: #bfc8d6;
+            cursor: not-allowed;
+        }
+        @media (max-width: 900px) {
+            .guia-section {
+                padding: 14px 8px 10px 8px;
+            }
+            .guia-section input[type="text"],
+            .guia-section select,
+            .guia-section textarea {
+                font-size: 1rem;
+                padding: 10px 10px;
+            }
+            .guia-section .guia-label {
+                font-size: 0.98rem;
+                padding: 8px 12px;
+            }
+        }
+        @media (max-width: 600px) {
+            .guia-section {
+                padding: 8px 2px 6px 2px;
+            }
+            .guia-section input[type="text"],
+            .guia-section select,
+            .guia-section textarea {
+                font-size: 0.95rem;
+                padding: 8px 6px;
+            }
+            .guia-section .guia-label {
+                font-size: 0.92rem;
+                padding: 6px 8px;
+            }
+        }
+        .guia-texto-adicional {
+            min-height: 110px;
+            background: #f7f9fc;
+            border: 2px solid #bfc8d6;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1.12rem;
+            color: #222;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(60,72,88,0.06);
         }
         .no-print {
-            font-size: 1rem;
-            padding: 10px 16px;
+            display: block;
+            margin: 40px auto 0 auto;
+            padding: 14px 36px;
+            background: linear-gradient(90deg, #ffb300 60%, #ffa000 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.15rem;
+            box-shadow: 0 4px 16px rgba(60,72,88,0.13);
+            transition: background 0.2s;
         }
-    }
-    @media (max-width: 400px) {
-        .dashboard-section {
-            padding: 2vw 0 8vw 0;
+        .no-print:hover {
+            background: linear-gradient(90deg, #ffa000 60%, #ffb300 100%);
         }
-        .guia-container {
-            padding: 2px 0;
+        .footer {
+            width: 100%;
+            background: #e7ebf2;
+            color: #181828;
+            text-align: center;
+            padding: 16px 0 8px 0;
+            font-size: 1.1rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
         }
-        .guia-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
-            padding: 2px 0 2px 0 !important;
+        @media print {
+            nav, .navbar, .navbar-top, .navbar-sticky, .navbar-header, .navbar-brand, .navbar-nav, .navbar-right, .navbar-menu, .navbar-container, .top-navbar, .header, header, #navbar {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                width: 0 !important;
+                min-height: 0 !important;
+                min-width: 0 !important;
+                max-height: 0 !important;
+                max-width: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                position: static !important;
+            }
+            body, html {
+                height: 100%;
+                width: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .profesor-main-content, .guia-container {
+                margin: 0 auto !important;
+                float: none !important;
+                display: block !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                align-items: initial !important;
+                justify-content: initial !important;
+            }
+            .guia-container {
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+            }
+            .guia-img-box {
+                display: none !important;
+            }
+            .print-only-section {
+                text-align: left !important;
+                margin-bottom: 24px !important;
+                box-sizing: border-box !important;
+                padding: 0.08cm !important;
+                width: 100% !important;
+                max-width: 98% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+            .print-only-section div, .print-only-section ul, .print-only-section li, .print-only-section p {
+                text-align: left !important;
+                box-sizing: border-box !important;
+                padding: 0 0.08cm !important;
+                width: 100% !important;
+                max-width: 98% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
         }
-        .dashboard-aside a {
-            font-size: 0.85rem;
-            padding: 6px 2px;
-        }
-    }
-    .menu-toggle {
-        display: none;
-        position: absolute;
-        left: 16px;
-        top: 12px;
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 2rem;
-        z-index: 40;
-        cursor: pointer;
-    }
-    .guia-container {
-        display: flex;
-        flex-direction: row;
-        gap: 32px;
-        padding: 48px 40px 40px 40px;
-        background: #fff;
-        border-radius: 22px;
-        box-shadow: 0 8px 32px rgba(60,72,88,0.13);
-        margin-top: 48px;
-        border: 2.5px solid #e3e6ea;
-        transition: box-shadow 0.2s;
-    }
-    .guia-container:hover {
-        box-shadow: 0 12px 40px rgba(60,72,88,0.18);
-    }
-    .guia-col {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 32px;
-    }
-    .guia-img-box {
-        width: 100%;
-        height: 180px;
-        background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
-        border: 2.5px dashed #bfc8d6;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 10px;
-        transition: border 0.2s;
-    }
-    .guia-img-box:hover {
-        border: 2.5px solid #3949ab;
-    }
-    .guia-section {
-        background: linear-gradient(120deg, #f7f9fc 80%, #e3e6ea 100%);
-        border-radius: 18px;
-        box-shadow: 0 4px 18px rgba(60,72,88,0.13);
-        padding: 22px 22px 14px 22px;
-        margin-bottom: 22px;
-        border: 2px solid #d1d9e6;
-        transition: box-shadow 0.2s, border 0.2s, background 0.2s;
-        position: relative;
-    }
-    .guia-section:hover {
-        box-shadow: 0 8px 32px rgba(60,72,88,0.18);
-        border: 2px solid #1976d2;
-        background: linear-gradient(120deg, #e3e6ea 60%, #f7f9fc 100%);
-    }
-    .guia-section label {
-        color: #1a237e;
-        font-size: 1.13rem;
-        font-weight: 800;
-        margin-bottom: 10px;
-        display: block;
-        letter-spacing: 0.7px;
-        text-shadow: 0 1px 0 #fff, 0 1.5px 2px #bfc8d6;
-    }
-    .guia-section input[type="text"],
-    .guia-section select,
-    .guia-section textarea {
-        border: 2px solid #bfc8d6;
-        border-radius: 10px;
-        padding: 12px 16px;
-        font-size: 1.13rem;
-        margin-bottom: 12px;
-        background: #f7f9fc;
-        box-shadow: 0 2px 8px rgba(60,72,88,0.06);
-        transition: border 0.2s, box-shadow 0.2s, background 0.2s;
-        color: #222;
-    }
-    .guia-section input[type="text"]:focus,
-    .guia-section select:focus,
-    .guia-section textarea:focus {
-        border: 2px solid #3949ab;
-        outline: none;
-        box-shadow: 0 4px 16px rgba(25,118,210,0.13);
-        background: #e3e6ea;
-    }
-    .guia-section select {
-        min-width: 120px;
-        max-width: 100%;
-        background: linear-gradient(90deg, #f7f9fc 80%, #e3e6ea 100%);
-        color: #3949ab;
-        font-weight: 600;
-    }
-    .guia-section input[type="file"] {
-        background: #f7f9fc;
-        border: 1.5px dashed #bfc8d6;
-        font-size: 1rem;
-        margin-bottom: 12px;
-        border-radius: 8px;
-        padding: 8px 10px;
-        color: #3949ab;
-        transition: border 0.2s;
-    }
-    .guia-section input[type="file"]:hover {
-        border: 1.5px solid #3949ab;
-        background: #e3e6ea;
-    }
-    .guia-section .guia-label {
-        background: linear-gradient(90deg, #e3e6ea 60%, #f7f9fc 100%);
-        color: #3949ab;
-        border-radius: 10px;
-        padding: 10px 22px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        display: inline-block;
-        box-shadow: 0 2px 8px rgba(60,72,88,0.08);
-        font-size: 1.07rem;
-        letter-spacing: 0.5px;
-    }
-    .guia-section:last-child {
-        margin-bottom: 0;
-    }
-    .guia-section select:disabled,
-    .guia-section input:disabled,
-    .guia-section textarea:disabled {
-        background: #e3e6ea;
-        color: #bfc8d6;
-        cursor: not-allowed;
-    }
-    @media (max-width: 900px) {
-        .guia-section {
-            padding: 14px 8px 10px 8px;
-        }
-        .guia-section input[type="text"],
-        .guia-section select,
-        .guia-section textarea {
-            font-size: 1rem;
-            padding: 10px 10px;
-        }
-        .guia-section .guia-label {
-            font-size: 0.98rem;
-            padding: 8px 12px;
-        }
-    }
-    @media (max-width: 600px) {
-        .guia-section {
-            padding: 8px 2px 6px 2px;
-        }
-        .guia-section input[type="text"],
-        .guia-section select,
-        .guia-section textarea {
-            font-size: 0.95rem;
-            padding: 8px 6px;
-        }
-        .guia-section .guia-label {
-            font-size: 0.92rem;
-            padding: 6px 8px;
-        }
-    }
-    .guia-texto-adicional {
-        min-height: 110px;
-        background: #f7f9fc;
-        border: 2px solid #bfc8d6;
-        border-radius: 12px;
-        padding: 16px;
-        font-size: 1.12rem;
-        color: #222;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 8px rgba(60,72,88,0.06);
-    }
-    .no-print {
-        display: block;
-        margin: 40px auto 0 auto;
-        padding: 14px 36px;
-        background: linear-gradient(90deg, #ffb300 60%, #ffa000 100%);
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: 700;
-        font-size: 1.15rem;
-        box-shadow: 0 4px 16px rgba(60,72,88,0.13);
-        transition: background 0.2s;
-    }
-    .no-print:hover {
-        background: linear-gradient(90deg, #ffa000 60%, #ffb300 100%);
-    }
-    .jornadas-profesor h3 {
-        color: #1a237e;
-        margin-bottom: 16px;
-        font-weight: 700;
-        font-size: 1.15rem;
-    }
-    .jornadas-list {
-        list-style: none;
-        padding: 0;
-    }
-    .jornada-item {
-        margin-bottom: 22px;
-    }
-    .jornada-toggle {
-        background: #3949ab;
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        padding: 10px 24px;
-        font-size: 1.08rem;
-        font-weight: 700;
-        cursor: pointer;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 8px rgba(60,72,88,0.10);
-        transition: background 0.2s;
-    }
-    .jornada-toggle:hover {
-        background: #1a237e;
-    }
-    .salones-jornada {
-        background: #f7f9fc;
-        border-radius: 12px;
-        padding: 18px 26px;
-        margin-top: 10px;
-        box-shadow: 0 2px 8px rgba(60,72,88,0.06);
-    }
-    .salones-jornada h4 {
-        color: #3949ab;
-        margin-bottom: 10px;
-        font-weight: 700;
-    }
-    .salones-jornada ul {
-        list-style: none;
-        padding: 0;
-    }
-    .salones-jornada li {
-        margin-bottom: 12px;
-    }
-    .salones-jornada a {
-        color: #007bff;
-        text-decoration: none;
-        font-weight: 600;
-    }
-    .salones-jornada a:hover {
-        text-decoration: underline;
-    }
-    .salones-jornada form {
-        margin-top: 10px;
-    }
-    .salones-jornada button {
-        background: #28a745;
-        color: #fff;
-        border: none;
-        padding: 8px 18px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1.05em;
-        font-weight: 700;
-        box-shadow: 0 2px 8px rgba(60,72,88,0.10);
-        transition: background 0.2s;
-    }
-    .salones-jornada button:hover {
-        background: #218838;
-    }
-    @media print {
-        body, html {
-            background: #fff !important;
-        }
-        .dashboard-container {
-            display: block !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100vw !important;
-        }
-        .dashboard-aside {
-            display: none !important;
-            width: 0 !important;
-            min-width: 0 !important;
-            max-width: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            position: static !important;
-            float: none !important;
-            visibility: hidden !important;
-            overflow: hidden !important;
-            z-index: -1 !important;
-            height: 0 !important;
-        }
-        .dashboard-section {
-            margin-left: 0 !important;
-            width: 100% !important;
-            padding: 0 !important;
-            min-width: 0 !important;
-            max-width: 100vw !important;
-        }
-        .profesor-sidebar {
-            display: none !important;
-            width: 0 !important;
-            min-width: 0 !important;
-            max-width: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            position: static !important;
-            float: none !important;
-            visibility: hidden !important;
-            overflow: hidden !important;
-            z-index: -1 !important;
-            height: 0 !important;
-        }
-        .profesor-main-content {
-            margin-left: 0 !important;
-            width: 100% !important;
-            padding: 0 !important;
-            min-width: 0 !important;
-            max-width: 100vw !important;
-        }
-        .guia-img-box,
-        .guia-section-subir-imagen {
-            display: none !important;
-            width: 0 !important;
-            min-width: 0 !important;
-            max-width: 0 !important;
-            height: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border: none !important;
-            box-shadow: none !important;
-            background: none !important;
-        }
-        .guia-texto-adicional,
-        .guia-texto-objetivos,
-        .guia-texto-procedimiento,
-        .guia-texto-resultados,
-        .guia-texto-conclusiones,
-        .guia-texto-referencias {
-            border: none !important;
-            background: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            min-height: 0 !important;
-            border-radius: 0 !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
-            box-sizing: border-box !important;
-            display: block !important;
-        }
-        .guia-texto-objetivos,
-        .guia-texto-procedimiento,
-        .guia-texto-resultados,
-        .guia-texto-conclusiones,
-        .guia-texto-referencias {
-            overflow-y: visible !important;
-            max-height: none !important;
-            resize: none !important;
-        }
-        .guia-col:last-child {
-            display: block !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        .guia-section.procedimiento,
-        .guia-section.resultados,
-        .guia-section.conclusiones,
-        .guia-section.referencias {
-            position: relative !important;
-            left: 0 !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
-            box-sizing: border-box !important;
-            display: block !important;
-            order: 99 !important;
-        }
-        .guia-col {
-            display: flex !important;
-            flex-direction: column !important;
-        }
-        .guia-section.instrumento-material {
-            order: 98 !important;
-        }
-        /* Reubica los campos largos debajo de instrumento-material */
-        .guia-col:last-child {
-            display: contents !important;
-        }
-        .guia-section.procedimiento,
-        .guia-section.resultados,
-        .guia-section.conclusiones,
-        .guia-section.referencias {
-            /* Mueve visualmente debajo de instrumento-material */
-            page-break-inside: avoid !important;
-        }
-        .guia-container {
-            display: block !important;
-            flex-direction: column !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-        .guia-col {
-            display: block !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        .guia-section.instrumento-material {
-            page-break-after: avoid !important;
-        }
-        .guia-section.procedimiento,
-        .guia-section.resultados,
-        .guia-section.conclusiones,
-        .guia-section.referencias {
-            position: static !important;
-            left: auto !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
-            box-sizing: border-box !important;
-            display: block !important;
-            order: unset !important;
-            page-break-inside: avoid !important;
-        }
-    }
-    </style>
+        </style>
 </head>
 <body>
     <div class="profesor-dashboard-wrapper">
-        <aside class="profesor-sidebar">
-            <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Profesor</div>
-            <nav>
-                <ul>
-                    <li class="active"><a href="/profesor/dashboard/"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
-                    <li><a href="/profesor/guias/"><i class="fa-solid fa-book icon"></i>Guías</a></li>
-                </ul>
-            </nav>
-        </aside>
         <main class="profesor-main-content">
             <div style="padding: 24px; width:100%; max-width:1200px;">
                  
@@ -1238,3 +907,4 @@
     </script>
 </body>
 </html>
+{% endblock %}

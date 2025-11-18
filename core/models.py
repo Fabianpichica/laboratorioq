@@ -20,7 +20,8 @@ class Profile(models.Model):
 
 class Quimico(models.Model):
     nombre = models.CharField(max_length=100)
-    cas = models.CharField(max_length=32, blank=True, null=True)  # Nuevo campo para el número CAS
+    cas = models.CharField(max_length=32, blank=True, null=True)
+    codigo_inventario = models.CharField(max_length=32, unique=True, blank=False, null=False)  # Ahora obligatorio
     cantidad = models.PositiveIntegerField()
     descripcion = models.TextField(blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
@@ -33,6 +34,7 @@ class Quimico(models.Model):
         return self.nombre
 
     def save(self, *args, **kwargs):
+        print(f"[DEBUG][MODEL PRE-SAVE] self.codigo_inventario={self.codigo_inventario}")
         # Guardar primero para obtener el ID si es nuevo
         if not self.pk:
             super().save(*args, **kwargs)
@@ -51,6 +53,7 @@ class Quimico(models.Model):
             # Guardar normalmente si no es nuevo
             if self.pk:
                 super().save(*args, **kwargs)
+        print(f"[DEBUG][MODEL POST-SAVE] self.id={self.id}, self.codigo_inventario={self.codigo_inventario}")
 
     def get_absolute_url(self):
         from django.urls import reverse

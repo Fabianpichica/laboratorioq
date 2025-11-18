@@ -18,22 +18,7 @@ import requests
 from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
-import pubchempy as pcp
-import os, json
-import unicodedata
-import logging
-
-logger = logging.getLogger(__name__)
-
-def normalizar_nombre(nombre):
-    nombre = nombre.strip().lower()
-    nombre = ''.join(c for c in unicodedata.normalize('NFD', nombre) if unicodedata.category(c) != 'Mn')
-    return nombre
-
-try:
-    from googletrans import Translator
-except ImportError:
-    Translator = None
+import json
 
 def login_view(request):
     if request.method == 'POST':
@@ -207,90 +192,45 @@ def descargar_informe_pdf(request, informe_id):
 def materiales_view(request):
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'aprendiz':
         return redirect('/')
+    import os, json
+    from django.contrib import messages
+    from .models import Quimico
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        cantidad = request.POST.get('cantidad')
-        descripcion = request.POST.get('descripcion')
-        fecha_vencimiento = request.POST.get('fecha_vencimiento')
-        cas_form = request.POST.get('cas', '').strip()
-        if nombre and cantidad and cantidad.isdigit():
-            import os, json
-            nombre_es = nombre.strip()
-            # Traducir automáticamente a español si el nombre está en inglés
+        cas = request.POST.get('cas', '').strip()
+        print(f"[DEBUG][POST] CAS recibido: '{cas}'")
+        codigo_inventario = request.POST.get('codigo_inventario', '').strip()
+        nombre = request.POST.get('nombre', '').strip()
+        cantidad = request.POST.get('cantidad', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        fecha_vencimiento = request.POST.get('fecha_vencimiento', '').strip()
+        # Validaciones
+        if not cas:
+            messages.error(request, "El campo CAS es obligatorio y no puede estar vacío.")
+        if not codigo_inventario:
+            messages.error(request, "El campo Código de inventario es obligatorio.")
+        if not nombre:
+            messages.error(request, "Debe ingresar el nombre del químico.")
+        if not cantidad or not cantidad.isdigit() or int(cantidad) < 0:
+            messages.error(request, "La cantidad debe ser un número entero positivo.")
+        if Quimico.objects.filter(cas=cas).exists():
+            messages.error(request, "Ya existe un químico con ese número CAS.")
+        if Quimico.objects.filter(codigo_inventario=codigo_inventario).exists():
+            messages.error(request, "Ya existe un químico con ese código de inventario.")
+        # Si no hay errores, guardar
+        if not list(messages.get_messages(request)):
             try:
-                from googletrans import Translator
-                translator = Translator()
-                nombre_traducido = translator.translate(nombre_es, src='en', dest='es').text
-                if nombre_traducido and nombre_traducido.lower() != nombre_es.lower():
-                    nombre_es = nombre_traducido
-            except Exception:
-                pass
-            # Si la traducción automática falla, consultar el archivo local como respaldo
-            if nombre_es.lower() == nombre.strip().lower():
-                ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
-                try:
-                    with open(ruta_json, 'r', encoding='utf-8') as f:
-                        traducciones = json.load(f)
-                    nombre_traducido = traducciones.get(nombre_es.lower())
-                    if nombre_traducido:
-                        nombre_es = nombre_traducido
-                except Exception:
-                    pass
-            cas = cas_form if cas_form else ''
-            # Buscar CAS en PubChem solo si no viene del formulario
-            if not cas:
-                try:
-                    results = pcp.get_compounds(nombre_es, 'name')
-                    if results:
-                        compound = results[0]
-                        cas_list = [x for x in compound.synonyms if x.count('-') == 2 and x.replace('-', '').isdigit()]
-                        if cas_list:
-                            cas = cas_list[0]
-                except Exception:
-                    cas = ''
-            # Si no se encontró en PubChem, buscar en el archivo local
-            if not cas:
-                ruta_cas = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_cas.json')
-                try:
-                    with open(ruta_cas, 'r', encoding='utf-8') as f:
-                        cas_dict = json.load(f)
-                    # Buscar por nombre en español y en inglés normalizados
-                    nombre_norm_es = normalizar_nombre(nombre_es)
-                    nombre_norm_en = normalizar_nombre(nombre.strip())
-                    variantes = [
-                        nombre_es.strip().lower(),
-                        nombre_norm_es,
-                        nombre_norm_en,
-                        nombre_norm_en.replace(' ', ''),
-                        nombre_norm_es.replace(' ', ''),
-                        nombre_es.replace('í', 'i').replace('ó', 'o').replace('é', 'e').replace('á', 'a').replace('ú', 'u').lower(),
-                        nombre_es.lower(),
-                        ''.join(c for c in unicodedata.normalize('NFD', nombre_es.lower()) if unicodedata.category(c) != 'Mn'),
-                    ]
-                    for v in variantes:
-                        if not cas:
-                            cas = cas_dict.get(v, '')
-                    print(f"[DEBUG] Nombre original: {nombre}, nombre_es: {nombre_es}, variantes: {variantes}, CAS encontrado: {cas}")
-                except Exception:
-                    cas = ''
-            filtro = {'nombre': nombre_es}
-            if fecha_vencimiento:
-                filtro['fecha_vencimiento'] = fecha_vencimiento
-            if not Quimico.objects.filter(**filtro).exists():
-                print(f"[DEBUG] Antes de guardar: nombre_es={nombre_es}, CAS={cas if cas else 'No disponible'}")
-                print(f"[DEBUG] GUARDANDO: nombre_es={nombre_es}, CAS={cas if cas else 'No disponible'}, cantidad={cantidad}, descripcion={descripcion}, fecha_vencimiento={fecha_vencimiento}")
-                try:
-                    Quimico.objects.create(
-                        nombre=nombre_es,
-                        cantidad=cantidad,
-                        descripcion=descripcion,
-                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None,
-                        cas=cas if cas else 'No disponible'
-                    )
-                except Exception as e:
-                    messages.error(request, f"Error al crear químico: {e}")
-            else:
-                messages.error(request, "Ya existe un químico con ese nombre y fecha de vencimiento.")
+                quimico = Quimico(
+                    nombre=nombre,
+                    cas=cas,
+                    codigo_inventario=codigo_inventario,
+                    cantidad=int(cantidad),
+                    descripcion=descripcion,
+                    fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
+                )
+                quimico.save()
+                messages.success(request, "Químico añadido correctamente.")
+            except Exception as e:
+                messages.error(request, f"Error al crear químico: {e}")
     quimicos = Quimico.objects.all()
     return render(request, 'materiales.html', {'quimicos': quimicos})
 
@@ -309,27 +249,6 @@ def editar_quimico(request, quimico_id):
         quimico.cantidad = request.POST.get('cantidad')
         quimico.descripcion = request.POST.get('descripcion')
         quimico.fecha_vencimiento = request.POST.get('fecha_vencimiento')
-        # Actualizar CAS automáticamente si cambia el nombre usando PubChem y respaldo local
-        cas = ''
-        try:
-            results = pcp.get_compounds(quimico.nombre.strip(), 'name')
-            if results:
-                compound = results[0]
-                cas_list = [x for x in compound.synonyms if x.count('-') == 2 and x.replace('-', '').isdigit()]
-                if cas_list:
-                    cas = cas_list[0]
-        except Exception:
-            cas = ''
-        if not cas:
-            import os, json
-            ruta_cas = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_cas.json')
-            try:
-                with open(ruta_cas, 'r', encoding='utf-8') as f:
-                    cas_dict = json.load(f)
-                cas = cas_dict.get(quimico.nombre.lower(), '')
-            except Exception:
-                cas = ''
-        quimico.cas = cas
         if request.FILES.get('ficha_seguridad'):
             quimico.ficha_seguridad = request.FILES['ficha_seguridad']
         if request.FILES.get('protocolo_uso'):
@@ -396,14 +315,12 @@ def reportes_view(request):
     else:
         aprendiz = request.user if hasattr(request.user, 'profile') and request.user.profile.role == 'aprendiz' else aprendices.first()
     # Top 5 químicos más usados por el aprendiz
-    quimicos_count = (
-        Quimico.objects
-        .filter(cuadernoentry__aprendiz=aprendiz)
-        .annotate(total=Count('cuadernoentry'))
-        .order_by('-total')[:5]
-    )
-    labels = [q.nombre for q in quimicos_count]
-    data = [q.total for q in quimicos_count]
+    quimicos_count = (CuadernoEntry.objects.filter(aprendiz=aprendiz)
+                      .values('quimicos__nombre')
+                      .annotate(total=Count('quimicos'))
+                      .order_by('-total')[:5])
+    labels = [q['quimicos__nombre'] for q in quimicos_count]
+    data = [q['total'] for q in quimicos_count]
     return render(request, 'reportes.html', {
         'labels': labels,
         'data': data,
@@ -506,54 +423,33 @@ def materiales_equipos_view(request):
     # CRUD para Químico
     if request.method == 'POST' and request.POST.get('tipo') == 'quimico':
         nombre = request.POST.get('nombre')
+        cas = request.POST.get('cas', '').strip()
+        codigo_inventario = request.POST.get('codigo_inventario', '').strip()
         cantidad = request.POST.get('cantidad')
         descripcion = request.POST.get('descripcion')
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
         # Validar que todos los campos requeridos estén presentes y que cantidad sea un número
-        if nombre and cantidad and cantidad.isdigit():
-            # Traducción de nombre si existe en quimicos_es.json (opcional, solo si se requiere para visualización, no para CAS)
-            import os, json
-            ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
-            nombre_es = None
-            cas = ''
-            try:
-                with open(ruta_json, 'r', encoding='utf-8') as f:
-                    traducciones = json.load(f)
-                nombre_es = traducciones.get(nombre.strip().lower())
-            except Exception:
-                nombre_es = None
-            # Si no hay traducción o es igual al original, usar el nombre original
-            if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
-                nombre_es = nombre.strip()
-            # Buscar CAS en PubChem
-            import pubchempy as pcp
-            try:
-                results = pcp.get_compounds(nombre_es, 'name')
-                if results:
-                    compound = results[0]
-                    cas_list = [x for x in compound.synonyms if x.count('-') == 2 and x.replace('-', '').isdigit()]
-                    if cas_list:
-                        cas = cas_list[0]
-            except Exception:
-                cas = ''
-            filtro = {'nombre': nombre_es}
+        if nombre and cantidad and cantidad.isdigit() and cas and codigo_inventario:
+            # Validar que no exista un químico con el mismo nombre y fecha de vencimiento
+            filtro = {'nombre': nombre}
             if fecha_vencimiento:
                 filtro['fecha_vencimiento'] = fecha_vencimiento
             if not Quimico.objects.filter(**filtro).exists():
                 try:
                     Quimico.objects.create(
-                        nombre=nombre_es,
+                        nombre=nombre,
+                        cas=cas,
+                        codigo_inventario=codigo_inventario,
                         cantidad=int(cantidad),
                         descripcion=descripcion,
-                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None,
-                        cas=cas
+                        fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
                     )
                 except Exception as e:
                     messages.error(request, f"Error al crear químico: {e}")
             else:
                 messages.error(request, "Ya existe un químico con ese nombre y fecha de vencimiento.")
         else:
-            messages.error(request, "Por favor, completa todos los campos requeridos y asegúrate de que la cantidad sea un número.")
+            messages.error(request, "Por favor, completa todos los campos requeridos (incluyendo CAS y Código de inventario) y asegúrate de que la cantidad sea un número.")
     # CRUD para Material
     if request.method == 'POST' and request.POST.get('tipo') == 'material':
         nombre = request.POST.get('nombre')
@@ -621,24 +517,3 @@ def detalle_equipo(request, pk):
 def logout_view(request):
     logout(request)
     return redirect('landing')
-
-@login_required
-def traducir_quimico(request):
-    nombre = request.GET.get('nombre', '').strip().lower()
-    nombre_es = None
-    ruta_json = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'core', 'quimicos_es.json')
-    try:
-        with open(ruta_json, 'r', encoding='utf-8') as f:
-            traducciones = json.load(f)
-        nombre_es = traducciones.get(nombre)
-    except Exception:
-        nombre_es = None
-    if not nombre_es and Translator:
-        try:
-            translator = Translator()
-            nombre_es = translator.translate(nombre, src='en', dest='es').text
-        except Exception:
-            nombre_es = nombre
-    if not nombre_es:
-        nombre_es = nombre
-    return JsonResponse({'nombre_es': nombre_es})

@@ -1,97 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Estudiantes del salón</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-    body { background: #f4f6fa; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
-    .profesor-dashboard-wrapper { display: flex; min-height: 100vh; }
-    .profesor-sidebar { width: 240px; background: linear-gradient(180deg, #1976d2 0%, #283593 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(25,118,210,0.08); }
-    .profesor-sidebar .sidebar-title { font-size: 1.7rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-    .profesor-sidebar nav { width: 100%; }
-    .profesor-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-    .profesor-sidebar li { margin-bottom: 8px; width: 70%; }
-    .profesor-sidebar a, .profesor-sidebar li.active { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; cursor: pointer; }
-    .profesor-sidebar a i, .profesor-sidebar li.active .icon { margin-right: 12px; font-size: 1.2rem; }
-    .profesor-sidebar a:hover, .profesor-sidebar li.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-    .profesor-dashboard-section { flex: 1; padding: 48px 40px; margin-left: 240px; }
-    .salon-estudiantes-list { margin-top: 20px; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
-    .salon-estudiantes-list li { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 18px 22px; margin-bottom: 0; font-size: 1rem; box-shadow: 0 1px 6px rgba(60,72,88,0.06); display: flex; align-items: center; }
-    .estudiante-foto { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-right: 28px; background: #f4f6fa; border: 2px solid #e3e6ea; box-shadow: 0 2px 8px rgba(60,72,88,0.10); }
-    .estudiante-info { flex: 1; }
-    @media (max-width: 900px) {
-        .profesor-dashboard-section { padding: 24px 8px; margin-left: 100px; } 
-        .profesor-sidebar { width: 100px; }
-        .salon-estudiantes-list { grid-template-columns: 1fr; gap: 12px; }
-    }
-    @media (max-width: 600px) {
-        .profesor-dashboard-section { padding: 10px; margin-left: 0; }
-        .sidebar-title { font-size: 0.95rem; }
-        .salon-estudiantes-list { grid-template-columns: 1fr; gap: 8px; }
-    }
-    @media (max-width: 400px) {
-        .profesor-dashboard-section { padding: 2vw 0 8vw 0; }
-        .sidebar-title { font-size: 0.85rem; }
-    }
-    </style>
-</head>
-<body>
-    <div class="profesor-dashboard-wrapper">
-        <aside class="profesor-sidebar">
-            <div class="sidebar-title"><i class="fa-solid fa-chalkboard-user"></i> Panel de Profesor</div>
-            <nav>
-                <ul>
-                    <li><a href="{% url 'dashboard_profesor' %}"><i class="fa-solid fa-house icon"></i>Inicio</a></li>
-                    <li><a href="{% url 'guias_profesor' %}"><i class="fa-solid fa-book icon"></i>Guías</a></li>
-                    <li><a href="{% url 'materiales_profesor' %}"><i class="fa-solid fa-boxes-stacked icon"></i>Materiales</a></li>
-                    <li><a href="{% url 'resultados_por_guia' %}"><i class="fa-solid fa-flask-vial icon"></i>Resultados por Guía</a></li>
-                    <li><a href="#"><i class="fa-solid fa-chart-bar icon"></i>Reportes</a></li>
-                    <li><a href="#"><i class="fa-solid fa-user icon"></i>Perfil</a></li>
-                    <li><a href="{% url 'landing' %}"><i class="fa-solid fa-right-from-bracket icon"></i>Cerrar sesión</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <section class="profesor-dashboard-section">
-            <div class="dashboard-header">
-                <i class="fas fa-users"></i>
-                <h2>Estudiantes en el salón: {{ salon.nombre }}</h2>
-            </div>
-            <form method="get" style="margin-bottom:18px;">
-                <input type="text" name="q" placeholder="Buscar estudiante por nombre o documento" value="{{ request.GET.q|default:'' }}" style="padding:8px 14px;border-radius:8px;border:1.5px solid #e3e6ea;width:320px;max-width:100%;font-size:1rem;">
-                <button type="submit" style="background:#1976d2;color:#fff;border:none;padding:7px 18px;border-radius:6px;font-weight:600;margin-left:8px;">Buscar</button>
-            </form>
-            {% if jornada %}
-                <h3 style="color:#3949ab;font-size:1.1rem;margin-bottom:18px;">Jornada: {{ jornada.nombre }} ({{ jornada.fecha }})</h3>
-            {% endif %}
-            {% if estudiantes %}
-                <ul class="salon-estudiantes-list">
-                    {% for estudiante in estudiantes %}
-                        {% if not request.GET.q or request.GET.q|lower in estudiante.nombre|lower or request.GET.q in estudiante.documento %}
-                        <li>
-                            {% if estudiante.foto %}
-                                <img src="{{ estudiante.foto.url }}" alt="Foto" class="estudiante-foto">
-                            {% endif %}
-                            <div class="estudiante-info">
-                                <strong>{{ estudiante.nombre|default:'Sin nombre' }}</strong><br>
-                                <span style="color:#888;">Documento:</span> {{ estudiante.documento|default:'-' }}<br>
-                                <span style="color:#888;">Tipo:</span> {{ estudiante.get_tipo_documento_display|default:'-' }}<br>
-                                <span style="color:#888;">Jornada:</span>
-                                {% if estudiante.jornada %}
-                                    {{ estudiante.jornada.nombre }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </div>
-                        </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p style="color:#888;">No hay estudiantes asignados a este salón y jornada.</p>
-            {% endif %}
-        </section>
-    </div>
-</body>
-</html>
+{% extends 'profesor/base.html' %}
+{% block title %}Estudiantes del salón{% endblock %}
+{% block content %}
+<div class="dashboard-header">
+    <i class="fas fa-users"></i>
+    <h2>Estudiantes en el salón: {{ salon.nombre }}</h2>
+</div>
+<ul class="salon-estudiantes-list">
+    {% for estudiante in estudiantes %}
+    <li>
+        {% if estudiante.foto and estudiante.foto.url %}
+            <img src="{{ estudiante.foto.url }}" alt="Foto de {{ estudiante.nombre }}" class="estudiante-foto">
+        {% else %}
+            <img src="/static/img/default-user.png" alt="Sin foto" class="estudiante-foto">
+        {% endif %}
+        <div class="estudiante-info">
+            <strong>{{ estudiante.nombre }}</strong><br>
+            {{ estudiante.email }}<br>
+            {{ estudiante.documento }}
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

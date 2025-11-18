@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Panel Profesor{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f4f6fb; margin: 0; font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; }
+        .main-content { margin-top: 56px; min-height: calc(100vh - 80px); padding: 0; }
+        .footer { background: #e7ebf2 !important; color: #181828; font-family: 'Poppins', Arial, sans-serif; font-weight: 700; font-size: 1.1rem; text-align: center; padding: 18px 0 10px 0; margin-top: 40px; border-top: none; position: fixed; bottom: 0; width: 100%; }
+        .nav-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #181828;
+            font-size: 1.35rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 10px;
+            background: none;
+            border: none;
+            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-navbar" style="width:100%;background:#e7ebf2;box-shadow:0 2px 8px rgba(40,53,147,0.07);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;position:fixed;top:0;left:0;z-index:100;overflow-x:auto;">
+        <div class="nav-left" style="display:flex;align-items:center;gap:36px;flex-wrap:nowrap;">
+            <a href="{% url 'dashboard_profesor' %}" class="nav-label"><i class="fa-solid fa-house"></i>Inicio</a>
+            <a href="{% url 'guias_profesor' %}" class="nav-label"><i class="fa-solid fa-book"></i>Guías</a>
+            <a href="{% url 'materiales_profesor' %}" class="nav-label"><i class="fa-solid fa-boxes-stacked"></i>Materiales</a>
+            <a href="{% url 'resultados_por_guia' %}" class="nav-label"><i class="fa-solid fa-flask-vial"></i>Resultados por Guía</a>
+            <a href="#" class="nav-label"><i class="fa-solid fa-chart-bar"></i>Reportes</a>
+        </div>
+        <div class="nav-right" style="display:flex;align-items:center;gap:16px;min-width:120px;justify-content:flex-end;">
+            <a href="/profesor/perfil/" class="perfil-btn" style="display:flex;align-items:center;gap:8px;background:#e0f7fa;color:#181828;font-weight:700;font-size:1.15rem;border-radius:10px;padding:8px 18px;border:none;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;text-decoration:none;"><i class="fa-regular fa-user"></i>Perfil</a>
+            <a href="{% url 'landing' %}" class="logout-btn" style="display:inline-flex;align-items:center;justify-content:center;background:#ede7f6;color:#181828;border-radius:10px;padding:8px 14px;border:none;font-size:1.2rem;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;margin-left:8px;visibility:visible;opacity:1;"><i class="fa-solid fa-right-from-bracket"></i></a>
+        </div>
+    </div>
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+    <footer class="footer">
+        Laboratorio Virtual 2025
+    </footer>
+</body>
+</html>
