@@ -47,6 +47,8 @@ def agregar_quimico_admin(request):
         return redirect('/')
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
+        cas = request.POST.get('cas')
+        codigo_inventario = request.POST.get('codigo_inventario')
         cantidad = request.POST.get('cantidad')
         descripcion = request.POST.get('descripcion')
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
@@ -88,8 +90,17 @@ def agregar_quimico_admin(request):
         except ValueError:
             messages.error(request, 'La cantidad debe ser un número válido.')
             return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        # Validación para código de inventario único
+        if not codigo_inventario:
+            messages.error(request, 'El campo Código inventario es obligatorio.')
+            return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        if Quimico.objects.filter(codigo_inventario=codigo_inventario).exists():
+            messages.error(request, 'Ya existe un reactivo con ese Código inventario. Debe ser único.')
+            return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
         Quimico.objects.create(
             nombre=nombre_es,
+            cas=cas,
+            codigo_inventario=codigo_inventario,
             cantidad=cantidad_int,
             descripcion=descripcion,
             fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
@@ -263,6 +274,8 @@ def reactivos_admin(request):
     limite_vencimiento = datetime.now().date() + timedelta(days=30)
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
+        cas = request.POST.get('cas')
+        codigo_inventario = request.POST.get('codigo_inventario')
         cantidad = request.POST.get('cantidad')
         descripcion = request.POST.get('descripcion')
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
@@ -281,14 +294,11 @@ def reactivos_admin(request):
             try:
                 translator = Translator()
                 nombre_es = translator.translate(nombre, src='en', dest='es').text
-                # Si la traducción automática falla o no cambia, forzar español
                 if not nombre_es or nombre_es.strip().lower() == nombre.strip().lower():
                     nombre_es = nombre
             except Exception:
                 nombre_es = nombre
-        # Si el nombre traducido sigue en inglés, forzar español manualmente
         if nombre_es and nombre_es.strip().lower() == nombre.strip().lower():
-            # Si el nombre tiene palabras en inglés comunes, traducirlas manualmente
             traducciones_manual = {'water': 'agua', 'sodium': 'sodio', 'chloride': 'cloruro', 'acid': 'ácido', 'hydrogen': 'hidrógeno', 'oxygen': 'oxígeno'}
             for eng, esp in traducciones_manual.items():
                 nombre_es = nombre_es.replace(eng, esp)
@@ -304,8 +314,17 @@ def reactivos_admin(request):
         except ValueError:
             messages.error(request, 'La cantidad debe ser un número válido.')
             return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        # Validación para código de inventario único
+        if not codigo_inventario:
+            messages.error(request, 'El campo Código inventario es obligatorio.')
+            return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
+        if Quimico.objects.filter(codigo_inventario=codigo_inventario).exists():
+            messages.error(request, 'Ya existe un reactivo con ese Código inventario. Debe ser único.')
+            return render(request, 'adminlab/reactivos.html', {'quimicos': quimicos})
         Quimico.objects.create(
             nombre=nombre_es,
+            cas=cas,
+            codigo_inventario=codigo_inventario,
             cantidad=cantidad_int,
             descripcion=descripcion,
             fecha_vencimiento=fecha_vencimiento if fecha_vencimiento else None
@@ -679,7 +698,8 @@ def editar_profesor(request, profesor_id):
     if not request.user.is_superuser:
         return redirect('/')
     profesor = get_object_or_404(User, id=profesor_id)
-    profile = Profile.objects.get(user=profesor)
+    # Usar get_or_create para evitar DoesNotExist
+    profile, _ = Profile.objects.get_or_create(user=profesor, defaults={'role': 'profesor'})
     salones = Salon.objects.all()
     jornadas = Jornada.objects.all()
     # Jornadas y salones actuales
@@ -709,15 +729,11 @@ def editar_profesor(request, profesor_id):
             else:
                 jornada.profesores.remove(profesor)
         # Actualizar salones: solo agregar el profesor a los salones seleccionados en las jornadas seleccionadas
-        # No sobrescribir los salones de la jornada, solo asegurarse que los salones seleccionados estén en las jornadas seleccionadas
         for jornada in jornadas:
             if str(jornada.id) in jornadas_ids:
-                # Para cada salón seleccionado, agregarlo a la jornada si no está
                 for salon in salones:
                     if str(salon.id) in salones_ids:
                         jornada.salones.add(salon)
-                # Opcional: quitar los salones que ya no están seleccionados SOLO para este profesor
-                # (No se elimina ningún salón de la jornada, solo se agregan los nuevos)
                 jornada.save()
         messages.success(request, 'Profesor actualizado correctamente.')
         return redirect('profesores_admin')

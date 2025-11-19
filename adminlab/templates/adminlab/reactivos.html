@@ -1,305 +1,180 @@
+{% extends 'adminlab/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Reactivos Químicos</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body { background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%); margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        .admin-dashboard-wrapper { display: flex; min-height: 100vh; }
-        .admin-sidebar { width: 250px; background: linear-gradient(180deg, #283593 0%, #1976d2 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(40,53,147,0.08); }
-        .admin-sidebar h2 { font-size: 2rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-        .admin-sidebar nav { width: 100%; }
-        .admin-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-        .admin-sidebar li { margin-bottom: 8px; width: 100%; }
-        .admin-sidebar a { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; }
-        .admin-sidebar a i { margin-right: 12px; font-size: 1.2rem; }
-        .admin-sidebar a:hover, .admin-sidebar a.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-        .admin-main-content { margin-left: 250px; padding: 48px 32px 32px 32px; width: 100%; }
-        .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-        .admin-header h1 { color: #283593; font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: 1px; }
-        .admin-header .admin-user { font-size: 1.1rem; color: #1976d2; background: #fff; border-radius: 20px; padding: 8px 18px; box-shadow: 0 2px 8px rgba(25,118,210,0.07); }
-        .materiales-container {
-            max-width: 900px;
-            margin: 40px auto 0 auto;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(60,72,88,0.13);
-            padding: 44px 38px 36px 38px;
-            border: 2.5px solid #1976d2;
-        }
-        .materiales-container h2 {
-            color: #1a237e;
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 22px;
-            letter-spacing: 0.5px;
-        }
-        .materiales-form {
-            display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
-        }
-        .materiales-form input[type="text"],
-        .materiales-form input[type="number"],
-        .materiales-form input[type="date"] {
-            border: 2px solid #bfc8d6;
-            background: #f7f9fc;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 1.05rem;
-            transition: border 0.2s;
-            min-width: 120px;
-        }
-        .materiales-form input[type="text"]:focus,
-        .materiales-form input[type="number"]:focus,
-        .materiales-form input[type="date"]:focus {
-            border: 2px solid #3949ab;
-            outline: none;
-        }
-        .materiales-form button, .materiales-form input[type="submit"] {
-            background: #1976d2;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 18px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .materiales-form button:hover, .materiales-form input[type="submit"]:hover {
-            background: #3949ab;
-        }
-        .materiales-table {
-            width: 100%;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
-            border-collapse: separate;
-            border-spacing: 0;
-            overflow: hidden;
-            margin-bottom: 32px;
-        }
-        .materiales-table th, .materiales-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #e3e6ea;
-        }
-        .materiales-table th {
-            background: #1976d2;
-            color: #fff;
-            font-size: 1.05rem;
-        }
-        .materiales-table tr:last-child td {
-            border-bottom: none;
-        }
-        .materiales-table tr:hover {
-            background: #f4f6fb;
-        }
-        .materiales-table a {
-            color: #1976d2;
-            font-weight: 500;
-            margin-right: 10px;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .materiales-table a:hover {
-            color: #ffb300;
-        }
-        @media (max-width: 900px) { .admin-main-content { padding: 32px 8px 8px 8px; } .admin-sidebar { width: 100px; } .admin-main-content { margin-left: 100px; } }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard-wrapper">
-        <aside class="admin-sidebar">
-            <h2><i class="fa-solid fa-flask-vial"></i> AdminLab</h2>
-            <nav>
-                <ul>
-                    <li><a href="/adminlab/dashboard/"><i class="fa-solid fa-house"></i>Inicio</a></li>
-                    <li><a href="/adminlab/inventario/"><i class="fa-solid fa-boxes-stacked"></i>Inventario</a></li>
-                    <li><a href="/adminlab/reactivos/" class="active"><i class="fa-solid fa-flask"></i>Reactivos Químicos</a></li>
-                    <li><a href="/adminlab/materiales/"><i class="fa-solid fa-cubes"></i>Materiales</a></li>
-                    <li><a href="/adminlab/equipos/"><i class="fa-solid fa-microscope"></i>Equipos</a></li>
-                    <li><a href="/adminlab/estudiantes/"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
-                    <li><a href="/adminlab/guias/"><i class="fa-solid fa-book"></i>Guías</a></li>
-                    <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
-                    <li><a href="/adminlab/salones/"><i class="fa-solid fa-school"></i>Salones</a></li>
-                    <li><a href="/adminlab/profesores/"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
-                    <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main class="admin-main-content">
-            <div class="admin-header">
-                <h1><i class="fa-solid fa-flask"></i> Reactivos Químicos</h1>
-                <div class="admin-user"><i class="fa-solid fa-user-shield"></i> Panel de inventario</div>
-            </div>
-            <div class="materiales-container">
-                <h2>Gestión de Reactivos Químicos</h2>
-                {% if quimicos %}
-                    {% with quimicos_bajo_stock=quimicos|dictsort:"cantidad" %}
-                        {% with bajo_stock=quimicos_bajo_stock|dictsort:"cantidad" %}
-                            {% if bajo_stock %}
-                                <div style="background:#fffde7;border:1.5px solid #ffb300;padding:18px 28px;margin-bottom:18px;border-radius:14px;color:#795548;font-weight:600;">
-                                    <span style="font-size:1.15em;"><i class="fa-solid fa-triangle-exclamation" style="color:#ffb300;margin-right:10px;"></i>¡Atención! Los siguientes químicos tienen <b>stock bajo</b> (≤ 5):</span>
-                                    <ul style="margin:10px 0 0 18px;">
-                                        {% for quimico in bajo_stock %}
-                                            {% if quimico.cantidad|default:0 <= 5 %}
-                                                <li>{{ quimico.nombre }} <span style="color:#b26a00;">(Cantidad: {{ quimico.cantidad }})</span></li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </div>
+{% block content %}
+<div class="main-content">
+    <section class="dashboard-section" style="display:flex;flex-direction:row;align-items:flex-start;gap:32px;">
+        <div class="materiales-main" style="flex:2;min-width:0;">
+            <h1 style="font-size:2.2rem;font-weight:900;color:#181828;margin-bottom:18px;letter-spacing:1px;">Gestión de Reactivos Químicos</h1>
+            <form class="materiales-form" method="post" enctype="multipart/form-data" style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:nowrap;align-items:center;">
+                {% csrf_token %}
+                <input type="hidden" name="tipo" value="quimico">
+                <input type="text" name="cas" placeholder="CAS" style="border-radius:8px;border:1.5px solid #bfc8d6;background:#fff;padding:8px 12px;font-size:1rem;min-width:110px;">
+                <input type="text" name="codigo_inventario" placeholder="Código inventario" style="border-radius:8px;border:1.5px solid #bfc8d6;background:#fff;padding:8px 12px;font-size:1rem;min-width:110px;">
+                <input type="text" name="nombre" id="busqueda-quimico" placeholder="Nombre del reactivo" autocomplete="off" style="border-radius:8px;border:1.5px solid #bfc8d6;background:#fff;padding:8px 12px;font-size:1rem;min-width:150px;">
+                <input type="number" name="cantidad" placeholder="Cantidad" style="border-radius:8px;border:1.5px solid #bfc8d6;background:#fff;padding:8px 12px;font-size:1rem;min-width:90px;">
+                <input type="text" name="descripcion" placeholder="Descripción" style="border-radius:8px;border:1.5px solid #bfc8d6;background:#fff;padding:8px 12px;font-size:1rem;min-width:120px;">
+                <input type="date" name="fecha_vencimiento" placeholder="dd/mm/aaaa" style="border-radius:8px;border:1.5px solid #bfc8d6;background:#fff;padding:8px 12px;font-size:1rem;min-width:120px;">
+                <input type="submit" value="Añadir" style="background:#26c6da;color:#181828;font-weight:700;border:none;border-radius:8px;padding:8px 18px;font-size:1rem;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;">
+            </form>
+            <table class="materiales-table" style="width:100%;background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(25,118,210,0.07);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:0.5rem;border:1.5px solid #b2ebf2;">
+                <thead>
+                    <tr style="background:#1976d2;">
+                        <th style="color:#fff;font-size:1.05rem;font-weight:700;padding:12px 14px;">Nombre</th>
+                        <th style="color:#fff;font-size:1.05rem;font-weight:700;padding:12px 14px;">CAS</th>
+                        <th style="color:#fff;font-size:1.05rem;font-weight:700;padding:12px 14px;">Código inventario</th>
+                        <th style="color:#fff;font-size:1.05rem;font-weight:700;padding:12px 14px;">Cantidad</th>
+                        <th style="color:#fff;font-size:1.05rem;font-weight:700;padding:12px 14px;">Descripción</th>
+                        <th style="color:#fff;font-size:1.05rem;font-weight:700;padding:12px 14px;">Fecha de vencimiento</th>
+                        <th style="color:#fff;font-size:1.05rem;font-weight:700;padding:12px 14px;">QR</th>
+                        <th style="color:#fff;font-size:1.05rem;font-weight:700;padding:12px 14px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quimico in quimicos %}
+                    <tr>
+                        <td style="font-weight:900;">{{ quimico.nombre }}</td>
+                        <td>{{ quimico.cas }}</td>
+                        <td>{{ quimico.codigo_inventario }}</td>
+                        <td>{{ quimico.cantidad }}</td>
+                        <td>{{ quimico.descripcion }}</td>
+                        <td>{{ quimico.fecha_vencimiento|date:'d / M / Y' }}</td>
+                        <td>
+                            {% if quimico.qr_code %}
+                                <img src="{{ quimico.qr_code.url }}" alt="QR" style="max-width:32px;max-height:32px;display:block;margin-bottom:4px;">
+                                <a href="{{ quimico.qr_code.url }}" download style="font-size:1.1em;color:#1976d2;">&#x21E9;</a>
+                            {% else %}
+                                <span style="color:#888;font-size:1.05em;">No generado</span>
                             {% endif %}
-                        {% endwith %}
-                        {% with vencen_pronto=quimicos_bajo_stock %}
-                            {% if vencen_pronto %}
-                                <div style="background:#e3f2fd;border:1.5px solid #1976d2;padding:18px 28px;margin-bottom:18px;border-radius:14px;color:#1976d2;font-weight:600;">
-                                    <span style="font-size:1.15em;"><i class="fa-solid fa-clock" style="color:#1976d2;margin-right:10px;"></i>¡Aviso! Los siguientes químicos <b>vencen pronto</b> (en 30 días o menos):</span>
-                                    <ul style="margin:10px 0 0 18px;">
-                                        {% for quimico in vencen_pronto %}
-                                            {% if quimico.fecha_vencimiento and quimico.fecha_vencimiento <= limite_vencimiento %}
-                                                <li>{{ quimico.nombre }} <span style="color:#0d47a1;">(Vence: {{ quimico.fecha_vencimiento|date:'d/m/Y' }})</span></li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
-                        {% endwith %}
+                        </td>
+                        <td>
+                            <a href="{% url 'editar_quimico_admin' quimico.id %}" style="background:#b2ebf2;color:#181828;padding:8px 20px;border-radius:10px;font-weight:700;text-decoration:none;margin-right:8px;font-size:1.05rem;box-shadow:0 2px 8px rgba(25,118,210,0.07);">Editar</a>
+                            <a href="{% url 'eliminar_quimico_admin' quimico.id %}" style="background:#ede7f6;color:#6a1b9a;padding:6px 18px;border-radius:8px;font-weight:700;text-decoration:none;font-size:1rem;border:none;">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">No hay reactivos registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="materiales-alertas" style="flex:1;display:flex;flex-direction:column;gap:18px;">
+            {% if quimicos %}
+                {% with quimicos_bajo_stock=quimicos|dictsort:"cantidad" %}
+                    {% with bajo_stock=quimicos_bajo_stock|dictsort:"cantidad" %}
+                        {% if bajo_stock %}
+                            <div style="background:#ffe0b2;border-radius:12px;padding:18px 22px;box-shadow:0 2px 8px rgba(255,193,7,0.08);color:#181828;">
+                                <div style="font-size:1.5rem;font-weight:900;color:#ff9800;margin-bottom:8px;">¡ATENCIÓN!</div>
+                                <div style="font-size:1.08rem;font-weight:700;margin-bottom:8px;">Los siguientes reactivos tienen <span style="font-weight:900;">Stock bajo (≤5):</span></div>
+                                <ul style="margin:0 0 0 18px;font-size:1rem;">
+                                    {% for q in bajo_stock %}
+                                        {% if q.cantidad|default:0 <= 5 %}
+                                            <li><span style="font-weight:900;">{{ q.nombre }}</span> <span style="color:#b26a00;">(Cantidad: {{ q.cantidad }})</span></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
                     {% endwith %}
-                {% endif %}
-                <form class="materiales-form" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="tipo" value="quimico">
-                    <input type="text" name="nombre" id="busqueda-quimico" placeholder="Nombre o CAS del químico" autocomplete="off">
-                    <div id="sugerencias-quimico" style="position:absolute;z-index:1000;background:#fff;border:1px solid #ccc;display:none;max-height:180px;overflow-y:auto;width:220px;"></div>
-                    <input type="number" name="cantidad" placeholder="Cantidad">
-                    <input type="text" name="descripcion" placeholder="Descripción">
-                    <input type="date" name="fecha_vencimiento" placeholder="dd/mm/aaaa">
-                    <input type="submit" value="Añadir Reactivo">
-                </form>
-                <table class="materiales-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>CAS</th>
-                            <th>Cantidad</th>
-                            <th>Descripción</th>
-                            <th>Fecha de vencimiento</th>
-                            <th>QR</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for quimico in quimicos %}
-                        <tr>
-                            <td>{{ quimico.nombre }}</td>
-                            <td>{{ quimico.cas }}</td>
-                            <td>{{ quimico.cantidad }}</td>
-                            <td>{{ quimico.descripcion }}</td>
-                            <td>{{ quimico.fecha_vencimiento|date:'M. d, Y' }}</td>
-                            <td>
-                                {% if quimico.qr_code %}
-                                    <img src="{{ quimico.qr_code.url }}" alt="QR Químico" width="60"><br>
-                                    <a href="{{ quimico.qr_code.url }}" download>Descargar</a>
-                                {% else %}
-                                    No generado
-                                {% endif %}
-                            </td>
-                            <td>
-                                <a href="{% url 'editar_quimico_admin' quimico.id %}">Editar</a> |
-                                <a href="{% url 'eliminar_quimico_admin' quimico.id %}">Eliminar</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="7" style="text-align:center;color:#888;">No hay reactivos registrados.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
-    <script>
-    const input = document.getElementById('busqueda-quimico');
-    const sugerencias = document.getElementById('sugerencias-quimico');
-    if(input && sugerencias) {
-        let timeout = null;
-        input.addEventListener('input', function() {
-            clearTimeout(timeout);
-            const query = this.value.trim();
-            if (query.length < 1) {
-                sugerencias.style.display = 'none';
-                sugerencias.innerHTML = '';
-                return;
-            }
-            timeout = setTimeout(() => {
-                fetch(`/buscar-quimico-local/?q=${encodeURIComponent(query)}`)
-                    .then(r => r.json())
-                    .then(data => {
-                        sugerencias.innerHTML = '';
-                        let resultados = data.results || [];
-                        if (resultados.length > 0) {
-                            resultados.forEach(item => {
-                                const div = document.createElement('div');
-                                let texto = item.nombre_comun;
-                                div.textContent = texto;
-                                div.style.cursor = 'pointer';
-                                div.onclick = () => {
-                                    input.value = item.nombre_comun;
-                                    sugerencias.style.display = 'none';
-                                };
-                                sugerencias.appendChild(div);
-                            });
-                            sugerencias.style.display = 'block';
-                        } else {
-                            fetch(`/buscar-quimico/?q=${encodeURIComponent(query)}`)
-                                .then(r2 => r2.json())
-                                .then(data2 => {
-                                    sugerencias.innerHTML = '';
-                                    if (data2.results && data2.results.length > 0) {
-                                        data2.results.forEach(item => {
-                                            const div = document.createElement('div');
-                                            let texto = '';
-                                            if (item.nombre_comun) {
-                                                texto += item.nombre_comun;
-                                            }
-                                            if (item.nombre_iupac && item.nombre_iupac !== item.nombre_comun) {
-                                                texto += texto ? ' — ' : '';
-                                                texto += item.nombre_iupac;
-                                            }
-                                            if (item.cas) {
-                                                texto += texto ? ' | ' : '';
-                                                texto += 'CAS: ' + item.cas;
-                                            }
-                                            div.textContent = texto;
-                                            div.style.cursor = 'pointer';
-                                            div.onclick = () => {
-                                                input.value = item.nombre_comun || item.nombre_iupac || item.cas || '';
-                                                sugerencias.style.display = 'none';
-                                            };
-                                            sugerencias.appendChild(div);
-                                        });
-                                        sugerencias.style.display = 'block';
-                                    } else {
+                    {% with vencen_pronto=quimicos_bajo_stock %}
+                        {% if vencen_pronto %}
+                            <div style="background:#ffe0b2;border-radius:12px;padding:18px 22px;box-shadow:0 2px 8px rgba(255,193,7,0.08);color:#181828;">
+                                <div style="font-size:1.5rem;font-weight:900;color:#ff9800;margin-bottom:8px;">¡AVISO!</div>
+                                <div style="font-size:1.08rem;font-weight:700;margin-bottom:8px;">Los siguientes reactivos <span style="font-weight:900;">Vencen pronto (En 30 días o menos):</span></div>
+                                <ul style="margin:0 0 0 18px;font-size:1rem;">
+                                    {% for q in vencen_pronto %}
+                                        {% if q.fecha_vencimiento and q.fecha_vencimiento <= limite_vencimiento %}
+                                            <li><span style="font-weight:900;">{{ q.nombre }}</span> <span style="color:#b26a00;">(Vence: {{ q.fecha_vencimiento|date:'d/m/Y' }})</span></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                {% endwith %}
+            {% endif %}
+        </div>
+    </section>
+</div>
+<script>
+// ...sugerencias-quimico script igual que en materiales.html...
+const input = document.getElementById('busqueda-quimico');
+const sugerencias = document.getElementById('sugerencias-quimico');
+if(input && sugerencias) {
+    let timeout = null;
+    input.addEventListener('input', function() {
+        clearTimeout(timeout);
+        const query = this.value.trim();
+        if (query.length < 1) {
+            sugerencias.style.display = 'none';
+            sugerencias.innerHTML = '';
+            return;
+        }
+        timeout = setTimeout(() => {
+            fetch(`/buscar-quimico-local/?q=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(data => {
+                    sugerencias.innerHTML = '';
+                    let resultados = data.results || [];
+                    if (resultados.length > 0) {
+                        resultados.forEach(item => {
+                            const div = document.createElement('div');
+                            let texto = item.nombre_comun;
+                            div.textContent = texto;
+                            div.style.cursor = 'pointer';
+                            div.onclick = () => {
+                                input.value = item.nombre_comun;
+                                sugerencias.style.display = 'none';
+                            };
+                            sugerencias.appendChild(div);
+                        });
+                        sugerencias.style.display = 'block';
+                    } else {
+                        fetch(`/buscar-quimico/?q=${encodeURIComponent(query)}`)
+                            .then(r2 => r2.json())
+                            .then(data2 => {
+                                sugerencias.innerHTML = '';
+                                if (data2.results && data2.results.length > 0) {
+                                    data2.results.forEach(item => {
                                         const div = document.createElement('div');
-                                        div.textContent = 'No se encontró el reactivo. Intenta con el nombre en inglés o regístralo manualmente.';
-                                        div.style.color = '#888';
-                                        div.style.padding = '8px';
+                                        let texto = '';
+                                        if (item.nombre_comun) {
+                                            texto += item.nombre_comun;
+                                        }
+                                        if (item.nombre_iupac && item.nombre_iupac !== item.nombre_comun) {
+                                            texto += texto ? ' — ' : '';
+                                            texto += item.nombre_iupac;
+                                        }
+                                        if (item.cas) {
+                                            texto += texto ? ' | ' : '';
+                                            texto += 'CAS: ' + item.cas;
+                                        }
+                                        div.textContent = texto;
+                                        div.style.cursor = 'pointer';
+                                        div.onclick = () => {
+                                            input.value = item.nombre_comun || item.nombre_iupac || item.cas || '';
+                                            sugerencias.style.display = 'none';
+                                        };
                                         sugerencias.appendChild(div);
-                                        sugerencias.style.display = 'block';
-                                    }
-                                });
-                        }
-                    });
-            }, 200);
-        });
-        document.addEventListener('click', function(e) {
-            if (!sugerencias.contains(e.target) && e.target !== input) {
-                sugerencias.style.display = 'none';
-            }
-        });
-    }
-    </script>
-</body>
-</html>
+                                    });
+                                    sugerencias.style.display = 'block';
+                                } else {
+                                    const div = document.createElement('div');
+                                    div.textContent = 'No se encontró el reactivo. Intenta con el nombre en inglés o regístralo manualmente.';
+                                    div.style.color = '#888';
+                                    div.style.padding = '8px';
+                                    sugerencias.appendChild(div);
+                                    sugerencias.style.display = 'block';
+                                }
+                            });
+                    }
+                });
+        }, 200);
+    });
+    document.addEventListener('click', function(e) {
+        if (!sugerencias.contains(e.target) && e.target !== input) {
+            sugerencias.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

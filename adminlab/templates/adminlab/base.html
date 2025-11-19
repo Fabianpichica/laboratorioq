@@ -1,0 +1,159 @@
+{% extends 'profesor/base.html' %}
+{% load static %}
+{% block navbar %}
+<style>
+.navbar, .navbar-top, .navbar-adminlab {
+    position: relative;
+    z-index: 10000;
+    width: 98;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background: #f5f6fa;
+    box-shadow: 0 2px 8px rgba(40,53,147,0.04);
+    padding: 0 18px;
+    overflow-x: auto;
+    gap: 0;
+}
+#inventario-menu-toggle.active, #inventario-menu-toggle:hover {
+    background: #e3e6ea;
+    border-radius: 10px 10px 0 0;
+}
+#inventario-menu {
+    display: none;
+    position: fixed;
+    z-index: 11000;
+    background: #fff;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 8px 32px rgba(40,53,147,0.18);
+    padding: 12px 0;
+    min-width: 220px;
+    border: 1.5px solid #bfc8d6;
+    left: 0;
+    top: 0;
+}
+#inventario-menu a {
+    display: block;
+    padding: 10px 24px;
+    color: #283593;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.08rem;
+    transition: background 0.15s;
+}
+#inventario-menu a:hover {
+    background: #e3e6ea;
+    color: #1976d2;
+}
+.profesor-main-content, main, .main-content, .content {
+    position: static !important;
+    z-index: auto !important;
+    background: inherit;
+}
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex-shrink: 0;
+    justify-content: flex-end;
+    z-index: 10000;
+}
+@media (max-width: 900px) {
+    .nav-left {
+        gap: 12px;
+    }
+    .perfil-btn, .logout-btn {
+        font-size: 1rem !important;
+        padding: 6px 10px !important;
+    }
+}
+</style>
+<div class="nav-left" style="display:flex;align-items:center;gap:36px;flex-wrap:nowrap;position:relative;z-index:10000;">
+    <a href="/adminlab/dashboard/" class="nav-label"><i class="fa-solid fa-house"></i>Inicio</a>
+    <div class="nav-label" id="inventario-menu-toggle" style="position:relative;cursor:pointer;">
+        <i class="fa-solid fa-boxes-stacked"></i>Inventario <i class="fa-solid fa-caret-down"></i>
+    </div>
+    <a href="/adminlab/estudiantes/" class="nav-label"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a>
+    <a href="/adminlab/guias/" class="nav-label"><i class="fa-solid fa-book"></i>Guías</a>
+    <a href="/adminlab/jornadas/" class="nav-label"><i class="fa-solid fa-calendar-days"></i>Jornadas</a>
+    <a href="/adminlab/salones/" class="nav-label"><i class="fa-solid fa-school"></i>Salones</a>
+    <a href="/adminlab/profesores/" class="nav-label"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a>
+</div>
+<div class="nav-right" style="display:flex;align-items:center;gap:16px;min-width:120px;justify-content:flex-end;z-index:10000;flex-shrink:0;">
+    <a href="#" class="perfil-btn" style="display:flex;align-items:center;gap:8px;background:#e0f7fa;color:#181828;font-weight:700;font-size:1.15rem;border-radius:10px;padding:8px 18px;border:none;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;text-decoration:none;white-space:nowrap;"><i class="fa-regular fa-user"></i>Perfil</a>
+    <a href="/logout/" class="logout-btn" style="display:inline-flex;align-items:center;justify-content:center;background:#ede7f6;color:#181828;border-radius:10px;padding:8px 14px;border:none;font-size:1.2rem;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;margin-left:8px;visibility:visible;opacity:1;white-space:nowrap;z-index:12000;position:relative;"><i class="fa-solid fa-right-from-bracket"></i></a>
+</div>
+<!-- Menú fuera del navbar, para stacking correcto -->
+<div id="inventario-menu">
+    <a href="/adminlab/reactivos/">Reactivos Químicos</a>
+    <a href="/adminlab/materiales/">Materiales</a>
+    <a href="/adminlab/equipos/">Equipos</a>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var toggle = document.getElementById('inventario-menu-toggle');
+    var menu = document.getElementById('inventario-menu');
+    function closeMenu() {
+        menu.style.display = 'none';
+        toggle.classList.remove('active');
+    }
+    function openMenu() {
+        var rect = toggle.getBoundingClientRect();
+        menu.style.left = rect.left + 'px';
+        menu.style.top = (rect.bottom + window.scrollY) + 'px';
+        menu.style.display = 'block';
+        toggle.classList.add('active');
+    }
+    if (toggle && menu) {
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (menu.style.display === 'block') {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+        document.addEventListener('click', function(e) {
+            if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+                closeMenu();
+            }
+        });
+        toggle.addEventListener('mouseenter', function() {
+            if (window.innerWidth > 900) {
+                openMenu();
+            }
+        });
+        toggle.addEventListener('mouseleave', function() {
+            if (window.innerWidth > 900) {
+                setTimeout(function() {
+                    if (!menu.matches(':hover')) closeMenu();
+                }, 180);
+            }
+        });
+        menu.addEventListener('mouseleave', function() {
+            if (window.innerWidth > 900) {
+                closeMenu();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% block content %}
+<!-- Contenido específico de cada vista adminlab -->
+{% endblock %}
+{% block footer %}
+<footer style="width:100%;text-align:center;padding:16px 0 8px 0;background:#eceff1;color:#181828;font-size:1.05rem;font-weight:600;letter-spacing:0.5px;margin-top:40px;">
+    Laboratorio Virtual 2025
+</footer>
+{% endblock %}

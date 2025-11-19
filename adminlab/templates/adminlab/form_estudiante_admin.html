@@ -1,131 +1,65 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>{% if estudiante %}Editar Estudiante{% else %}Agregar Estudiante{% endif %}</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        .admin-dashboard-wrapper { display: flex; min-height: 100vh; }
-        .admin-sidebar { width: 250px; background: linear-gradient(180deg, #283593 0%, #1976d2 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(40,53,147,0.08); }
-        .admin-sidebar h2 { font-size: 2rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-        .admin-sidebar nav { width: 100%; }
-        .admin-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-        .admin-sidebar li { margin-bottom: 8px; width: 100%; }
-        .admin-sidebar a { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; }
-        .admin-sidebar a i { margin-right: 12px; font-size: 1.2rem; }
-        .admin-sidebar a:hover, .admin-sidebar a.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-        .admin-main-content { margin-left: 250px; padding: 48px 32px 32px 32px; width: 100%; }
-        .form-card { max-width: 480px; margin: 60px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(25,118,210,0.10); padding: 36px 32px 28px 32px; display: flex; flex-direction: column; align-items: center; }
-        .form-card h2 { color: #283593; font-size: 1.5rem; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
-        .form-card form { width: 100%; display: flex; flex-direction: column; gap: 18px; }
-        .form-card label { color: #1976d2; font-weight: 600; margin-bottom: 4px; }
-        .form-card input[type="text"],
-        .form-card input[type="number"],
-        .form-card input[type="email"],
-        .form-card input[type="password"],
-        .form-card select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid #bfc8d6;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: #f7f9fc;
-            color: #222;
-            transition: border 0.2s;
-        }
-        .form-card input:focus, .form-card select:focus {
-            border: 1.5px solid #1976d2;
-            outline: none;
-        }
-        .form-card .form-actions { display: flex; gap: 16px; margin-top: 10px; }
-        .btn-guardar { background: #1976d2; color: #fff; border: none; border-radius: 8px; padding: 10px 28px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-guardar:hover { background: #1565c0; }
-        .btn-cancelar { background: #fff; color: #1976d2; border: 1.5px solid #1976d2; border-radius: 8px; padding: 10px 22px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: background 0.2s, color 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-cancelar:hover { background: #e3e6ea; color: #1565c0; }
-        @media (max-width: 900px) { .admin-main-content { padding: 32px 8px 8px 8px; } .admin-sidebar { width: 100px; } .admin-main-content { margin-left: 100px; } .form-card { margin: 32px 8px; } }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard-wrapper">
-        <aside class="admin-sidebar">
-            <h2><i class="fa-solid fa-flask-vial"></i> AdminLab</h2>
-            <nav>
-                <ul>
-                    <li><a href="/adminlab/dashboard/"><i class="fa-solid fa-house"></i>Inicio</a></li>
-                    <li><a href="/adminlab/inventario/"><i class="fa-solid fa-boxes-stacked"></i>Inventario</a></li>
-                    <li><a href="/adminlab/estudiantes/" class="active"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
-                    <li><a href="/adminlab/guias/"><i class="fa-solid fa-book"></i>Guías</a></li>
-                    <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
-                    <li><a href="/adminlab/salones/"><i class="fa-solid fa-school"></i>Salones</a></li>
-                    
-                </ul>
-            </nav>
-        </aside>
-        <main class="admin-main-content">
-            <div class="form-card">
-                <h2><i class="fa-solid fa-user-graduate"></i> {% if estudiante %}Editar Estudiante{% else %}Agregar Estudiante{% endif %}</h2>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div>
-                        <label for="nombre">Nombre</label>
-                        <input type="text" name="nombre" id="nombre" placeholder="Nombre completo" value="{{ estudiante.nombre|default:'' }}" required>
-                    </div>
-                    <div>
-                        <label for="documento">Documento</label>
-                        <input type="text" name="documento" id="documento" placeholder="Documento" value="{{ estudiante.documento|default:'' }}" required>
-                    </div>
-                    <div>
-                        <label for="tipo_documento">Tipo de documento</label>
-                        <select name="tipo_documento" id="tipo_documento" required>
-                            <option value="">-- Selecciona --</option>
-                            <option value="CC" {% if estudiante and estudiante.tipo_documento == 'CC' %}selected{% endif %}>Cédula de ciudadanía</option>
-                            <option value="TI" {% if estudiante and estudiante.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de identidad</option>
-                            <option value="CE" {% if estudiante and estudiante.tipo_documento == 'CE' %}selected{% endif %}>Cédula de extranjería</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="salon">Salón</label>
-                        <select name="salon" id="salon">
-                            <option value="">-- --</option>
-                            {% for s in salones %}
-                                <option value="{{ s.id }}" {% if estudiante and estudiante.salon and estudiante.salon.id == s.id %}selected{% endif %}>{{ s.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="jornada">Jornada</label>
-                        <select name="jornada" id="jornada">
-                            <option value="">-- --</option>
-                            {% for j in jornadas %}
-                                <option value="{{ j.id }}" {% if estudiante and estudiante.jornada and estudiante.jornada.id == j.id %}selected{% endif %}>{{ j.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="correo">Correo</label>
-                        <input type="email" name="correo" id="correo" placeholder="Correo electrónico" value="{{ estudiante.correo|default:'' }}">
-                    </div>
-                    <div>
-                        <label for="telefono">Teléfono</label>
-                        <input type="text" name="telefono" id="telefono" placeholder="Teléfono" value="{{ estudiante.telefono|default:'' }}">
-                    </div>
-                    <div>
-                        <label for="password">Contraseña</label>
-                        <input type="password" name="password" id="password" placeholder="Contraseña" value="{{ estudiante.password|default:'' }}">
-                    </div>
-                    <div>
-                        <label for="foto">Fotografía</label>
-                        <input type="file" name="foto" id="foto" accept="image/*">
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-guardar"><i class="fa-solid fa-check"></i> Guardar</button>
-                        <a href="{% url 'estudiantes_admin' %}" class="btn-cancelar"><i class="fa-solid fa-xmark"></i> Cancelar</a>
-                    </div>
-                </form>
-            </div>
-        </main>
-    </div>
-</body>
-</html>
+{% extends 'adminlab/base.html' %}
+{% load static %}
+{% block content %}
+<div class="form-card" style="max-width:480px;margin:60px auto;background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(25,118,210,0.10);padding:36px 32px 28px 32px;display:flex;flex-direction:column;align-items:center;">
+    <h2 style="color:#283593;font-size:1.5rem;margin-bottom:18px;display:flex;align-items:center;gap:10px;"><i class="fa-solid fa-user-graduate"></i> {% if estudiante %}Editar Estudiante{% else %}Agregar Estudiante{% endif %}</h2>
+    <form method="post" enctype="multipart/form-data" style="width:100%;display:flex;flex-direction:column;gap:18px;">
+        {% csrf_token %}
+        <div>
+            <label for="nombre" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Nombre</label>
+            <input type="text" name="nombre" id="nombre" placeholder="Nombre completo" value="{{ estudiante.nombre|default:'' }}" required style="width:100%;padding:10px 12px;border:1.5px solid #bfc8d6;border-radius:8px;font-size:1rem;background:#f7f9fc;color:#222;transition:border 0.2s;">
+        </div>
+        <div>
+            <label for="documento" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Documento</label>
+            <input type="text" name="documento" id="documento" placeholder="Documento" value="{{ estudiante.documento|default:'' }}" required style="width:100%;padding:10px 12px;border:1.5px solid #bfc8d6;border-radius:8px;font-size:1rem;background:#f7f9fc;color:#222;transition:border 0.2s;">
+        </div>
+        <div>
+            <label for="tipo_documento" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Tipo de documento</label>
+            <select name="tipo_documento" id="tipo_documento" required style="width:100%;padding:10px 12px;border-radius:8px;">
+                <option value="">-- Selecciona --</option>
+                <option value="CC" {% if estudiante and estudiante.tipo_documento == 'CC' %}selected{% endif %}>Cédula de ciudadanía</option>
+                <option value="TI" {% if estudiante and estudiante.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de identidad</option>
+                <option value="CE" {% if estudiante and estudiante.tipo_documento == 'CE' %}selected{% endif %}>Cédula de extranjería</option>
+            </select>
+        </div>
+        <div>
+            <label for="salon" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Salón</label>
+            <select name="salon" id="salon" style="width:100%;padding:10px 12px;border-radius:8px;">
+                <option value="">-- --</option>
+                {% for s in salones %}
+                    <option value="{{ s.id }}" {% if estudiante and estudiante.salon and estudiante.salon.id == s.id %}selected{% endif %}>{{ s.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="jornada" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Jornada</label>
+            <select name="jornada" id="jornada" style="width:100%;padding:10px 12px;border-radius:8px;">
+                <option value="">-- --</option>
+                {% for j in jornadas %}
+                    <option value="{{ j.id }}" {% if estudiante and estudiante.jornada and estudiante.jornada.id == j.id %}selected{% endif %}>{{ j.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="correo" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Correo</label>
+            <input type="email" name="correo" id="correo" placeholder="Correo electrónico" value="{{ estudiante.correo|default:'' }}" style="width:100%;padding:10px 12px;border:1.5px solid #bfc8d6;border-radius:8px;font-size:1rem;background:#f7f9fc;color:#222;transition:border 0.2s;">
+        </div>
+        <div>
+            <label for="telefono" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Teléfono</label>
+            <input type="text" name="telefono" id="telefono" placeholder="Teléfono" value="{{ estudiante.telefono|default:'' }}" style="width:100%;padding:10px 12px;border:1.5px solid #bfc8d6;border-radius:8px;font-size:1rem;background:#f7f9fc;color:#222;transition:border 0.2s;">
+        </div>
+        <div>
+            <label for="password" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Contraseña</label>
+            <input type="password" name="password" id="password" placeholder="Contraseña" value="{{ estudiante.password|default:'' }}" style="width:100%;padding:10px 12px;border:1.5px solid #bfc8d6;border-radius:8px;font-size:1rem;background:#f7f9fc;color:#222;transition:border 0.2s;">
+        </div>
+        <div>
+            <label for="foto" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Fotografía</label>
+            <input type="file" name="foto" id="foto" accept="image/*" style="width:100%;padding:10px 12px;border:1.5px solid #bfc8d6;border-radius:8px;font-size:1rem;background:#f7f9fc;color:#222;transition:border 0.2s;">
+        </div>
+        <div class="form-actions" style="display:flex;gap:16px;margin-top:10px;">
+            <button type="submit" class="btn-guardar" style="background:#1976d2;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-weight:600;font-size:1rem;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-check"></i> Guardar</button>
+            <a href="{% url 'estudiantes_admin' %}" class="btn-cancelar" style="background:#fff;color:#1976d2;border:1.5px solid #1976d2;border-radius:8px;padding:10px 22px;font-weight:600;font-size:1rem;text-decoration:none;transition:background 0.2s,color 0.2s;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-xmark"></i> Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

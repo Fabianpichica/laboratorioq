@@ -1,91 +1,38 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Salones (Admin)</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        .admin-dashboard-wrapper { display: flex; min-height: 100vh; }
-        .admin-sidebar { width: 250px; background: linear-gradient(180deg, #283593 0%, #1976d2 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(40,53,147,0.08); }
-        .admin-sidebar h2 { font-size: 2rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-        .admin-sidebar nav { width: 100%; }
-        .admin-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-        .admin-sidebar li { margin-bottom: 8px; width: 100%; }
-        .admin-sidebar a { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; }
-        .admin-sidebar a i { margin-right: 12px; font-size: 1.2rem; }
-        .admin-sidebar a:hover, .admin-sidebar a.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-        .admin-main-content { margin-left: 250px; padding: 48px 32px 32px 32px; width: 100%; }
-        .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-        .admin-header h1 { color: #283593; font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: 1px; }
-        .admin-header .admin-user { font-size: 1.1rem; color: #1976d2; background: #fff; border-radius: 20px; padding: 8px 18px; box-shadow: 0 2px 8px rgba(25,118,210,0.07); }
-        .salones-section { margin-bottom: 40px; }
-        .salones-title { color: #1a237e; font-size: 1.7rem; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
-        .salones-table { width: 100%; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(25,118,210,0.07); border-collapse: separate; border-spacing: 0; overflow: hidden; margin-bottom: 32px; }
-        .salones-table th, .salones-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e3e6ea; }
-        .salones-table th { background: #e3e6ea; color: #283593; font-size: 1.05rem; }
-        .salones-table tr:last-child td { border-bottom: none; }
-        .salones-table tr:hover { background: #f4f6fb; }
-        .btn-agregar { display: inline-block; background: #1976d2; color: #fff; padding: 10px 22px; border-radius: 8px; font-weight: 600; text-decoration: none; margin-bottom: 18px; margin-top: 8px; transition: background 0.2s; box-shadow: 0 2px 8px rgba(25,118,210,0.08); }
-        .btn-agregar i { margin-right: 8px; }
-        .btn-agregar:hover { background: #1565c0; color: #fff; }
-        .salones-actions a { color: #1976d2; font-weight: 500; margin-right: 10px; text-decoration: none; transition: color 0.2s; }
-        .salones-actions a:hover { color: #ffb300; }
-        @media (max-width: 900px) { .admin-main-content { padding: 32px 8px 8px 8px; } .admin-sidebar { width: 100px; } .admin-main-content { margin-left: 100px; } }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard-wrapper">
-        <aside class="admin-sidebar">
-            <h2><i class="fa-solid fa-flask-vial"></i> AdminLab</h2>
-            <nav>
-                <ul>
-                    <li><a href="/adminlab/dashboard/"><i class="fa-solid fa-house"></i>Inicio</a></li>
-                    <li><a href="/adminlab/inventario/"><i class="fa-solid fa-boxes-stacked"></i>Inventario</a></li>
-                    <li><a href="/adminlab/estudiantes/"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
-                    <li><a href="/adminlab/guias/"><i class="fa-solid fa-book"></i>Guías</a></li>
-                    <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
-                    <li><a href="/adminlab/salones/" class="active"><i class="fa-solid fa-school"></i>Salones</a></li>
-                    <li><a href="/adminlab/profesores/"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
-                   <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main class="admin-main-content">
-            <div class="admin-header">
-                <h1><i class="fa-solid fa-school"></i> Gestión de Salones</h1>
-                <div class="admin-user"><i class="fa-solid fa-user-shield"></i> Panel de salones</div>
-            </div>
-            <div class="salones-section">
-                <a href="{% url 'agregar_salon_admin' %}" class="btn-agregar"><i class="fa-solid fa-plus"></i>Agregar Salón</a>
-                <table class="salones-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Ubicación</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for s in salones %}
-                        <tr>
-                            <td>{{ s.nombre }}</td>
-                            <td>{{ s.ubicacion }}</td>
-                            <td class="salones-actions">
-                                <a href="{% url 'editar_salon_admin' s.id %}"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
-                                <a href="{% url 'eliminar_salon_admin' s.id %}" onclick="return confirm('¿Eliminar este salón?');"><i class="fa-solid fa-trash"></i> Eliminar</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="3">No hay salones registrados.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            
-        </main>
+{% extends 'adminlab/base.html' %}
+{% load static %}
+{% block content %}
+<main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
+    <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
+        <div class="admin-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;">
+            <h1 style="color:#283593;font-size:2.2rem;font-weight:800;margin:0;letter-spacing:1px;"><i class="fa-solid fa-school"></i> Gestión de Salones</h1>
+            <div class="admin-user" style="font-size:1.1rem;color:#1976d2;background:#fff;border-radius:20px;padding:8px 18px;box-shadow:0 2px 8px rgba(25,118,210,0.07);"><i class="fa-solid fa-user-shield"></i> Panel de salones</div>
+        </div>
+        <div class="salones-section" style="margin-bottom:40px;">
+            <a href="{% url 'agregar_salon_admin' %}" class="btn-agregar" style="display:inline-block;background:#1976d2;color:#fff;padding:10px 22px;border-radius:8px;font-weight:600;text-decoration:none;margin-bottom:18px;margin-top:8px;transition:background 0.2s;box-shadow:0 2px 8px rgba(25,118,210,0.08);"><i class="fa-solid fa-plus"></i>Agregar Salón</a>
+            <table class="salones-table" style="width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(25,118,210,0.07);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:32px;">
+                <thead>
+                    <tr>
+                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Nombre</th>
+                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Ubicación</th>
+                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in salones %}
+                    <tr>
+                        <td>{{ s.nombre }}</td>
+                        <td>{{ s.ubicacion }}</td>
+                        <td class="salones-actions" style="white-space:nowrap;">
+                            <a href="{% url 'editar_salon_admin' s.id %}" style="color:#1976d2;font-weight:500;margin-right:10px;text-decoration:none;transition:color 0.2s;"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
+                            <a href="{% url 'eliminar_salon_admin' s.id %}" onclick="return confirm('¿Eliminar este salón?');" style="color:#1976d2;font-weight:500;text-decoration:none;transition:color 0.2s;"><i class="fa-solid fa-trash"></i> Eliminar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3">No hay salones registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</body>
-</html>
+</main>
+{% endblock %}

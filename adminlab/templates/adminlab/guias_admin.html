@@ -1,84 +1,36 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Guías (Admin)</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        .admin-dashboard-wrapper { display: flex; min-height: 100vh; }
-        .admin-sidebar { width: 250px; background: linear-gradient(180deg, #283593 0%, #1976d2 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(40,53,147,0.08); }
-        .admin-sidebar h2 { font-size: 2rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-        .admin-sidebar nav { width: 100%; }
-        .admin-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-        .admin-sidebar li { margin-bottom: 8px; width: 100%; }
-        .admin-sidebar a { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; }
-        .admin-sidebar a i { margin-right: 12px; font-size: 1.2rem; }
-        .admin-sidebar a:hover, .admin-sidebar a.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-        .admin-main-content { margin-left: 250px; padding: 48px 32px 32px 32px; width: 100%; }
-        .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-        .admin-header h1 { color: #283593; font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: 1px; }
-        .admin-header .admin-user { font-size: 1.1rem; color: #1976d2; background: #fff; border-radius: 20px; padding: 8px 18px; box-shadow: 0 2px 8px rgba(25,118,210,0.07); }
-        .guias-section { margin-bottom: 40px; }
-        .guias-title { color: #1a237e; font-size: 1.7rem; margin-bottom: 18px; display: flex; align-items: center; gap: 12px; }
-        .guias-table { width: 100%; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(25,118,210,0.07); border-collapse: separate; border-spacing: 0; overflow: hidden; margin-bottom: 32px; }
-        .guias-table th, .guias-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e3e6ea; }
-        .guias-table th { background: #e3e6ea; color: #283593; font-size: 1.05rem; }
-        .guias-table tr:last-child td { border-bottom: none; }
-        .guias-table tr:hover { background: #f4f6fb; }
-        .guias-actions a { color: #1976d2; font-weight: 500; margin-right: 10px; text-decoration: none; transition: color 0.2s; }
-        .guias-actions a:hover { color: #ffb300; }
-        @media (max-width: 900px) { .admin-main-content { padding: 32px 8px 8px 8px; } .admin-sidebar { width: 100px; } .admin-main-content { margin-left: 100px; } }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard-wrapper">
-        <aside class="admin-sidebar">
-            <h2><i class="fa-solid fa-flask-vial"></i> AdminLab</h2>
-            <nav>
-                <ul>
-                    <li><a href="/adminlab/dashboard/"><i class="fa-solid fa-house"></i>Inicio</a></li>
-                    <li><a href="/adminlab/inventario/"><i class="fa-solid fa-boxes-stacked"></i>Inventario</a></li>
-                    <li><a href="/adminlab/estudiantes/"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
-                    <li><a href="/adminlab/guias/" class="active"><i class="fa-solid fa-book"></i>Guías</a></li>
-                    <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
-                    <li><a href="/adminlab/salones/"><i class="fa-solid fa-school"></i>Salones</a></li>
-                    <li><a href="/adminlab/profesores/"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
-                    <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main class="admin-main-content">
-            <div class="admin-header">
-                <h1><i class="fa-solid fa-book"></i> Guías</h1>
-                <div class="admin-user"><i class="fa-solid fa-user-shield"></i> Panel de guías</div>
-            </div>
-            <div class="guias-section">
-                <table class="guias-table">
-                    <thead>
-                        <tr>
-                            <th>Título</th>
-                            <th>Descripción</th>
-                            <th>Archivo</th>
-                            <th>Salones asignados</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for g in guias %}
-                        <tr>
-                            <td>{{ g.titulo }}</td>
-                            <td>{{ g.descripcion }}</td>
-                            <td>{% if g.archivo %}<a href="{{ g.archivo.url }}" target="_blank"><i class="fa-solid fa-file-arrow-down"></i> Descargar</a>{% else %}-{% endif %}</td>
-                            <td>{% for s in g.salones.all %}{{ s.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4">No hay guías registradas.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </main>
+{% extends 'adminlab/base.html' %}
+{% load static %}
+{% block content %}
+<main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
+    <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
+        <div class="admin-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;">
+            <h1 style="color:#283593;font-size:2.2rem;font-weight:800;margin:0;letter-spacing:1px;"><i class="fa-solid fa-book"></i> Guías</h1>
+            <div class="admin-user" style="font-size:1.1rem;color:#1976d2;background:#fff;border-radius:20px;padding:8px 18px;box-shadow:0 2px 8px rgba(25,118,210,0.07);"><i class="fa-solid fa-user-shield"></i> Panel de guías</div>
+        </div>
+        <div class="guias-section" style="margin-bottom:40px;">
+            <table class="guias-table" style="width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(25,118,210,0.07);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:32px;">
+                <thead>
+                    <tr>
+                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Título</th>
+                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Descripción</th>
+                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Archivo</th>
+                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Salones asignados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in guias %}
+                    <tr>
+                        <td>{{ g.titulo }}</td>
+                        <td>{{ g.descripcion }}</td>
+                        <td>{% if g.archivo %}<a href="{{ g.archivo.url }}" target="_blank"><i class="fa-solid fa-file-arrow-down"></i> Descargar</a>{% else %}-{% endif %}</td>
+                        <td>{% for s in g.salones.all %}{{ s.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">No hay guías registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</body>
-</html>
+</main>
+{% endblock %}

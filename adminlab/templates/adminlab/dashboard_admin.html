@@ -1,225 +1,45 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Admin</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f4f6fb;
-        }
-        .admin-dashboard-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-        .admin-sidebar {
-            width: 250px;
-            background: linear-gradient(180deg, #283593 0%, #1976d2 100%);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 0;
-            min-height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            z-index: 10;
-            box-shadow: 2px 0 8px rgba(40,53,147,0.08);
-        }
-        .admin-sidebar h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 32px 0 32px 32px;
-            color: #fff;
-            letter-spacing: 1px;
-        }
-        .admin-sidebar nav {
-            width: 100%;
-        }
-        .admin-sidebar ul {
-            list-style: none;
-            padding: 0 0 0 0;
-            margin: 0;
-            width: 100%;
-        }
-        .admin-sidebar li {
-            margin-bottom: 8px;
-            width: 100%;
-        }
-        .admin-sidebar a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            padding: 14px 32px;
-            transition: background 0.2s, color 0.2s;
-            border-left: 4px solid transparent;
-        }
-        .admin-sidebar a i {
-            margin-right: 12px;
-            font-size: 1.2rem;
-        }
-        .admin-sidebar a:hover, .admin-sidebar a.active {
-            background: #1565c0;
-            color: #fff;
-            border-left: 4px solid #ffb300;
-        }
-        .admin-main-content {
-            margin-left: 250px;
-            padding: 48px 32px 32px 32px;
-            width: 100%;
-        }
-        .admin-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 32px;
-        }
-        .admin-header h1 {
-            color: #283593;
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin: 0;
-            letter-spacing: 1px;
-        }
-        .admin-header .admin-user {
-            font-size: 1.1rem;
-            color: #1976d2;
-            background: #fff;
-            border-radius: 20px;
-            padding: 8px 18px;
-            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
-        }
-        .admin-cards {
-            display: flex;
-            gap: 32px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-        .admin-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(25,118,210,0.08);
-            padding: 32px 28px 24px 28px;
-            min-width: 220px;
-            flex: 1 1 220px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            transition: box-shadow 0.2s;
-        }
-        .admin-card:hover {
-            box-shadow: 0 4px 24px rgba(25,118,210,0.18);
-        }
-        .admin-card-title {
-            font-size: 1.1rem;
-            color: #1976d2;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .admin-card-value {
-            font-size: 2.1rem;
-            color: #283593;
-            font-weight: 800;
-        }
-        .admin-card-link {
-            margin-top: 18px;
-            color: #1976d2;
-            text-decoration: underline;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        .admin-card-link:hover {
-            color: #ffb300;
-        }
-        .admin-section {
-            margin-top: 32px;
-        }
-        .admin-section h3 {
-            color: #283593;
-            font-size: 1.3rem;
-            margin-bottom: 18px;
-        }
-        .admin-section ul {
-            padding-left: 18px;
-        }
-        @media (max-width: 900px) {
-            .admin-cards { flex-direction: column; gap: 18px; }
-            .admin-main-content { padding: 32px 8px 8px 8px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard-wrapper">
-        <aside class="admin-sidebar">
-            <h2><i class="fa-solid fa-flask-vial"></i> AdminLab</h2>
-            <nav>
-                <ul>
-                    <li><a href="/adminlab/dashboard/"><i class="fa-solid fa-house"></i>Inicio</a></li>
-                    <li><a href="/adminlab/inventario/"><i class="fa-solid fa-boxes-stacked"></i>Inventario</a></li>
-                    <li><a href="/adminlab/estudiantes/"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
-                    <li><a href="/adminlab/guias/"><i class="fa-solid fa-book"></i>Guías</a></li>
-                    <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
-                    <li><a href="/adminlab/salones/"><i class="fa-solid fa-school"></i>Salones</a></li>
-                    <li><a href="/adminlab/profesores/"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
-                    <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main class="admin-main-content">
-            <div class="admin-header">
-                <h1>Bienvenido, Administrador</h1>
-                <div class="admin-user"><i class="fa-solid fa-user-shield"></i> Panel de control</div>
+{% extends 'adminlab/base.html' %}
+{% load static %}
+{% block content %}
+<main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
+    <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
+        <h1 style="font-size:2.1rem;font-weight:800;margin-bottom:12px;"><i class="fa-solid fa-flask-vial"></i> Dashboard Administrador</h1>
+        <div style="color:#3949ab;font-weight:600;margin-bottom:18px;"><i class="fa-solid fa-user-shield"></i> Panel de control</div>
+        <div class="admin-cards" style="display:flex;gap:32px;margin-bottom:40px;flex-wrap:wrap;">
+            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
+                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Reactivos</div>
+                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ quimicos|length }}</div>
+                <a href="/adminlab/inventario/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver inventario</a>
             </div>
-            <div class="admin-cards">
-                <div class="admin-card">
-                    <div class="admin-card-title">Reactivos</div>
-                    <div class="admin-card-value">{{ quimicos|length }}</div>
-                    <a href="/adminlab/inventario/" class="admin-card-link">Ver inventario</a>
-                </div>
-                <div class="admin-card">
-                    <div class="admin-card-title">Estudiantes</div>
-                    <div class="admin-card-value">{{ estudiantes|length }}</div>
-                    <a href="/adminlab/estudiantes/" class="admin-card-link">Ver estudiantes</a>
-                </div>
-                <div class="admin-card">
-                    <div class="admin-card-title">Guías</div>
-                    <div class="admin-card-value">{{ guias|length }}</div>
-                    <a href="/adminlab/guias/" class="admin-card-link">Ver guías</a>
-                </div>
-                <div class="admin-card">
-                    <div class="admin-card-title">Jornadas</div>
-                    <div class="admin-card-value">{{ jornadas|length }}</div>
-                    <a href="/adminlab/jornadas/" class="admin-card-link">Ver jornadas</a>
-                </div>
-                <div class="admin-card">
-                    <div class="admin-card-title">Salones</div>
-                    <div class="admin-card-value">{{ salones|length }}</div>
-                    <a href="/adminlab/salones/" class="admin-card-link">Ver salones</a>
-                </div>
+            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
+                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Estudiantes</div>
+                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ estudiantes|length }}</div>
+                <a href="/adminlab/estudiantes/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver estudiantes</a>
             </div>
-            <div class="admin-section">
-                <h3>Accesos rápidos</h3>
-                <ul>
-                    <li>Gestiona inventario, estudiantes, guías, jornadas y salones desde este panel.</li>
-                    <li>Accede al <b>admin clásico</b> para configuraciones avanzadas.</li>
-                    <li>Personaliza este dashboard según las necesidades del laboratorio.</li>
-                </ul>
+            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
+                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Guías</div>
+                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ guias|length }}</div>
+                <a href="/adminlab/guias/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver guías</a>
             </div>
-        </main>
+            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
+                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Jornadas</div>
+                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ jornadas|length }}</div>
+                <a href="/adminlab/jornadas/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver jornadas</a>
+            </div>
+            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
+                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Salones</div>
+                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ salones|length }}</div>
+                <a href="/adminlab/salones/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver salones</a>
+            </div>
+        </div>
+        <div class="admin-section" style="margin-top:32px;">
+            <h3 style="color:#283593;font-size:1.3rem;margin-bottom:18px;">Accesos rápidos</h3>
+            <ul style="padding-left:18px;">
+                <li>Gestiona inventario, estudiantes, guías, jornadas y salones desde este panel.</li>
+                <li>Accede al <b>admin clásico</b> para configuraciones avanzadas.</li>
+                <li>Personaliza este dashboard según las necesidades del laboratorio.</li>
+            </ul>
+        </div>
     </div>
-    <script>
-        document.getElementById('cerrar-sesion-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = '/logout/';
-        });
-    </script>
-</body>
-</html>
+</main>
+{% endblock %}

@@ -1,135 +1,60 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Registrar Profesor</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <style>
-        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        .admin-dashboard-wrapper { display: flex; min-height: 100vh; }
-        .admin-sidebar { width: 250px; background: linear-gradient(180deg, #283593 0%, #1976d2 100%); color: #fff; display: flex; flex-direction: column; align-items: flex-start; padding: 0; min-height: 100vh; position: fixed; left: 0; top: 0; bottom: 0; z-index: 10; box-shadow: 2px 0 8px rgba(40,53,147,0.08); }
-        .admin-sidebar h2 { font-size: 2rem; font-weight: 700; margin: 32px 0 32px 32px; color: #fff; letter-spacing: 1px; }
-        .admin-sidebar nav { width: 100%; }
-        .admin-sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; }
-        .admin-sidebar li { margin-bottom: 8px; width: 100%; }
-        .admin-sidebar a { color: #fff; text-decoration: none; font-size: 1.1rem; display: flex; align-items: center; padding: 14px 32px; transition: background 0.2s, color 0.2s; border-left: 4px solid transparent; }
-        .admin-sidebar a i { margin-right: 12px; font-size: 1.2rem; }
-        .admin-sidebar a:hover, .admin-sidebar a.active { background: #1565c0; color: #fff; border-left: 4px solid #ffb300; }
-        .admin-main-content { margin-left: 250px; padding: 48px 32px 32px 32px; width: 100%; }
-        .form-card { max-width: 480px; margin: 60px auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(25,118,210,0.10); padding: 36px 32px 28px 32px; display: flex; flex-direction: column; align-items: center; }
-        .form-card h2 { color: #283593; font-size: 1.5rem; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
-        .form-card form { width: 100%; display: flex; flex-direction: column; gap: 18px; }
-        .form-card label { color: #1976d2; font-weight: 600; margin-bottom: 4px; }
-        .form-card input[type="text"],
-        .form-card input[type="number"],
-        .form-card input[type="email"],
-        .form-card input[type="password"],
-        .form-card select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid #bfc8d6;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: #f7f9fc;
-            color: #222;
-            transition: border 0.2s;
-        }
-        .form-card input:focus, .form-card select:focus {
-            border: 1.5px solid #1976d2;
-            outline: none;
-        }
-        .form-card input[type="file"] {
-            margin-top: 4px;
-        }
-        .form-card .form-actions { display: flex; gap: 16px; margin-top: 10px; }
-        .btn-guardar { background: #1976d2; color: #fff; border: none; border-radius: 8px; padding: 10px 28px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-guardar:hover { background: #1565c0; }
-        .btn-cancelar { background: #fff; color: #1976d2; border: 1.5px solid #1976d2; border-radius: 8px; padding: 10px 22px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: background 0.2s, color 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-cancelar:hover { background: #e3e6ea; color: #1565c0; }
-        @media (max-width: 900px) { .admin-main-content { padding: 32px 8px 8px 8px; } .admin-sidebar { width: 100px; } .admin-main-content { margin-left: 100px; } .form-card { margin: 32px 8px; } }
-        .form-messages { width: 100%; margin-bottom: 18px; }
-        .alert { padding: 12px 18px; border-radius: 8px; margin-bottom: 8px; font-size: 1rem; }
-        .alert-error, .alert-danger { background: #ffebee; color: #c62828; border: 1.5px solid #e57373; }
-        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #81c784; }
-    </style>
-</head>
-<body>
-    <div class="admin-dashboard-wrapper">
-        <aside class="admin-sidebar">
-            <h2><i class="fa-solid fa-flask-vial"></i> AdminLab</h2>
-            <nav>
-                <ul>
-                    <li><a href="/adminlab/dashboard/"><i class="fa-solid fa-house"></i>Inicio</a></li>
-                    <li><a href="/adminlab/inventario/"><i class="fa-solid fa-boxes-stacked"></i>Inventario</a></li>
-                    <li><a href="/adminlab/estudiantes/"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a></li>
-                    <li><a href="/adminlab/guias/"><i class="fa-solid fa-book"></i>Guías</a></li>
-                    <li><a href="/adminlab/jornadas/"><i class="fa-solid fa-calendar-days"></i>Jornadas</a></li>
-                    <li><a href="/adminlab/salones/"><i class="fa-solid fa-school"></i>Salones</a></li>
-                    <li><a href="/adminlab/profesores/" class="active"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a></li>
-                    <li><a href="/logout/" id="cerrar-sesion-link"><i class="fa-solid fa-right-from-bracket icon"></i>cerrar sesion</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <main class="admin-main-content">
-            <div class="form-card">
-                <h2><i class="fa-solid fa-user-tie"></i> Registrar Profesor</h2>
-                {% if messages %}
-                <div class="form-messages">
-                    {% for message in messages %}
-                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div>
-                        <label for="id_nombre">Nombre completo</label>
-                        {{ form.nombre }}
-                    </div>
-                    <div>
-                        <label for="id_tipo_documento">Tipo de documento</label>
-                        {{ form.tipo_documento }}
-                    </div>
-                    <div>
-                        <label for="id_numero_documento">Número de documento</label>
-                        {{ form.numero_documento }}
-                    </div>
-                    <div>
-                        <label for="id_salones">Salones asignados</label>
-                        {{ form.salones }}
-                    </div>
-                    <div>
-                        <label for="id_jornadas">Jornadas asignadas</label>
-                        {{ form.jornadas }}
-                    </div>
-                    <div>
-                        <label for="id_password">Contraseña</label>
-                        {{ form.password }}
-                    </div>
-                    <div>
-                        <label for="id_fotografia">Fotografía</label>
-                        {{ form.fotografia }}
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-guardar"><i class="fa-solid fa-check"></i> Registrar</button>
-                        <a href="{% url 'profesores_admin' %}" class="btn-cancelar"><i class="fa-solid fa-xmark"></i> Cancelar</a>
-                    </div>
-                </form>
-            </div>
-        </main>
+{% extends 'adminlab/base.html' %}
+{% load static %}
+{% block content %}
+<div class="form-card" style="max-width:480px;margin:60px auto;background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(25,118,210,0.10);padding:36px 32px 28px 32px;display:flex;flex-direction:column;align-items:center;">
+    <h2 style="color:#283593;font-size:1.5rem;margin-bottom:18px;display:flex;align-items:center;gap:10px;"><i class="fa-solid fa-user-tie"></i> Registrar Profesor</h2>
+    {% if messages %}
+    <div class="form-messages" style="width:100%;margin-bottom:18px;">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" style="padding:12px 18px;border-radius:8px;margin-bottom:8px;font-size:1rem;{% if message.tags == 'error' or message.tags == 'danger' %}background:#ffebee;color:#c62828;border:1.5px solid #e57373;{% elif message.tags == 'success' %}background:#e8f5e9;color:#2e7d32;border:1.5px solid #81c784;{% endif %}">{{ message }}</div>
+        {% endfor %}
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-    $(document).ready(function() {
-        $('select[multiple]').select2({
-            width: '100%',
-            placeholder: 'Selecciona una o varias opciones',
-            allowClear: true
-        });
+    {% endif %}
+    <form method="post" enctype="multipart/form-data" style="width:100%;display:flex;flex-direction:column;gap:18px;">
+        {% csrf_token %}
+        <div>
+            <label for="id_nombre" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Nombre completo</label>
+            {{ form.nombre }}
+        </div>
+        <div>
+            <label for="id_tipo_documento" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Tipo de documento</label>
+            {{ form.tipo_documento }}
+        </div>
+        <div>
+            <label for="id_numero_documento" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Número de documento</label>
+            {{ form.numero_documento }}
+        </div>
+        <div>
+            <label for="id_salones" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Salones asignados</label>
+            {{ form.salones }}
+        </div>
+        <div>
+            <label for="id_jornadas" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Jornadas asignadas</label>
+            {{ form.jornadas }}
+        </div>
+        <div>
+            <label for="id_password" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Contraseña</label>
+            {{ form.password }}
+        </div>
+        <div>
+            <label for="id_fotografia" style="color:#1976d2;font-weight:600;margin-bottom:4px;">Fotografía</label>
+            {{ form.fotografia }}
+        </div>
+        <div class="form-actions" style="display:flex;gap:16px;margin-top:10px;">
+            <button type="submit" class="btn-guardar" style="background:#1976d2;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-weight:600;font-size:1rem;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-check"></i> Registrar</button>
+            <a href="{% url 'profesores_admin' %}" class="btn-cancelar" style="background:#fff;color:#1976d2;border:1.5px solid #1976d2;border-radius:8px;padding:10px 22px;font-weight:600;font-size:1rem;text-decoration:none;transition:background 0.2s,color 0.2s;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-xmark"></i> Cancelar</a>
+        </div>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('select[multiple]').select2({
+        width: '100%',
+        placeholder: 'Selecciona una o varias opciones',
+        allowClear: true
     });
-    </script>
-</body>
-</html>
+});
+</script>
+{% endblock %}

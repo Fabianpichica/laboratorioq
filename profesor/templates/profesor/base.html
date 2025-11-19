@@ -26,7 +26,8 @@
     </style>
 </head>
 <body>
-    <div class="top-navbar" style="width:100%;background:#e7ebf2;box-shadow:0 2px 8px rgba(40,53,147,0.07);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;position:fixed;top:0;left:0;z-index:100;overflow-x:auto;">
+    <div class="top-navbar" style="width:98%;background:#e7ebf2;box-shadow:0 2px 8px rgba(40,53,147,0.07);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;position:fixed;top:0;left:0;z-index:100;overflow-x:auto;">
+        {% block navbar %}
         <div class="nav-left" style="display:flex;align-items:center;gap:36px;flex-wrap:nowrap;">
             <a href="{% url 'dashboard_profesor' %}" class="nav-label"><i class="fa-solid fa-house"></i>Inicio</a>
             <a href="{% url 'guias_profesor' %}" class="nav-label"><i class="fa-solid fa-book"></i>Guías</a>
@@ -38,6 +39,7 @@
             <a href="/profesor/perfil/" class="perfil-btn" style="display:flex;align-items:center;gap:8px;background:#e0f7fa;color:#181828;font-weight:700;font-size:1.15rem;border-radius:10px;padding:8px 18px;border:none;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;text-decoration:none;"><i class="fa-regular fa-user"></i>Perfil</a>
             <a href="{% url 'landing' %}" class="logout-btn" style="display:inline-flex;align-items:center;justify-content:center;background:#ede7f6;color:#181828;border-radius:10px;padding:8px 14px;border:none;font-size:1.2rem;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;margin-left:8px;visibility:visible;opacity:1;"><i class="fa-solid fa-right-from-bracket"></i></a>
         </div>
+        {% endblock %}
     </div>
     <div class="main-content">
         {% block content %}{% endblock %}
