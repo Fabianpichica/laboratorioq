@@ -108,7 +108,7 @@ def cuaderno_aprendiz(request):
     if profile.role == 'aprendiz':
         if request.method == 'POST':
             nota = request.POST.get('nota')
-            foto = request.FILES.get('foto')
+            archivo = request.FILES.get('archivo')
             quimico_ids = request.POST.getlist('quimicos[]')
             guia_id = request.POST.get('guia')
             guia_usada = None
@@ -117,19 +117,12 @@ def cuaderno_aprendiz(request):
                     guia_usada = Guia.objects.get(id=guia_id)
                 except Guia.DoesNotExist:
                     guia_usada = None
-            imagen_url = None
-            imagen_file = None
-            if foto:
-                fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'cuadernos'))
-                filename = fs.save(f"{request.user.username}_cuaderno_{foto.name}", foto)
-                imagen_url = fs.url(filename)
-                imagen_file = f"cuadernos/{filename.split('/')[-1]}"
-            # Crear una sola entrada y asociar todos los químicos seleccionados
+            # Guardar el archivo en el mismo paso de creación
             cuaderno_entry = CuadernoEntry.objects.create(
                 aprendiz=request.user,
                 guia=guia_usada,
                 nota=nota,
-                imagen=imagen_file if imagen_file else None
+                archivo=archivo if archivo else None
             )
             for quimico_id in quimico_ids:
                 try:
@@ -140,11 +133,12 @@ def cuaderno_aprendiz(request):
             informes = CuadernoEntry.objects.filter(aprendiz=request.user).order_by('-fecha')
             return render(request, 'cuaderno_aprendiz.html', {
                 'nota': nota,
-                'imagen_url': imagen_url,
+                'archivo_url': None,
                 'quimicos': quimicos,
                 'guias': guias,
                 'informes': informes
             })
+        informes = informes.order_by('-fecha')[:6]
         return render(request, 'cuaderno_aprendiz.html', {'quimicos': quimicos, 'guias': guias, 'informes': informes})
     else:
         return redirect('/')
@@ -178,12 +172,14 @@ def descargar_informe_pdf(request, informe_id):
     for line in informe.nota.splitlines():
         textobject.textLine(line)
     p.drawText(textobject)
-    if informe.imagen and informe.imagen.path:
-        try:
+    # Eliminar referencias a informe.imagen y usar informe.archivo si es necesario
+    # Por ejemplo, en la generación de PDF:
+    if informe.archivo and informe.archivo.path:
+        # lógica para manejar el archivo según el tipo (imagen, pdf, etc.)
+        if informe.archivo.name.lower().endswith((".jpg", ".jpeg", ".png", ".gif")):
             from reportlab.lib.utils import ImageReader
-            p.drawImage(ImageReader(informe.imagen.path), 50, 100, width=200, preserveAspectRatio=True, mask='auto')
-        except Exception:
-            pass
+            p.drawImage(ImageReader(informe.archivo.path), 50, 100, width=200, preserveAspectRatio=True, mask='auto')
+        # para otros tipos de archivo, se puede omitir o mostrar un mensaje
     p.showPage()
     p.save()
     return response

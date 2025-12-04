@@ -142,7 +142,7 @@ class CuadernoEntry(models.Model):
     quimicos = models.ManyToManyField(Quimico)
     guia = models.ForeignKey(Guia, on_delete=models.SET_NULL, null=True, blank=True, related_name='resultados')
     nota = models.TextField(blank=True)
-    imagen = models.ImageField(upload_to='cuadernos/', blank=True, null=True)
+    archivo = models.FileField(upload_to='cuadernos/', blank=True, null=True)
     fecha = models.DateTimeField(auto_now_add=True)
     retroalimentacion = models.TextField(blank=True, null=True)
 

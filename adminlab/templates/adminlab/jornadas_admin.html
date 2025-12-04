@@ -1,44 +1,70 @@
 {% extends 'adminlab/base.html' %}
 {% load static %}
 {% block content %}
-<main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
-    <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
-        <div class="admin-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;">
-            <h1 style="color:#283593;font-size:2.2rem;font-weight:800;margin:0;letter-spacing:1px;"><i class="fa-solid fa-calendar-days"></i> Gestión de Jornadas</h1>
-            <div class="admin-user" style="font-size:1.1rem;color:#1976d2;background:#fff;border-radius:20px;padding:8px 18px;box-shadow:0 2px 8px rgba(25,118,210,0.07);"><i class="fa-solid fa-user-shield"></i> Panel de jornadas</div>
-        </div>
-        <div class="jornadas-section" style="margin-bottom:40px;">
-            <a href="{% url 'agregar_jornada_admin' %}" class="btn-agregar" style="display:inline-block;background:#1976d2;color:#fff;padding:10px 22px;border-radius:8px;font-weight:600;text-decoration:none;margin-bottom:18px;margin-top:8px;transition:background 0.2s;box-shadow:0 2px 8px rgba(25,118,210,0.08);"><i class="fa-solid fa-plus"></i>Agregar Jornada</a>
-            <table class="jornadas-table" style="width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(25,118,210,0.07);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:32px;">
-                <thead>
-                    <tr>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Nombre</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Descripción</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Fecha</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Profesor</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Salones</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for j in jornadas %}
-                    <tr>
-                        <td>{{ j.nombre }}</td>
-                        <td>{{ j.descripcion }}</td>
-                        <td>{{ j.fecha }}</td>
-                        <td>{{ j.profesor.username }}</td>
-                        <td>{% for s in j.salones.all %}{{ s.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
-                        <td class="jornadas-actions" style="white-space:nowrap;">
-                            <a href="{% url 'editar_jornada_admin' j.id %}" style="color:#1976d2;font-weight:500;margin-right:10px;text-decoration:none;transition:color 0.2s;"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
-                            <a href="{% url 'eliminar_jornada_admin' j.id %}" onclick="return confirm('¿Eliminar esta jornada?');" style="color:#1976d2;font-weight:500;text-decoration:none;transition:color 0.2s;"><i class="fa-solid fa-trash"></i> Eliminar</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="6">No hay jornadas registradas.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<main class="main-bg" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fff;">
+  <div class="jornadas-card" style="width:100%;max-width:1200px;margin:0 auto;background:#fff;border-radius:22px;box-shadow:0 8px 32px rgba(25,118,210,0.13);padding:32px 18px 24px 18px;display:flex;flex-direction:column;">
+    <div class="admin-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+      <h1 style="color:#283593;font-size:2.1rem;font-weight:800;margin:0;letter-spacing:1px;display:flex;align-items:center;gap:12px;"><i class="fa-solid fa-calendar-days"></i> Gestión de Jornadas</h1>
+      <div class="admin-user" style="font-size:1.08rem;color:#1976d2;background:#fff;border-radius:20px;padding:8px 18px;box-shadow:0 2px 8px rgba(25,118,210,0.07);display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-user-shield"></i> Panel de jornadas</div>
     </div>
+    <div class="jornadas-section" style="margin-bottom:40px;">
+      <a href="{% url 'agregar_jornada_admin' %}" class="btn-agregar" style="display:inline-block;background:linear-gradient(90deg,#1976d2 60%,#00bcd4 100%);color:#fff;padding:10px 22px;border-radius:10px;font-weight:600;text-decoration:none;margin-bottom:18px;margin-top:8px;transition:background 0.2s;box-shadow:0 2px 8px rgba(25,118,210,0.08);"><i class="fa-solid fa-plus"></i> Agregar Jornada</a>
+      <div style="overflow-x:auto;">
+        <table class="jornadas-table" style="width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(25,118,210,0.07);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:32px;min-width:700px;">
+          <thead>
+            <tr>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Nombre</th>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Descripción</th>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Fecha</th>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Profesor</th>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Salones</th>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for j in jornadas %}
+            <tr>
+              <td style="padding:10px 8px;">{{ j.nombre }}</td>
+              <td style="padding:10px 8px;">{{ j.descripcion }}</td>
+              <td style="padding:10px 8px;">{{ j.fecha }}</td>
+              <td style="padding:10px 8px;">{{ j.profesor.username }}</td>
+              <td style="padding:10px 8px;">{% for s in j.salones.all %}{{ s.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+              <td class="jornadas-actions" style="white-space:nowrap;padding:10px 8px;">
+                <a href="{% url 'editar_jornada_admin' j.id %}" style="color:#1976d2;font-weight:500;margin-right:10px;text-decoration:none;transition:color 0.2s;"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
+                <a href="{% url 'eliminar_jornada_admin' j.id %}" onclick="return confirm('¿Eliminar esta jornada?');" style="color:#1976d2;font-weight:500;text-decoration:none;transition:color 0.2s;"><i class="fa-solid fa-trash"></i> Eliminar</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="padding:18px 8px;color:#b0b0b0;text-align:center;">No hay jornadas registradas.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </main>
+<style>
+.main-bg { min-height:100vh; background:#fff; }
+.jornadas-card { transition:box-shadow 0.2s; }
+.admin-header h1 { font-size:2.1rem; }
+.admin-user { font-size:1.08rem; }
+.jornadas-table th, .jornadas-table td { font-size:1.01rem; }
+.btn-agregar { background:linear-gradient(90deg,#1976d2 60%,#00bcd4 100%) !important; color:#fff !important; }
+@media (max-width: 900px) {
+  .jornadas-card { max-width:99vw !important; padding:18px 2vw 18px 2vw !important; }
+  .admin-header h1 { font-size:1.3rem !important; }
+  .admin-user { font-size:0.98rem !important; padding:7px 12px !important; }
+  .jornadas-table th, .jornadas-table td { font-size:0.97rem !important; }
+}
+@media (max-width: 600px) {
+  .main-bg { padding:0; }
+  .jornadas-card { max-width:99vw !important; padding:10px 2vw 10px 2vw !important; border-radius:14px !important; }
+  .admin-header { flex-direction:column !important; gap:10px !important; }
+  .admin-header h1 { font-size:1rem !important; }
+  .admin-user { font-size:0.95rem !important; padding:7px 8px !important; }
+  .jornadas-table th, .jornadas-table td { font-size:0.95rem !important; padding:7px 4px !important; }
+  .btn-agregar { width:100% !important; text-align:center !important; }
+  .jornadas-section { margin-bottom:20px !important; }
+}
+</style>
 {% endblock %}

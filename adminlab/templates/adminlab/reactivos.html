@@ -95,6 +95,31 @@
         </div>
     </section>
 </div>
+<style>
+@media (max-width: 1100px) {
+  .dashboard-section { flex-direction:column !important; gap:18px !important; }
+  .materiales-main, .materiales-alertas { width:100% !important; min-width:0 !important; }
+}
+@media (max-width: 900px) {
+  .materiales-form { flex-wrap:wrap !important; gap:8px !important; }
+  .materiales-table th, .materiales-table td { font-size:0.98rem !important; padding:8px 6px !important; }
+  .materiales-table { min-width:600px !important; overflow-x:auto !important; }
+}
+@media (max-width: 600px) {
+  .main-content { padding:0 !important; }
+  .dashboard-section { flex-direction:column !important; gap:10px !important; }
+  .materiales-main, .materiales-alertas { width:100% !important; min-width:0 !important; }
+  .materiales-form { flex-direction:column !important; flex-wrap:nowrap !important; gap:7px !important; align-items:stretch !important; }
+  .materiales-form input, .materiales-form textarea, .materiales-form select {
+    font-size:0.97rem !important; padding:8px 6px !important; min-width:0 !important; width:100% !important; margin-bottom:2px !important;
+  }
+  .materiales-form input[type="submit"] {
+    font-size:1rem !important; padding:10px 0 !important; width:100% !important; margin-top:4px !important;
+  }
+  .materiales-table { min-width:480px !important; overflow-x:auto !important; }
+  .materiales-table th, .materiales-table td { font-size:0.95rem !important; padding:7px 4px !important; }
+}
+</style>
 <script>
 // ...sugerencias-quimico script igual que en materiales.html...
 const input = document.getElementById('busqueda-quimico');

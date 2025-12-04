@@ -29,6 +29,7 @@ urlpatterns = [
     path('guias/agregar/', views.agregar_guia_admin, name='agregar_guia_admin'),
     path('guias/<int:guia_id>/editar/', views.editar_guia_admin, name='editar_guia_admin'),
     path('guias/<int:guia_id>/eliminar/', views.eliminar_guia_admin, name='eliminar_guia_admin'),
+    path('guias/eliminar/<int:guia_id>/', views.eliminar_guia_admin, name='eliminar_guia_admin'),
     # CRUD Jornadas
     path('jornadas/', views.jornadas_admin, name='jornadas_admin'),
     path('jornadas/agregar/', views.agregar_jornada_admin, name='agregar_jornada_admin'),

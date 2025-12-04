@@ -523,8 +523,10 @@ def eliminar_guia_admin(request, guia_id):
     if not request.user.is_superuser:
         return redirect('/')
     guia = get_object_or_404(Guia, id=guia_id)
-    guia.delete()
-    messages.success(request, 'Guía eliminada correctamente.')
+    if request.method == 'POST':
+        guia.delete()
+        messages.success(request, 'Guía eliminada correctamente.')
+        return redirect('guias_admin')
     return redirect('guias_admin')
 
 # --- CRUD JORNADA ---

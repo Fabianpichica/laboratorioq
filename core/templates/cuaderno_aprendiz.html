@@ -251,23 +251,14 @@
             margin-bottom: 18px;
             position: relative;
         }
-        .cuaderno-upload-box label[for="foto"] {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff;
-            border-radius: 8px;
-            padding: 18px 38px;
-            font-size: 1.18rem;
-            font-family: 'Poppins', Arial, sans-serif;
-            font-weight: 700;
-            color: #181828;
-            box-shadow: 0 2px 8px rgba(60,72,88,0.10);
+        .cuaderno-upload-box label[for="archivo"] {
+            /* Estilos para el botón de carga de archivo */
+            background: #3949ab;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 4px;
             cursor: pointer;
-            margin: 0 auto;
-            border: none;
+            font-weight: 500;
         }
         .cuaderno-upload-area button {
             background: #d1c4e9;
@@ -443,17 +434,16 @@
                         </select>
                         <label for="nota">Notas:</label>
                         <textarea name="nota" id="nota" rows="6" placeholder="Describe el experimento..."></textarea>
+                        <label for="archivo">Cargar archivo:</label>
+                        <div class="cuaderno-upload-box">
+                            <label for="archivo">Seleccionar Archivo</label>
+                            <input type="file" id="archivo" name="archivo" accept="image/*,.pdf,.doc,.docx,.odt,.rtf,.txt" style="display:none;" onchange="mostrarNombreArchivo(event)">
+                            <div id="archivo-preview" style="margin-top:10px;font-size:0.98rem;color:#3949ab;"></div>
+                        </div>
+                        <button type="submit">GUARDAR</button>
                     </form>
                 </div>
                 <div class="cuaderno-right-col">
-                    <div class="cuaderno-upload-area">
-                        <label for="foto">Cargar foto:</label>
-                        <div class="cuaderno-upload-box">
-                            <label for="foto">Seleccionar Archivo</label>
-                            <input type="file" id="foto" name="foto" accept="image/*,.pdf,.doc,.docx,.odt,.rtf,.txt" style="display:none;">
-                        </div>
-                        <button type="submit" form="formulario">GUARDAR</button>
-                    </div>
                     <div class="cuaderno-informes-section">
                         <div class="cuaderno-informes-title">Mis informes guardados</div>
                         <ul class="cuaderno-informes">
@@ -462,7 +452,25 @@
                                 <a href="{% url 'informe_detalle' informe.id %}">
                                     {{ informe.fecha }}<br>
                                     Químico(s): {{ informe.quimicos }}<br>
-                                    {% if informe.guia %}Guía: {{ informe.guia }}{% endif %}
+                                    {% if informe.guia %}Guía: {{ informe.guia }}<br>{% endif %}
+                                    {% if informe.archivo %}
+                                        {% with informe.archivo.name|lower as filename %}
+                                            {% if filename|slice:"-4:" == ".pdf" %}
+                                                <i class="fa-solid fa-file-pdf" style="color:#d32f2f;"></i>
+                                            {% elif filename|slice:"-4:" == ".doc" or filename|slice:"-5:" == ".docx" %}
+                                                <i class="fa-solid fa-file-word" style="color:#1976d2;"></i>
+                                            {% elif filename|slice:"-4:" == ".odt" %}
+                                                <i class="fa-solid fa-file-lines" style="color:#43a047;"></i>
+                                            {% elif filename|slice:"-4:" == ".txt" %}
+                                                <i class="fa-solid fa-file-lines" style="color:#616161;"></i>
+                                            {% elif filename|slice:"-4:" == ".jpg" or filename|slice:"-5:" == ".jpeg" or filename|slice:"-4:" == ".png" or filename|slice:"-4:" == ".gif" %}
+                                                <i class="fa-solid fa-file-image" style="color:#ffa726;"></i>
+                                            {% else %}
+                                                <i class="fa-solid fa-file" style="color:#3949ab;"></i>
+                                            {% endif %}
+                                            <a href="{{ informe.archivo.url }}" target="_blank" style="margin-left:8px;">Ver archivo</a>
+                                        {% endwith %}
+                                    {% endif %}
                                 </a>
                             </li>
                             {% endfor %}

@@ -118,3 +118,7 @@ def materiales_profesor(request):
         'equipos': equipos,
         'quimicos': quimicos,
     })
+
+@login_required
+def perfil_profesor(request):
+    return render(request, 'profesor/perfil_profesor.html', {'user': request.user})

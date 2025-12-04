@@ -1,0 +1,15 @@
+{% extends 'profesor/base.html' %}
+{% block content %}
+<main class="profesor-main-content" style="width:100%;max-width:600px;margin:0 auto;">
+    <div style="padding: 24px; width:100%; max-width:600px; margin:auto;">
+        <h1 style="font-size:2rem;font-weight:800;margin-bottom:12px;"><i class="fa-solid fa-user"></i> Perfil del Profesor</h1>
+        <div style="color:#3949ab;font-weight:600;margin-bottom:18px;"><i class="fa-solid fa-id-badge"></i> Información personal</div>
+        <ul style="list-style:none;padding:0;font-size:1.1rem;">
+            <li><strong>Usuario:</strong> {{ user.username }}</li>
+            <li><strong>Nombre:</strong> {{ user.first_name }} {{ user.last_name }}</li>
+            <li><strong>Email:</strong> {{ user.email }}</li>
+        </ul>
+        <p style="margin-top:24px;color:#555;">Esta es la información básica de tu perfil. Si necesitas editar tus datos, contacta al administrador.</p>
+    </div>
+</main>
+{% endblock %}

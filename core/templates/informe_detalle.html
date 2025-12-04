@@ -272,10 +272,27 @@
                 <div><span class="dato-label">Guía:</span> {{ informe.guia.titulo }}</div>
                 {% endif %}
                 <div><span class="dato-label">Nota:</span> {{ informe.nota }}</div>
-                {% if informe.imagen %}
+                <div style="color:#888;font-size:0.95em;">[Depuración] archivo: {{ informe.archivo }} | archivo.url: {% if informe.archivo %}{{ informe.archivo.url }}{% else %}None{% endif %}</div>
+                {% if informe.archivo %}
                 <div class="cuaderno-imagen" style="margin-top:18px;text-align:center;">
-                    <img src="{{ informe.imagen.url }}" alt="Evidencia">
+                    {% with informe.archivo.name|lower as filename %}
+                        {% if filename|slice:"-4:" == ".pdf" %}
+                            <a href="{{ informe.archivo.url }}" target="_blank"><i class="fa-solid fa-file-pdf fa-2x" style="color:#d32f2f;"></i> Ver PDF</a>
+                        {% elif filename|slice:"-4:" == ".doc" or filename|slice:"-5:" == ".docx" %}
+                            <a href="{{ informe.archivo.url }}" target="_blank"><i class="fa-solid fa-file-word fa-2x" style="color:#1976d2;"></i> Ver Word</a>
+                        {% elif filename|slice:"-4:" == ".odt" %}
+                            <a href="{{ informe.archivo.url }}" target="_blank"><i class="fa-solid fa-file-lines fa-2x" style="color:#43a047;"></i> Ver ODT</a>
+                        {% elif filename|slice:"-4:" == ".txt" %}
+                            <a href="{{ informe.archivo.url }}" target="_blank"><i class="fa-solid fa-file-lines fa-2x" style="color:#616161;"></i> Ver TXT</a>
+                        {% elif filename|slice:"-4:" == ".jpg" or filename|slice:"-5:" == ".jpeg" or filename|slice:"-4:" == ".png" or filename|slice:"-4:" == ".gif" %}
+                            <img src="{{ informe.archivo.url }}" alt="Evidencia" style="max-width:350px;max-height:350px;">
+                        {% else %}
+                            <a href="{{ informe.archivo.url }}" target="_blank"><i class="fa-solid fa-file fa-2x" style="color:#3949ab;"></i> Descargar archivo</a>
+                        {% endif %}
+                    {% endwith %}
                 </div>
+                {% else %}
+                <div style="text-align:center;color:#b71c1c;font-weight:500;margin:12px 0;">No hay archivo adjunto en este informe.</div>
                 {% endif %}
                 <hr>
                 <h3 style="color:#3949ab;font-size:1.13rem;margin-bottom:10px;"><i class="fa-solid fa-comments" style="margin-right:6px;"></i> Retroalimentación del docente</h3>

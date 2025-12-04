@@ -16,7 +16,23 @@
                                 <span class="entregado"><i class="fas fa-check-circle"></i> Entregado</span>
                                 <br><strong>Nota:</strong> {{ informe.nota|truncatechars:80 }}
                                 <br><strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}
-                                {% if informe.imagen %}<br><a href="{{ informe.imagen.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-image"></i> Ver imagen</a>{% endif %}
+                                {% if informe.archivo %}
+                                    {% with informe.archivo.url|lower as fileurl %}
+                                        {% if fileurl|slice:"-4:" == ".pdf" %}
+                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file-pdf"></i> Ver PDF</a>
+                                        {% elif fileurl|slice:"-4:" == ".doc" or fileurl|slice:"-5:" == ".docx" %}
+                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file-word"></i> Ver Word</a>
+                                        {% elif fileurl|slice:"-4:" == ".txt" %}
+                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file-alt"></i> Ver TXT</a>
+                                        {% elif fileurl|slice:"-4:" == ".odt" %}
+                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file-alt"></i> Ver ODT</a>
+                                        {% elif fileurl|slice:"-4:" == ".jpg" or fileurl|slice:"-5:" == ".jpeg" or fileurl|slice:"-4:" == ".png" or fileurl|slice:"-4:" == ".gif" %}
+                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-image"></i> Ver imagen</a>
+                                        {% else %}
+                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file"></i> Descargar archivo</a>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
                                 <form method="post" style="margin-top:10px;">
                                     {% csrf_token %}
                                     <label for="retroalimentacion_{{ informe.id }}" style="font-weight:600;color:#3949ab;">Retroalimentación:</label>

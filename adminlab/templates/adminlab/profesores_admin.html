@@ -1,76 +1,103 @@
 {% extends 'adminlab/base.html' %}
 {% load static %}
 {% block content %}
-<main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
-    <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
-        <div class="admin-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;">
-            <h1 style="color:#283593;font-size:2.2rem;font-weight:800;margin:0;letter-spacing:1px;"><i class="fa-solid fa-chalkboard-teacher"></i> Gestión de Profesores</h1>
-            <div class="admin-user" style="font-size:1.1rem;color:#1976d2;background:#fff;border-radius:20px;padding:8px 18px;box-shadow:0 2px 8px rgba(25,118,210,0.07);"><i class="fa-solid fa-user-shield"></i> Panel de profesores</div>
-        </div>
-        <div class="profesores-section" style="margin-bottom:40px;">
-            <a href="{% url 'registrar_profesor' %}" class="btn-agregar" style="display:inline-block;background:#1976d2;color:#fff;padding:10px 22px;border-radius:8px;font-weight:600;text-decoration:none;margin-bottom:18px;margin-top:8px;transition:background 0.2s;box-shadow:0 2px 8px rgba(25,118,210,0.08);"><i class="fa-solid fa-user-plus"></i>Registrar Profesor</a>
-            <table class="profesores-table" style="width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(25,118,210,0.07);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:32px;">
-                <thead>
-                    <tr>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Profesor</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Jornadas</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Salones asignados</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pinfo in profesores_info %}
-                    <tr>
-                        <td><i class="fa-solid fa-user-tie"></i> {{ pinfo.profesor.get_full_name|default:pinfo.profesor.username }}</td>
-                        <td>
-                            {% if pinfo.jornadas %}
-                                <ul style="margin:0;padding-left:18px;">
-                                    {% for jinfo in pinfo.jornadas %}
-                                        <li><b>{{ jinfo.jornada.nombre }}</b> <span style="color:#1976d2;">({{ jinfo.jornada.fecha }})</span></li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <em>Sin jornadas</em>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if pinfo.jornadas %}
-                                <ul style="margin:0;padding-left:18px;">
-                                    {% for jinfo in pinfo.jornadas %}
-                                        <li>
-                                            <b>{{ jinfo.jornada.nombre }}</b>:
-                                            {% if jinfo.salones %}
-                                                {% for s in jinfo.salones %}
-                                                    <span class="badge" style="background:#e3e6ea;color:#283593;border-radius:6px;padding:3px 10px;margin-right:6px;">{{ s.nombre }}</span>
-                                                {% endfor %}
-                                            {% else %}
-                                                <em>Sin salones</em>
-                                            {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <em>Sin salones</em>
-                            {% endif %}
-                        </td>
-                        <td style="text-align:center;min-width:140px;">
-                            {% with profile=pinfo.profesor.profile %}
-                                {% if profile.fotografia %}
-                                    <img src="{{ profile.fotografia.url }}" alt="Foto" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
-                                {% else %}
-                                    <span style="color:#aaa;font-size:0.9em;">Sin foto</span>
-                                {% endif %}
-                            {% endwith %}
-                            <div style="margin-top:8px;">
-                                <a href="{% url 'editar_profesor' pinfo.profesor.id %}" class="btn-editar" style="margin-right:8px;color:#1976d2;font-weight:500;text-decoration:none;transition:color 0.2s;"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
-                                <a href="{% url 'eliminar_profesor' pinfo.profesor.id %}" class="btn-eliminar" onclick="return confirm('¿Eliminar este profesor?');" style="color:#1976d2;font-weight:500;text-decoration:none;transition:color 0.2s;"><i class="fa-solid fa-trash"></i> Eliminar</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<main class="main-bg" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fff;">
+  <div class="profesores-card" style="width:100%;max-width:1200px;margin:0 auto;background:#fff;border-radius:22px;box-shadow:0 8px 32px rgba(25,118,210,0.13);padding:32px 18px 24px 18px;display:flex;flex-direction:column;">
+    <div class="admin-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+      <h1 style="color:#283593;font-size:2.1rem;font-weight:800;margin:0;letter-spacing:1px;display:flex;align-items:center;gap:12px;"><i class="fa-solid fa-chalkboard-teacher"></i> Gestión de Profesores</h1>
+      <div class="admin-user" style="font-size:1.08rem;color:#1976d2;background:#fff;border-radius:20px;padding:8px 18px;box-shadow:0 2px 8px rgba(25,118,210,0.07);display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-user-shield"></i> Panel de profesores</div>
     </div>
+    <div class="profesores-section" style="margin-bottom:40px;">
+      <a href="{% url 'registrar_profesor' %}" class="btn-agregar" style="display:inline-block;background:linear-gradient(90deg,#1976d2 60%,#00bcd4 100%);color:#fff;padding:10px 22px;border-radius:10px;font-weight:600;text-decoration:none;margin-bottom:18px;margin-top:8px;transition:background 0.2s;box-shadow:0 2px 8px rgba(25,118,210,0.08);"><i class="fa-solid fa-user-plus"></i> Registrar Profesor</a>
+      <div style="overflow-x:auto;">
+        <table class="profesores-table" style="width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(25,118,210,0.07);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:32px;min-width:700px;">
+          <thead>
+            <tr>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Profesor</th>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Jornadas</th>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Salones asignados</th>
+              <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;padding:12px 8px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pinfo in profesores_info %}
+            <tr>
+              <td style="padding:10px 8px;"><i class="fa-solid fa-user-tie"></i> {{ pinfo.profesor.get_full_name|default:pinfo.profesor.username }}</td>
+              <td style="padding:10px 8px;">
+                {% if pinfo.jornadas %}
+                  <ul style="margin:0;padding-left:18px;">
+                    {% for jinfo in pinfo.jornadas %}
+                      <li><b>{{ jinfo.jornada.nombre }}</b> <span style="color:#1976d2;">({{ jinfo.jornada.fecha }})</span></li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <em>Sin jornadas</em>
+                {% endif %}
+              </td>
+              <td style="padding:10px 8px;">
+                {% if pinfo.jornadas %}
+                  <ul style="margin:0;padding-left:18px;">
+                    {% for jinfo in pinfo.jornadas %}
+                      <li>
+                        <b>{{ jinfo.jornada.nombre }}</b>:
+                        {% if jinfo.salones %}
+                          {% for s in jinfo.salones %}
+                            <span class="badge" style="background:#e3e6ea;color:#283593;border-radius:6px;padding:3px 10px;margin-right:6px;">{{ s.nombre }}</span>
+                          {% endfor %}
+                        {% else %}
+                          <em>Sin salones</em>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <em>Sin salones</em>
+                {% endif %}
+              </td>
+              <td style="text-align:center;min-width:140px;padding:10px 8px;">
+                {% with profile=pinfo.profesor.profile %}
+                  {% if profile.fotografia %}
+                    <img src="{{ profile.fotografia.url }}" alt="Foto" style="width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(25,118,210,0.10);margin-bottom:6px;">
+                  {% else %}
+                    <span style="color:#aaa;font-size:0.9em;">Sin foto</span>
+                  {% endif %}
+                {% endwith %}
+                <div style="margin-top:8px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+                  <a href="{% url 'editar_profesor' pinfo.profesor.id %}" class="btn-editar" style="color:#1976d2;font-weight:500;text-decoration:none;transition:color 0.2s;background:#e3e6ea;border-radius:8px;padding:7px 16px;display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
+                  <a href="{% url 'eliminar_profesor' pinfo.profesor.id %}" class="btn-eliminar" onclick="return confirm('¿Eliminar este profesor?');" style="color:#fff;font-weight:500;text-decoration:none;transition:background 0.2s;background:linear-gradient(90deg,#1976d2 60%,#00bcd4 100%);border-radius:8px;padding:7px 16px;display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-trash"></i> Eliminar</a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </main>
+<style>
+.main-bg { min-height:100vh; background:#fff; }
+.profesores-card { transition:box-shadow 0.2s; }
+.admin-header h1 { font-size:2.1rem; }
+.admin-user { font-size:1.08rem; }
+.profesores-table th, .profesores-table td { font-size:1.01rem; }
+.btn-agregar { background:linear-gradient(90deg,#1976d2 60%,#00bcd4 100%) !important; color:#fff !important; }
+.badge { background:#e3e6ea;color:#283593;border-radius:6px;padding:3px 10px;margin-right:6px;display:inline-block;font-size:0.97rem; }
+@media (max-width: 900px) {
+  .profesores-card { max-width:99vw !important; padding:18px 2vw 18px 2vw !important; }
+  .admin-header h1 { font-size:1.3rem !important; }
+  .admin-user { font-size:0.98rem !important; padding:7px 12px !important; }
+  .profesores-table th, .profesores-table td { font-size:0.97rem !important; }
+}
+@media (max-width: 600px) {
+  .main-bg { padding:0; }
+  .profesores-card { max-width:99vw !important; padding:10px 2vw 10px 2vw !important; border-radius:14px !important; }
+  .admin-header { flex-direction:column !important; gap:10px !important; }
+  .admin-header h1 { font-size:1rem !important; }
+  .admin-user { font-size:0.95rem !important; padding:7px 8px !important; }
+  .profesores-table th, .profesores-table td { font-size:0.95rem !important; padding:7px 4px !important; }
+  .btn-agregar { width:100% !important; text-align:center !important; }
+  .profesores-section { margin-bottom:20px !important; }
+}
+</style>
 {% endblock %}

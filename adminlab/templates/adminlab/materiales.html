@@ -15,22 +15,64 @@
         <input type="text" name="descripcion" placeholder="Descripción" style="padding:14px 16px;border-radius:10px;border:1.5px solid #b3c2e0;font-size:1.1rem;background:#f4f6fb;box-shadow:0 2px 8px rgba(25,118,210,0.07);outline:none;transition:border 0.2s;flex:1 1 180px;">
         <input type="submit" value="Añadir Material" style="background:linear-gradient(90deg,#1976d2 0%,#64b5f6 100%);color:#fff;font-weight:700;font-size:1.15rem;border-radius:10px;padding:14px 32px;border:none;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.2s;">
     </form>
-    <table class="materiales-table" style="width:100%;border-collapse:collapse;margin-top:18px;background:#f4f6fb;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(25,118,210,0.07);">
+    <style>
+        .materiales-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(60,72,88,0.13);
+            overflow: hidden;
+        }
+        .materiales-table th {
+            background: #ccecf2;
+            color: #222;
+            font-size: 1.18rem;
+            font-weight: 700;
+            padding: 14px 0;
+            border: none;
+        }
+        .materiales-table td {
+            background: #fff;
+            color: #222;
+            font-size: 1.08rem;
+            padding: 12px 8px;
+            border: 1.5px solid #222;
+            text-align: center;
+        }
+        .materiales-table tr {
+            border-bottom: 1.5px solid #222;
+        }
+        .materiales-table th, .materiales-table td {
+            border-right: 1.5px solid #222;
+        }
+        .materiales-table th:last-child, .materiales-table td:last-child {
+            border-right: none;
+        }
+        .materiales-table tr:last-child td {
+            border-bottom: none;
+        }
+        .materiales-table {
+            border-radius: 18px;
+        }
+    </style>
+    <table class="materiales-table">
         <thead>
             <tr>
-                <th style="background:#1976d2;color:#fff;font-size:1.1rem;font-weight:700;padding:16px 8px;border-bottom:2px solid #e3f2fd;">Nombre</th>
-                <th style="background:#1976d2;color:#fff;font-size:1.1rem;font-weight:700;padding:16px 8px;border-bottom:2px solid #e3f2fd;">Cantidad</th>
-                <th style="background:#1976d2;color:#fff;font-size:1.1rem;font-weight:700;padding:16px 8px;border-bottom:2px solid #e3f2fd;">Descripción</th>
-                <th style="background:#1976d2;color:#fff;font-size:1.1rem;font-weight:700;padding:16px 8px;border-bottom:2px solid #e3f2fd;">Acciones</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for material in materiales %}
-            <tr style="{% if forloop.counter0|divisibleby:2 %}background:#e3f2fd;{% endif %}">
-                <td style="padding:14px 8px;font-size:1rem;color:#222;border-bottom:1px solid #e3f2fd;">{{ material.nombre }}</td>
-                <td style="padding:14px 8px;font-size:1rem;color:#222;border-bottom:1px solid #e3f2fd;">{{ material.cantidad }}</td>
-                <td style="padding:14px 8px;font-size:1rem;color:#222;border-bottom:1px solid #e3f2fd;">{{ material.descripcion }}</td>
-                <td style="padding:14px 8px;font-size:1rem;color:#222;border-bottom:1px solid #e3f2fd;">
+            <tr>
+                <td>{{ material.nombre }}</td>
+                <td>{{ material.cantidad }}</td>
+                <td>{{ material.descripcion }}</td>
+                <td>
                     <a href="{% url 'editar_material_admin' material.id %}" style="color:#1976d2;font-weight:600;text-decoration:underline;margin:0 6px;transition:color 0.2s;">Editar</a> |
                     <a href="{% url 'eliminar_material_admin' material.id %}" style="color:#1976d2;font-weight:600;text-decoration:underline;margin:0 6px;transition:color 0.2s;">Eliminar</a>
                 </td>
