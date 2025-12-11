@@ -1,67 +1,56 @@
 {% extends 'adminlab/base.html' %}
 {% load static %}
 {% block content %}
-<main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
-    <div style="padding: 2vw 2vw 0 2vw; width:100%; max-width:1200px; margin:auto;">
-        <div class="admin-header" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;">
-            <h1 style="color:#283593;font-size:2rem;font-weight:800;margin:0;letter-spacing:0.5px;flex:1 1 180px;line-height:1.2;white-space:break-spaces;"><i class="fa-solid fa-user-graduate"></i> Gestión de Estudiantes</h1>
-            <div class="admin-user" style="font-size:1rem;color:#1976d2;background:linear-gradient(120deg,#e0f7fa 0%,#ede7f6 100%);border-radius:14px;padding:8px 18px;box-shadow:0 2px 12px rgba(25,118,210,0.13);flex:0 1 220px;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;max-width:240px;width:100%;transition:box-shadow 0.2s,background 0.2s;">
-                <span style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(25,118,210,0.10);margin-right:10px;">
-                    <i class="fa-solid fa-user-shield" style="font-size:1.3rem;color:#1976d2;"></i>
-                </span>
-                <span style="font-weight:700;letter-spacing:0.5px;">Panel de estudiantes</span>
-            </div>
-        </div>
-        <div class="estudiantes-section" style="margin-bottom:32px;">
-            <a href="{% url 'agregar_estudiante_admin' %}" class="btn-agregar" style="display:inline-block;background:linear-gradient(90deg,#1976d2 60%,#00bcd4 100%);color:#fff;padding:12px 28px;border-radius:10px;font-weight:700;text-decoration:none;margin-bottom:18px;margin-top:8px;transition:background 0.2s;box-shadow:0 2px 12px rgba(25,118,210,0.13);font-size:1.08rem;letter-spacing:0.5px;">
-                <i class="fa-solid fa-plus"></i> Agregar Estudiante
-            </a>
-            <div style="overflow-x:auto;">
-            <table class="estudiantes-table" style="width:100%;background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.13);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:24px;min-width:320px;">
-                <thead>
-                    <tr>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Nombre</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Documento</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Tipo</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Salón</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Jornada</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Correo</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Teléfono</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Foto</th>
-                        <th style="background:#e3e6ea;color:#283593;font-size:1rem;padding:14px 8px;font-weight:700;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for e in estudiantes %}
-                    <tr style="transition:background 0.18s;">
-                        <td style="padding:12px 8px;">{{ e.nombre }}</td>
-                        <td style="padding:12px 8px;">{{ e.documento }}</td>
-                        <td style="padding:12px 8px;">{{ e.get_tipo_documento_display }}</td>
-                        <td style="padding:12px 8px;">{{ e.salon }}</td>
-                        <td style="padding:12px 8px;">{{ e.jornada }}</td>
-                        <td style="padding:12px 8px;">{{ e.correo }}</td>
-                        <td style="padding:12px 8px;">{{ e.telefono }}</td>
-                        <td style="padding:12px 8px;">
-                            {% if e.foto %}
-                                <img src="{{ e.foto.url }}" alt="Foto" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid #e3e6ea;">
-                            {% else %}
-                                <span style="color:#aaa;font-size:0.9em;">Sin foto</span>
-                            {% endif %}
-                        </td>
-                        <td class="estudiantes-actions" style="white-space:nowrap;padding:12px 8px;">
-                            <a href="{% url 'editar_estudiante_admin' e.id %}" style="color:#1976d2;font-weight:500;margin-right:10px;text-decoration:none;transition:color 0.2s;padding:8px 16px;border-radius:8px;background:#e3e6ea;display:inline-block;font-size:1rem;"><i class="fa-solid fa-pen-to-square"></i> Editar</a>
-                            <a href="{% url 'eliminar_estudiante_admin' e.id %}" onclick="return confirm('¿Eliminar este estudiante?');" style="color:#fff;font-weight:500;text-decoration:none;transition:background 0.2s;padding:8px 16px;border-radius:8px;background:#d32f2f;display:inline-block;font-size:1rem;margin-left:4px;"><i class="fa-solid fa-trash"></i> Eliminar</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="9" style="padding:18px;text-align:center;color:#aaa;">No hay estudiantes registrados.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            </div>
-        </div>
+<div style="padding: 40px; max-width: 1200px; margin: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="font-size: 2rem; font-weight: 800;"><i class="fas fa-user-graduate"></i> GESTIÓN DE ESTUDIANTES</h1>
+        <a href="{% url 'agregar_estudiante_admin' %}" style="background: #e0f7fa; color: #00796b; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">Agregar Estudiante</a>
     </div>
-</main>
+
+    <div style="background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.07);">
+        <table class="student-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Documento</th>
+                    <th>Tipo</th>
+                    <th>Salón</th>
+                    <th>Jornada</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Foto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for estudiante in estudiantes %}
+                <tr>
+                    <td>{{ estudiante.nombre }}</td>
+                    <td>{{ estudiante.documento }}</td>
+                    <td>{{ estudiante.tipo_documento }}</td>
+                    <td>{{ estudiante.salon.nombre|default:'N/A' }}</td>
+                    <td>{{ estudiante.jornada.nombre|default:'N/A' }}</td>
+                    <td>{{ estudiante.correo }}</td>
+                    <td>{{ estudiante.telefono }}</td>
+                    <td>
+                        {% if estudiante.foto %}
+                            <img src="{{ estudiante.foto.url }}" alt="Foto" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #eee;"></div>
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        <a href="{% url 'editar_estudiante_admin' estudiante.id %}"><i class="fas fa-edit"></i> Editar</a><br>
+                        <a href="{% url 'eliminar_estudiante_admin' estudiante.id %}" style="color: #ef5350;"><i class="fas fa-trash"></i> Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
 <style>
 @media (max-width: 900px) {
   .profesor-main-content { max-width: 100vw !important; }
@@ -86,4 +75,3 @@
   .btn-agregar { font-size: 0.85rem !important; }
 }
 </style>
-{% endblock %}

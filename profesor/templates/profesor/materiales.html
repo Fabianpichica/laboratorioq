@@ -1,83 +1,84 @@
 {% extends 'profesor/base.html' %}
 {% block title %}Materiales y Equipos de Laboratorio{% endblock %}
 {% block content %}
-<div class="materiales-container">
-    <h2>Químicos de Laboratorio</h2>
-    <table class="materiales-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Fecha de registro</th>
-                <th>Fecha de vencimiento</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for quimico in quimicos %}
-            <tr>
-                <td>{{ quimico.nombre }}</td>
-                <td>{{ quimico.descripcion }}</td>
-                <td>{{ quimico.cantidad }}</td>
-                <td>{{ quimico.fecha_registro|date:'M. d, Y' }}</td>
-                <td>{% if quimico.fecha_vencimiento %}{{ quimico.fecha_vencimiento|date:'M. d, Y' }}{% else %}-{% endif %}</td>
-            </tr>
-        {% empty %}
-            <tr><td colspan="5">No hay químicos registrados.</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <h2>Materiales de Laboratorio</h2>
-    <table class="materiales-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Ubicación</th>
-                <th>Fecha de registro</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for material in materiales %}
-            <tr>
-                <td>{{ material.nombre }}</td>
-                <td>{{ material.descripcion }}</td>
-                <td>{{ material.cantidad }}</td>
-                <td>{{ material.ubicacion }}</td>
-                <td>{{ material.fecha_registro }}</td>
-            </tr>
-        {% empty %}
-            <tr><td colspan="5">No hay materiales registrados.</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <h2>Equipos de Laboratorio</h2>
-    <table class="materiales-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Ubicación</th>
-                <th>Estado</th>
-                <th>Fecha de registro</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for equipo in equipos %}
-            <tr>
-                <td>{{ equipo.nombre }}</td>
-                <td>{{ equipo.descripcion }}</td>
-                <td>{{ equipo.cantidad }}</td>
-                <td>{{ equipo.ubicacion }}</td>
-                <td>{{ equipo.estado }}</td>
-                <td>{{ equipo.fecha_registro }}</td>
-            </tr>
-        {% empty %}
-            <tr><td colspan="6">No hay equipos registrados.</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div style="padding: 20px; max-width: 1200px; margin: 80px auto;">
+
+    <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 20px;">Químicos de Laboratorio</h2>
+    <div class="table-container">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Descripción</th>
+                    <th>Fecha de registro</th>
+                    <th>Fecha de vencimiento</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for quimico in quimicos %}
+                <tr>
+                    <td>{{ quimico.nombre }}</td>
+                    <td>{{ quimico.cantidad }}</td>
+                    <td>{{ quimico.descripcion }}</td>
+                    <td>{{ quimico.fecha_registro|date:'d / M / Y' }}</td>
+                    <td>{% if quimico.fecha_vencimiento %}{{ quimico.fecha_vencimiento|date:'d / M / Y' }}{% else %}-{% endif %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 20px;">Materiales de Laboratorio</h2>
+    <div class="table-container">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Descripción</th>
+                    <th>Ubicación</th>
+                    <th>Fecha de registro</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for material in materiales %}
+                <tr>
+                    <td>{{ material.nombre }}</td>
+                    <td>{{ material.cantidad }}</td>
+                    <td>{{ material.descripcion }}</td>
+                    <td>{{ material.ubicacion }}</td>
+                    <td>{{ material.fecha_registro|date:'d / M / Y' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 20px;">Equipos de Laboratorio</h2>
+    <div class="table-container">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Descripción</th>
+                    <th>Ubicación</th>
+                    <th>Fecha de registro</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for equipo in equipos %}
+                <tr>
+                    <td>{{ equipo.nombre }}</td>
+                    <td>{{ equipo.cantidad }}</td>
+                    <td>{{ equipo.descripcion }}</td>
+                    <td>{{ equipo.ubicacion }}</td>
+                    <td>{{ equipo.fecha_registro|date:'d / M / Y' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

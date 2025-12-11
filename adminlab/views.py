@@ -2,8 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Equipo, Material
-from core.models import Quimico, Profile
+from core.models import Quimico, Profile, Material, Equipo
 from profesor.models import Estudiante, Guia, Jornada, Salon
 from .forms import ProfesorCustomForm
 import json
@@ -20,12 +19,14 @@ def dashboard_admin(request):
     guias = Guia.objects.all()
     jornadas = Jornada.objects.all()
     salones = Salon.objects.all()
+    profesores = User.objects.filter(is_staff=True)
     return render(request, 'adminlab/dashboard_admin.html', {
         'quimicos': quimicos,
         'estudiantes': estudiantes,
         'guias': guias,
         'jornadas': jornadas,
-        'salones': salones
+        'salones': salones,
+        'profesores': profesores
     })
 
 @login_required
@@ -622,6 +623,15 @@ def profesores_admin(request):
     })
 
 @login_required
+def eliminar_profesor(request, profesor_id):
+    if not request.user.is_superuser:
+        return redirect('/')
+    profesor = get_object_or_404(User, id=profesor_id)
+    profesor.delete()
+    messages.success(request, 'Profesor eliminado correctamente.')
+    return redirect('profesores_admin')
+
+@login_required
 def agregar_salon_admin(request):
     if not request.user.is_superuser:
         return redirect('/')
@@ -700,11 +710,9 @@ def editar_profesor(request, profesor_id):
     if not request.user.is_superuser:
         return redirect('/')
     profesor = get_object_or_404(User, id=profesor_id)
-    # Usar get_or_create para evitar DoesNotExist
     profile, _ = Profile.objects.get_or_create(user=profesor, defaults={'role': 'profesor'})
     salones = Salon.objects.all()
     jornadas = Jornada.objects.all()
-    # Jornadas y salones actuales
     jornadas_actuales = jornadas.filter(profesores=profesor)
     salones_actuales = set()
     for jornada in jornadas_actuales:
@@ -722,15 +730,11 @@ def editar_profesor(request, profesor_id):
         if fotografia:
             profile.fotografia = fotografia
             profile.save()
-        # Actualizar jornadas del profesor
-        profesor.jornadas.set(jornadas_ids)
-        # Para cada jornada, agregar o quitar el profesor según corresponda
         for jornada in jornadas:
             if str(jornada.id) in jornadas_ids:
                 jornada.profesores.add(profesor)
             else:
                 jornada.profesores.remove(profesor)
-        # Actualizar salones: solo agregar el profesor a los salones seleccionados en las jornadas seleccionadas
         for jornada in jornadas:
             if str(jornada.id) in jornadas_ids:
                 for salon in salones:
@@ -747,6 +751,12 @@ def editar_profesor(request, profesor_id):
         'jornadas_actuales': jornadas_actuales,
         'salones_actuales': salones_actuales
     })
+
+@login_required
+def perfil_admin(request):
+    if not request.user.is_superuser:
+        return redirect('/')
+    return render(request, 'adminlab/perfil_admin.html', {'user': request.user})
 
 @login_required
 def eliminar_profesor(request, profesor_id):

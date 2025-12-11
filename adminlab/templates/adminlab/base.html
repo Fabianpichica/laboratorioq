@@ -1,160 +1,257 @@
-{% extends 'profesor/base.html' %}
 {% load static %}
-{% block navbar %}
-<style>
-.navbar, .navbar-top, .navbar-adminlab {
-    position: relative;
-    z-index: 10000;
-    width: 98;
-    min-width: 0;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    background: #f5f6fa;
-    box-shadow: 0 2px 8px rgba(40,53,147,0.04);
-    padding: 0 18px;
-    overflow-x: auto;
-    gap: 0;
-}
-#inventario-menu-toggle.active, #inventario-menu-toggle:hover {
-    background: #e3e6ea;
-    border-radius: 10px 10px 0 0;
-}
-#inventario-menu {
-    display: none;
-    position: fixed;
-    z-index: 11000;
-    background: #fff;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 8px 32px rgba(40,53,147,0.18);
-    padding: 12px 0;
-    min-width: 220px;
-    border: 1.5px solid #bfc8d6;
-    left: 0;
-    top: 0;
-}
-#inventario-menu a {
-    display: block;
-    padding: 10px 24px;
-    color: #283593;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.08rem;
-    transition: background 0.15s;
-}
-#inventario-menu a:hover {
-    background: #e3e6ea;
-    color: #1976d2;
-}
-.profesor-main-content, main, .main-content, .content {
-    position: static !important;
-    z-index: auto !important;
-    background: inherit;
-}
-.nav-left {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: nowrap;
-    min-width: 0;
-}
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-    flex-shrink: 0;
-    justify-content: flex-end;
-    z-index: 10000;
-}
-@media (max-width: 900px) {
-    .nav-left {
-        gap: 12px;
-    }
-    .perfil-btn, .logout-btn {
-        font-size: 1rem !important;
-        padding: 6px 10px !important;
-    }
-}
-</style>
-<div class="nav-left" style="display:flex;align-items:center;gap:36px;flex-wrap:nowrap;position:relative;z-index:10000;">
-    <a href="/adminlab/dashboard/" class="nav-label"><i class="fa-solid fa-house"></i>Inicio</a>
-    <div class="nav-label" id="inventario-menu-toggle" style="position:relative;cursor:pointer;">
-        <i class="fa-solid fa-boxes-stacked"></i>Inventario <i class="fa-solid fa-caret-down"></i>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Panel Administrador{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f4f6fb; margin: 0; font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; }
+        .main-content { margin-top: 56px; padding: 0; padding-bottom: 60px; /* Espacio para el footer */ min-height: calc(100vh - 116px); }
+        .footer { background: #e7ebf2 !important; color: #181828; font-family: 'Poppins', Arial, sans-serif; font-weight: 700; font-size: 1.1rem; text-align: center; padding: 18px 0 10px 0; border-top: none; position: fixed; bottom: 0; width: 100%; z-index: 10001; }
+        .nav-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #181828;
+            font-size: 1.35rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 10px;
+            background: none;
+            border: none;
+            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+        }
+        .navbar, .navbar-top, .navbar-adminlab {
+            position: relative;
+            z-index: 10000;
+            width: 98%;
+            min-width: 0;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            background: #f5f6fa;
+            box-shadow: 0 2px 8px rgba(40,53,147,0.04);
+            padding: 0 18px;
+            overflow-x: auto;
+            gap: 0;
+        }
+        #inventario-menu-toggle.active, #inventario-menu-toggle:hover {
+            background: #e3e6ea;
+            border-radius: 10px 10px 0 0;
+        }
+        #inventario-menu {
+            display: none;
+            position: fixed;
+            z-index: 11000;
+            background: #fff;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 8px 32px rgba(40,53,147,0.18);
+            padding: 12px 0;
+            min-width: 220px;
+            border: 1.5px solid #bfc8d6;
+            left: 0;
+            top: 0;
+        }
+        #inventario-menu a {
+            display: block;
+            padding: 10px 24px;
+            color: #283593;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.08rem;
+            transition: background 0.15s;
+        }
+        #inventario-menu a:hover {
+            background: #e3e6ea;
+            color: #1976d2;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .admin-card-new {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.07);
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .admin-card-new .card-header {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .admin-card-new .card-body {
+            height: 80px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="1" d="M0,128L80,149.3C160,171,320,213,480,208C640,203,800,149,960,138.7C1120,128,1280,160,1360,176L1440,192L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: bottom;
+        }
+        .card-header.inventario { background-color: #e0f7fa; }
+        .card-header.estudiantes { background-color: #ede7f6; }
+        .card-header.profesores { background-color: #fdebd0; }
+        .card-header.salones { background-color: #e0f7fa; }
+        .card-header.guias { background-color: #ede7f6; }
+        .card-header.jornadas { background-color: #fdebd0; }
+
+        .salon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 25px;
+        }
+        .salon-door {
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            aspect-ratio: 2 / 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .salon-door .knob { width: 15px; height: 15px; border-radius: 50%; position: absolute; left: 20px; top: 50%; transform: translateY(-50%); }
+        .salon-door .number-plate { background: rgba(0,0,0,0.1); padding: 5px 10px; border-radius: 5px; font-weight: bold; position: absolute; top: 20px; right: 20px; }
+        .salon-door .window { height: 30px; background: rgba(255,255,255,0.5); border-radius: 5px; margin-bottom: 10px; }
+
+        .salon-door:nth-child(5n+1) { background-color: #e0f7fa; }
+        .salon-door:nth-child(5n+1) .window { background-color: #b2dfdb; }
+        .salon-door:nth-child(5n+1) .knob { background-color: #80cbc4; }
+
+        .salon-door:nth-child(5n+2) { background-color: #ede7f6; }
+        .salon-door:nth-child(5n+2) .window { background-color: #d1c4e9; }
+        .salon-door:nth-child(5n+2) .knob { background-color: #b39ddb; }
+
+        .salon-door:nth-child(5n+3) { background-color: #fdebd0; }
+        .salon-door:nth-child(5n+3) .window { background-color: #ffcc80; }
+        .salon-door:nth-child(5n+3) .knob { background-color: #ffb74d; }
+
+        .salon-door:nth-child(5n+4) { background-color: #fce4ec; }
+        .salon-door:nth-child(5n+4) .window { background-color: #f8bbd0; }
+        .salon-door:nth-child(5n+4) .knob { background-color: #f48fb1; }
+
+        .salon-door:nth-child(5n+5) { background-color: #e8f5e9; }
+        .salon-door:nth-child(5n+5) .window { background-color: #c8e6c9; }
+        .salon-door:nth-child(5n+5) .knob { background-color: #a5d6a7; }
+
+         .salon-door {
+            position: relative;
+            /* ... otros estilos ... */
+        }
+        .salon-actions {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .salon-door:hover .salon-actions { opacity: 1; }
+        .salon-actions a { padding: 8px 15px; border-radius: 8px; color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9rem; }
+        .edit-btn { background-color: #42a5f5; }
+        .delete-btn { background-color: #ef5350; }
+
+        .student-table { width: 100%; border-collapse: collapse; }
+        .student-table th, .student-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .student-table th { background-color: #ede7f6; font-weight: bold; }
+        .student-table .actions a { margin-right: 10px; color: #555; text-decoration: none; }
+        .student-table .actions a:hover { color: #000; }
+
+        .profesor-table { width: 100%; border-collapse: collapse; }
+        .profesor-table th, .profesor-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .profesor-table th { background-color: #fdebd0; font-weight: bold; }
+        .profesor-table .salon-tag { background: #fdebd0; color: #e65100; padding: 5px 10px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; }
+
+        .guia-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .guia-card {
+            background: #fff; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.07);
+            display: flex; flex-direction: column;
+        }
+        .guia-card-header {
+            padding: 20px; border-radius: 15px 15px 0 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23e0f7fa" fill-opacity="1" d="M0,128L80,149.3C160,171,320,213,480,208C640,203,800,149,960,138.7C1120,128,1280,160,1360,176L1440,192L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>');
+            background-size: cover; background-position: bottom; height: 80px;
+            font-weight: bold; font-size: 1.2rem;
+        }
+        .guia-card-body { padding: 20px; flex-grow: 1; }
+        .guia-card-footer { padding: 20px; border-top: 1px solid #eee; }
+        .salon-tag { background: #ede7f6; color: #5e35b1; padding: 5px 10px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="top-navbar" style="width:98%;background:#e7ebf2;box-shadow:0 2px 8px rgba(40,53,147,0.07);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;position:fixed;top:0;left:0;z-index:100;overflow-x:auto;">
+        {% block navbar %}
+        <div class="nav-left" style="display:flex;align-items:center;gap:36px;flex-wrap:nowrap;position:relative;z-index:10000;">
+            <a href="{% url 'dashboard_admin' %}" class="nav-label"><i class="fa-solid fa-house"></i>Inicio</a>
+            <div class="nav-label" id="inventario-menu-toggle" style="position:relative;cursor:pointer;">
+                <i class="fa-solid fa-boxes-stacked"></i>Inventario <i class="fa-solid fa-caret-down"></i>
+            </div>
+            <a href="{% url 'estudiantes_admin' %}" class="nav-label"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a>
+            <a href="{% url 'guias_admin' %}" class="nav-label"><i class="fa-solid fa-book"></i>Guías</a>
+            <a href="{% url 'jornadas_admin' %}" class="nav-label"><i class="fa-solid fa-calendar-days"></i>Jornadas</a>
+            <a href="{% url 'salones_admin' %}" class="nav-label"><i class="fa-solid fa-school"></i>Salones</a>
+            <a href="{% url 'profesores_admin' %}" class="nav-label"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a>
+        </div>
+        <div class="nav-right" style="display:flex;align-items:center;gap:16px;min-width:120px;justify-content:flex-end;z-index:10000;flex-shrink:0;">
+            <a href="{% url 'perfil_admin' %}" class="perfil-btn" style="display:flex;align-items:center;gap:8px;background:#e0f7fa;color:#181828;font-weight:700;font-size:1.15rem;border-radius:10px;padding:8px 18px;border:none;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;text-decoration:none;white-space:nowrap;"><i class="fa-regular fa-user"></i>Perfil</a>
+            <a href="{% url 'logout' %}" class="logout-btn" style="display:inline-flex;align-items:center;justify-content:center;background:#ede7f6;color:#181828;border-radius:10px;padding:8px 14px;border:none;font-size:1.2rem;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;margin-left:8px;visibility:visible;opacity:1;white-space:nowrap;z-index:12000;position:relative;"><i class="fa-solid fa-right-from-bracket"></i></a>
+        </div>
+        <div id="inventario-menu">
+            <a href="{% url 'reactivos_admin' %}">Reactivos Químicos</a>
+            <a href="{% url 'materiales_admin' %}">Materiales</a>
+            <a href="{% url 'equipos_admin' %}">Equipos</a>
+        </div>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggle = document.getElementById('inventario-menu-toggle');
+            var menu = document.getElementById('inventario-menu');
+            function closeMenu() {
+                menu.style.display = 'none';
+                toggle.classList.remove('active');
+            }
+            function openMenu() {
+                var rect = toggle.getBoundingClientRect();
+                menu.style.left = rect.left + 'px';
+                menu.style.top = (rect.bottom + window.scrollY) + 'px';
+                menu.style.display = 'block';
+                toggle.classList.add('active');
+            }
+            if (toggle && menu) {
+                toggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (menu.style.display === 'block') {
+                        closeMenu();
+                    } else {
+                        openMenu();
+                    }
+                });
+                document.addEventListener('click', function(e) {
+                    if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+                        closeMenu();
+                    }
+                });
+            }
+        });
+        </script>
+        {% endblock %}
     </div>
-    <a href="/adminlab/estudiantes/" class="nav-label"><i class="fa-solid fa-user-graduate"></i>Estudiantes</a>
-    <a href="/adminlab/guias/" class="nav-label"><i class="fa-solid fa-book"></i>Guías</a>
-    <a href="/adminlab/jornadas/" class="nav-label"><i class="fa-solid fa-calendar-days"></i>Jornadas</a>
-    <a href="/adminlab/salones/" class="nav-label"><i class="fa-solid fa-school"></i>Salones</a>
-    <a href="/adminlab/profesores/" class="nav-label"><i class="fa-solid fa-chalkboard-teacher"></i>Profesores</a>
-    
-</div>
-<div class="nav-right" style="display:flex;align-items:center;gap:16px;min-width:120px;justify-content:flex-end;z-index:10000;flex-shrink:0;">
-    <a href="#" class="perfil-btn" style="display:flex;align-items:center;gap:8px;background:#e0f7fa;color:#181828;font-weight:700;font-size:1.15rem;border-radius:10px;padding:8px 18px;border:none;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;text-decoration:none;white-space:nowrap;"><i class="fa-regular fa-user"></i>Perfil</a>
-    <a href="/logout/" class="logout-btn" style="display:inline-flex;align-items:center;justify-content:center;background:#ede7f6;color:#181828;border-radius:10px;padding:8px 14px;border:none;font-size:1.2rem;box-shadow:0 2px 8px rgba(25,118,210,0.07);cursor:pointer;transition:background 0.18s,color 0.18s;margin-left:8px;visibility:visible;opacity:1;white-space:nowrap;z-index:12000;position:relative;"><i class="fa-solid fa-right-from-bracket"></i></a>
-</div>
-<!-- Menú fuera del navbar, para stacking correcto -->
-<div id="inventario-menu">
-    <a href="/adminlab/reactivos/">Reactivos Químicos</a>
-    <a href="/adminlab/materiales/">Materiales</a>
-    <a href="/adminlab/equipos/">Equipos</a>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var toggle = document.getElementById('inventario-menu-toggle');
-    var menu = document.getElementById('inventario-menu');
-    function closeMenu() {
-        menu.style.display = 'none';
-        toggle.classList.remove('active');
-    }
-    function openMenu() {
-        var rect = toggle.getBoundingClientRect();
-        menu.style.left = rect.left + 'px';
-        menu.style.top = (rect.bottom + window.scrollY) + 'px';
-        menu.style.display = 'block';
-        toggle.classList.add('active');
-    }
-    if (toggle && menu) {
-        toggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (menu.style.display === 'block') {
-                closeMenu();
-            } else {
-                openMenu();
-            }
-        });
-        document.addEventListener('click', function(e) {
-            if (!toggle.contains(e.target) && !menu.contains(e.target)) {
-                closeMenu();
-            }
-        });
-        toggle.addEventListener('mouseenter', function() {
-            if (window.innerWidth > 900) {
-                openMenu();
-            }
-        });
-        toggle.addEventListener('mouseleave', function() {
-            if (window.innerWidth > 900) {
-                setTimeout(function() {
-                    if (!menu.matches(':hover')) closeMenu();
-                }, 180);
-            }
-        });
-        menu.addEventListener('mouseleave', function() {
-            if (window.innerWidth > 900) {
-                closeMenu();
-            }
-        });
-    }
-});
-</script>
-{% endblock %}
-{% block content %}
-<!-- Contenido específico de cada vista adminlab -->
-{% endblock %}
-{% block footer %}
-<footer style="width:100%;text-align:center;padding:16px 0 8px 0;background:#eceff1;color:#181828;font-size:1.05rem;font-weight:600;letter-spacing:0.5px;margin-top:40px;">
-    Laboratorio Virtual 2025
-</footer>
-{% endblock %}
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+    <footer class="footer">
+        {% block footer %}
+        Laboratorio Virtual 2025
+        {% endblock %}
+    </footer>
+</body>
+</html>

@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f4f6fb; margin: 0; font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; }
-        .main-content { margin-top: 56px; min-height: calc(100vh - 80px); padding: 0; }
-        .footer { background: #e7ebf2 !important; color: #181828; font-family: 'Poppins', Arial, sans-serif; font-weight: 700; font-size: 1.1rem; text-align: center; padding: 18px 0 10px 0; margin-top: 40px; border-top: none; position: fixed; bottom: 0; width: 100%; }
+        .main-content { margin-top: 56px; min-height: calc(100vh - 80px); padding: 0; overflow-y: auto; }
+        .footer { background: #e7ebf2 !important; color: #181828; font-family: 'Poppins', Arial, sans-serif; font-weight: 700; font-size: 1.1rem; text-align: center; padding: 18px 0 10px 0; margin-top: 40px; border-top: none; position: fixed; bottom: 0; width: 100%; z-index: 2; }
         .nav-label {
             display: flex;
             align-items: center;
@@ -23,9 +23,284 @@
             border: none;
             font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
         }
+
+        .dashboard-background {
+            background-color: #fff;
+            position: relative;
+        }
+
+        .dashboard-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 15% 20%, #e1d5f5 40px, transparent 41px),
+                radial-gradient(circle at 80% 10%, #f7e4c3 30px, transparent 31px),
+                radial-gradient(circle at 50% 50%, #d4f0f0 25px, transparent 26px),
+                radial-gradient(circle at 20% 80%, #f7e4c3 20px, transparent 21px),
+                radial-gradient(circle at 90% 70%, #e1d5f5 35px, transparent 36px),
+                radial-gradient(circle at 5% 95%, #d4f0f0 15px, transparent 16px),
+                radial-gradient(circle at 60% 85%, #f7e4c3 22px, transparent 23px);
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .jornada-card {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 8px;
+            margin-bottom: 16px;
+            width: 300px;
+            transition: transform 0.2s;
+        }
+
+        .jornada-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .jornada-card .nombre {
+            background-color: #f7e4c3;
+            color: #000;
+            font-weight: bold;
+            padding: 16px 24px;
+            border-radius: 8px;
+            margin-right: 16px;
+        }
+
+        .jornada-card .fecha {
+            color: #333;
+            font-size: 1rem;
+        }
+
+        /* Estilos para Resultados por Guía */
+        .main-container {
+            padding: 25px;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .create-guia-btn {
+            background-color: #e0f7fa;
+            color: #00796b;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .salon-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+        .salon-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: bold;
+        }
+        .salon-tab.active {
+            background-color: #f7e4c3;
+            border-radius: 8px 8px 0 0;
+        }
+        .guia-selector {
+            background-color: #f7e4c3;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            margin-bottom: 15px;
+        }
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .student-card {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            overflow: hidden;
+            padding: 10px;
+        }
+        .student-name {
+            background-color: #d4f0f0;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        .student-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-entregado {
+            color: #2e7d32;
+        }
+        .status-no-entregado {
+            color: #d32f2f;
+        }
+
+        /* Estilos para Tablas de Materiales */
+        .table-container {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+        }
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .styled-table thead th {
+            background-color: #fdebd0;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        .styled-table thead th:first-child { border-radius: 8px 0 0 8px; }
+        .styled-table thead th:last-child { border-radius: 0 8px 8px 0; }
+        .styled-table tbody {
+            display: block;
+            max-height: 300px; /* Altura máxima antes de que aparezca el scroll */
+            overflow-y: auto;
+        }
+        .styled-table thead, .styled-table tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+        .styled-table tbody tr {
+            border-bottom: 1px solid #eee;
+        }
+        .styled-table td {
+            padding: 12px 15px;
+        }
+        /* Estilo del scrollbar */
+        .styled-table tbody::-webkit-scrollbar {
+            width: 8px;
+        }
+        .styled-table tbody::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .styled-table tbody::-webkit-scrollbar-thumb {
+            background: #fdebd0;
+            border-radius: 10px;
+        }
+        .styled-table tbody::-webkit-scrollbar-thumb:hover {
+            background: #f7e4c3;
+        }
+
+        /* Estilos para Guia Form */
+        .guia-form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            grid-template-areas:
+                "upload procedure results"
+                "upload procedure additional"
+                "conclusions objectives references"
+                "materials jornadas-salones upload-final"
+                "instruments jornadas-salones download-pdf";
+        }
+        .form-card { background-color: #fff; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
+        .form-card h4 { margin-top: 0; }
+        .form-card textarea, .form-card select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+        }
+        .upload-area { grid-area: upload; display: flex; align-items: center; justify-content: center; border: 2px dashed #ccc; flex-direction: column; }
+        .procedure-area { grid-area: procedure; }
+        .results-area { grid-area: results; }
+        .additional-area { grid-area: additional; }
+        .conclusions-area { grid-area: conclusions; }
+        .objectives-area { grid-area: objectives; }
+        .references-area { grid-area: references; }
+        .materials-area { grid-area: materials; }
+        .instruments-area { grid-area: instruments; }
+        .jornadas-salones-area { grid-area: jornadas-salones; }
+        .upload-final-area { grid-area: upload-final; }
+        .download-pdf-area { grid-area: download-pdf; }
+        
+        .radio-card-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .radio-card input[type="radio"] { display: none; }
+        .radio-card label { 
+            display: block; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            background-color: #f0f0f0; 
+            cursor: pointer; 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 0.9rem;
+        }
+        .radio-card input[type="radio"]:checked + label { 
+            background-color: #f7e4c3; 
+            color: #333; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-submit-guia { background-color: #e0f7fa; color: #00796b; border: none; border-radius: 10px; padding: 10px 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-download-pdf { background-color: #d4f0f0; color: #00695c; border: none; border-radius: 10px; padding: 15px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; }
+
+        /* Estilos para Salon Estudiantes */
+        .estudiantes-container { padding: 25px; }
+        .estudiantes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .estudiante-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.07);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .estudiante-foto {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid #f7e4c3;
+        }
+        .estudiante-info h4 { margin: 10px 0 5px; font-size: 1.2rem; }
+        .estudiante-info p { margin: 0; color: #666; }
     </style>
 </head>
-<body>
+<body class="dashboard-background">
     <div class="top-navbar" style="width:98%;background:#e7ebf2;box-shadow:0 2px 8px rgba(40,53,147,0.07);display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:56px;position:fixed;top:0;left:0;z-index:100;overflow-x:auto;">
         {% block navbar %}
         <div class="nav-left" style="display:flex;align-items:center;gap:36px;flex-wrap:nowrap;">

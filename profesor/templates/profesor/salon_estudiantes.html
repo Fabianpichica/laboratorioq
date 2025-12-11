@@ -1,24 +1,47 @@
 {% extends 'profesor/base.html' %}
+{% load static %}
 {% block title %}Estudiantes del salón{% endblock %}
 {% block content %}
-<div class="dashboard-header">
-    <i class="fas fa-users"></i>
-    <h2>Estudiantes en el salón: {{ salon.nombre }}</h2>
-</div>
-<ul class="salon-estudiantes-list">
-    {% for estudiante in estudiantes %}
-    <li>
-        {% if estudiante.foto and estudiante.foto.url %}
-            <img src="{{ estudiante.foto.url }}" alt="Foto de {{ estudiante.nombre }}" class="estudiante-foto">
-        {% else %}
-            <img src="/static/img/default-user.png" alt="Sin foto" class="estudiante-foto">
-        {% endif %}
-        <div class="estudiante-info">
-            <strong>{{ estudiante.nombre }}</strong><br>
-            {{ estudiante.email }}<br>
-            {{ estudiante.documento }}
+<div class="estudiantes-container">
+    <div class="header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 2rem; font-weight: 700; margin: 0;">Estudiantes en el salón: {{ salon.nombre }}</h2>
+        <input type="text" id="student-search" placeholder="Buscar estudiante..." style="padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; width: 300px;">
+    </div>
+    <div class="estudiantes-grid">
+        {% for estudiante in estudiantes %}
+        <div class="estudiante-card">
+            {% if estudiante.foto and estudiante.foto.url %}
+                <img src="{{ estudiante.foto.url }}" alt="Foto de {{ estudiante.nombre }}" class="estudiante-foto">
+            {% else %}
+                <img src="{% static 'img/default-user.png' %}" alt="Sin foto" class="estudiante-foto">
+            {% endif %}
+            <div class="estudiante-info">
+                <h4>{{ estudiante.nombre }}</h4>
+                <p>{{ estudiante.email }}</p>
+                <p>Documento: {{ estudiante.documento }}</p>
+            </div>
         </div>
-    </li>
-    {% endfor %}
-</ul>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('student-search');
+    const studentCards = document.querySelectorAll('.estudiante-card');
+
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        studentCards.forEach(function(card) {
+            const studentName = card.querySelector('.estudiante-info h4').textContent.toLowerCase();
+            if (studentName.includes(searchTerm)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

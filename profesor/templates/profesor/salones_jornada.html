@@ -1,0 +1,24 @@
+{% extends 'profesor/base.html' %}
+{% block content %}
+<main class="profesor-main-content" style="width:100%;max-width:900px;margin: 20px auto; padding: 40px;">
+    <div style="font-family: 'Poppins', sans-serif;">
+        <a href="{% url 'dashboard_profesor' %}" style="text-decoration: none; color: #555; margin-bottom: 20px; display: inline-block;">&larr; Volver al Dashboard</a>
+        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 0;">Salones de la Jornada: {{ jornada.nombre }}</h1>
+        <p style="font-size: 1.2rem; color: #555; margin-top: 5px;">{{ jornada.fecha|date:"M d, Y" }}</p>
+        
+        <div class="salones-container" style="margin-top: 40px;">
+            {% if salones %}
+                <ul style="list-style: none; padding: 0;">
+                    {% for salon in salones %}
+                        <li style="background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 16px;">
+                            <a href="{% url 'salon_estudiantes' salon_id=salon.id jornada_id=jornada.id %}" style="text-decoration: none; color: #333; font-size: 1.2rem; font-weight: bold;">{{ salon.nombre }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No hay salones asignados a esta jornada.</p>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}

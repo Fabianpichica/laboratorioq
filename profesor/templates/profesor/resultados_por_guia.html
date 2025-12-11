@@ -1,53 +1,170 @@
 {% extends 'profesor/base.html' %}
 {% block title %}Resultados por Guía{% endblock %}
 {% block content %}
-<h3 style="color:#1a237e;font-size:1.15rem;margin-bottom:18px;"><i class="fas fa-book"></i> Guías asignadas por salón</h3>
-{% for salon_info in salones_info %}
-    <div class="guia-entregas-box">
-        <h3 style="color:#283593;">{{ salon_info.salon.nombre }}</h3>
+<div class="main-container" style="margin: 100px auto; max-width: 1200px;">
+    <div class="header-flex">
+        <h3 style="color:#1a237e;font-size:1.5rem;margin:0;"><i class="fas fa-book"></i> Guías asignadas por salón</h3>
+        <a href="{% url 'guias_profesor' %}" class="create-guia-btn">Crear Guía +</a>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <select onchange="filterSalones(this.value)" class="guia-selector">
+            <option value="all">Todas las Jornadas</option>
+            {% for jornada in jornadas %}
+                <option value="jornada-{{ jornada.id }}">{{ jornada.nombre }} - {{ jornada.fecha }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="salon-tabs">
+        {% for salon_info in salones_info %}
+            <button class="salon-tab {% if forloop.first %}active{% endif %}" data-jornada="jornada-{{ salon_info.jornada_id }}" onclick="openSalon(event, 'salon-{{ salon_info.salon.id }}')">{{ salon_info.salon.nombre }}</button>
+        {% endfor %}
+    </div>
+
+    {% for salon_info in salones_info %}
+    <div id="salon-{{ salon_info.salon.id }}" class="salon-content" {% if not forloop.first %}style="display:none;"{% endif %}>
+        <select class="guia-selector" onchange="showGuia(this, 'salon-{{ salon_info.salon.id }}')">
+            <option value="">Seleccione una guía</option>
+            {% for guia_info in salon_info.guias_info %}
+                <option value="guia-{{ guia_info.guia.id }}">{{ guia_info.guia.titulo }}</option>
+            {% endfor %}
+        </select>
+
         {% for guia_info in salon_info.guias_info %}
-            <div style="margin-bottom:18px;">
-                <h4>{{ guia_info.guia.titulo }}</h4>
-                <ul>
+            <div id="guia-{{ guia_info.guia.id }}" class="guia-content" style="display:none;">
+                <div class="student-grid">
                     {% for estudiante, informe in guia_info.entregas.items %}
-                        <li>
-                            <strong>{{ estudiante.nombre|default:'Sin nombre' }}</strong>:
-                            {% if informe %}
-                                <span class="entregado"><i class="fas fa-check-circle"></i> Entregado</span>
-                                <br><strong>Nota:</strong> {{ informe.nota|truncatechars:80 }}
-                                <br><strong>Fecha:</strong> {{ informe.fecha|date:'d/m/Y H:i' }}
-                                {% if informe.archivo %}
-                                    {% with informe.archivo.url|lower as fileurl %}
-                                        {% if fileurl|slice:"-4:" == ".pdf" %}
-                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file-pdf"></i> Ver PDF</a>
-                                        {% elif fileurl|slice:"-4:" == ".doc" or fileurl|slice:"-5:" == ".docx" %}
-                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file-word"></i> Ver Word</a>
-                                        {% elif fileurl|slice:"-4:" == ".txt" %}
-                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file-alt"></i> Ver TXT</a>
-                                        {% elif fileurl|slice:"-4:" == ".odt" %}
-                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file-alt"></i> Ver ODT</a>
-                                        {% elif fileurl|slice:"-4:" == ".jpg" or fileurl|slice:"-5:" == ".jpeg" or fileurl|slice:"-4:" == ".png" or fileurl|slice:"-4:" == ".gif" %}
-                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-image"></i> Ver imagen</a>
-                                        {% else %}
-                                            <br><a href="{{ informe.archivo.url }}" target="_blank" style="color:#ffb300;font-weight:500;"><i class="fas fa-file"></i> Descargar archivo</a>
-                                        {% endif %}
-                                    {% endwith %}
+                        <div class="student-card">
+                            <div class="student-name">{{ estudiante.nombre|default:'Sin nombre' }}</div>
+                            <div class="student-status">
+                                {% if informe %}
+                                    <button class="btn-view-report"
+                                            data-informe-id="{{ informe.id }}"
+                                            data-student-name="{{ estudiante.nombre }}"
+                                            data-report-content="{{ informe.contenido|escapejs }}"
+                                            data-feedback="{{ informe.retroalimentacion|default:''|escapejs }}"
+                                            data-image-url="{% if informe.imagen %}{{ informe.imagen.url }}{% endif %}"
+                                            data-file-url="{% if informe.archivo %}{{ informe.archivo.url }}{% endif %}"
+                                            onclick="openModal(this)">Ver Entrega</button>
+                                {% else %}
+                                    <span class="status-no-entregado"><i class="fas fa-times-circle"></i> NO Entregado</span>
                                 {% endif %}
-                                <form method="post" style="margin-top:10px;">
-                                    {% csrf_token %}
-                                    <label for="retroalimentacion_{{ informe.id }}" style="font-weight:600;color:#3949ab;">Retroalimentación:</label>
-                                    <textarea name="retroalimentacion" id="retroalimentacion_{{ informe.id }}" rows="2" style="width:100%;border-radius:8px;margin-bottom:6px;">{{ informe.retroalimentacion }}</textarea>
-                                    <input type="hidden" name="informe_id" value="{{ informe.id }}">
-                                    <button type="submit" style="background:#1976d2;color:#fff;border:none;padding:4px 14px;border-radius:6px;font-weight:600;">Guardar</button>
-                                </form>
-                            {% else %}
-                                <span class="no-entregado"><i class="fas fa-times-circle"></i> No entregado</span>
-                            {% endif %}
-                        </li>
+                            </div>
+                        </div>
                     {% endfor %}
-                </ul>
+                </div>
             </div>
         {% endfor %}
     </div>
-{% endfor %}
+    {% endfor %}
+</div>
+
+<div id="report-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h3 id="modal-student-name"></h3>
+        <div id="modal-report-content"></div>
+        <div id="modal-attachments" style="margin-top: 15px;"></div>
+        <form method="post" id="feedback-form">
+            {% csrf_token %}
+            <input type="hidden" name="informe_id" id="modal-informe-id">
+            <textarea name="retroalimentacion" id="modal-feedback" placeholder="Escribe tu retroalimentación aquí..."></textarea>
+            <button type="submit">Guardar Retroalimentación</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.modal { position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 15px; width: 60%; }
+.close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+#modal-report-content { white-space: pre-wrap; background: #f0f0f0; padding: 15px; border-radius: 8px; margin-bottom: 15px; max-height: 300px; overflow-y: auto; }
+#modal-feedback { width: 100%; height: 100px; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
+.btn-view-report { background-color: #e0f7fa; color: #00796b; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+</style>
+
+<script>
+function filterSalones(jornadaId) {
+    var salontabs = document.querySelectorAll('.salon-tab');
+    salontabs.forEach(function(tab) {
+        if (jornadaId === 'all' || tab.dataset.jornada === jornadaId) {
+            tab.style.display = '';
+        } else {
+            tab.style.display = 'none';
+        }
+    });
+    var firstVisibleTab = document.querySelector('.salon-tab[style=""]');
+    if (firstVisibleTab) {
+        firstVisibleTab.click();
+    } else {
+        var saloncontent = document.getElementsByClassName("salon-content");
+        for (var i = 0; i < saloncontent.length; i++) {
+            saloncontent[i].style.display = "none";
+        }
+    }
+}
+
+function openSalon(evt, salonId) {
+    var i, saloncontent, salontabs;
+    saloncontent = document.getElementsByClassName("salon-content");
+    for (i = 0; i < saloncontent.length; i++) {
+        saloncontent[i].style.display = "none";
+    }
+    salontabs = document.getElementsByClassName("salon-tab");
+    for (i = 0; i < salontabs.length; i++) {
+        salontabs[i].className = salontabs[i].className.replace(" active", "");
+    }
+    document.getElementById(salonId).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+function showGuia(selectElement, salonId) {
+    var salon = document.getElementById(salonId);
+    var guiaContents = salon.getElementsByClassName('guia-content');
+    for (var i = 0; i < guiaContents.length; i++) {
+        guiaContents[i].style.display = 'none';
+    }
+    var selectedGuiaId = selectElement.value;
+    if (selectedGuiaId) {
+        document.getElementById(selectedGuiaId).style.display = 'block';
+    }
+}
+
+function openModal(button) {
+    const informeId = button.dataset.informeId;
+    const studentName = button.dataset.studentName;
+    const reportContent = button.dataset.reportContent;
+    const feedback = button.dataset.feedback;
+    const imageUrl = button.dataset.imageUrl;
+    const fileUrl = button.dataset.fileUrl;
+
+    document.getElementById('modal-informe-id').value = informeId;
+    document.getElementById('modal-student-name').innerText = 'Informe de: ' + studentName;
+    document.getElementById('modal-report-content').innerText = reportContent;
+    document.getElementById('modal-feedback').value = feedback;
+
+    const attachmentsContainer = document.getElementById('modal-attachments');
+    attachmentsContainer.innerHTML = ''; // Limpiar contenedor
+
+    if (imageUrl) {
+        attachmentsContainer.innerHTML += `<h5>Imagen Adjunta:</h5><img src="${imageUrl}" style="max-width: 100%; border-radius: 8px;">`;
+    }
+    if (fileUrl) {
+        attachmentsContainer.innerHTML += `<h5>Archivo Adjunto:</h5><a href="${fileUrl}" target="_blank">Descargar Archivo</a>`;
+    }
+
+    document.getElementById('report-modal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('report-modal').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    if(document.querySelector('.salon-tab')){
+         document.querySelector('.salon-tab').click();
+    }
+});
+</script>
 {% endblock %}

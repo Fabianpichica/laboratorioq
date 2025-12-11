@@ -5,7 +5,6 @@ from core.views import buscar_quimico_local
 urlpatterns = [
     path('', views.landing_view, name='landing'),
     path('login/', views.login_view, name='login'),
-    path('register/', views.register_view, name='register'),
     path('dashboard/', views.dashboard_aprendiz, name='dashboard_aprendiz'),
     path('cuaderno/', views.cuaderno_aprendiz, name='cuaderno_aprendiz'),
     path('cuaderno/informe/<int:informe_id>/', views.informe_detalle, name='informe_detalle'),

@@ -45,4 +45,5 @@ urlpatterns = [
     path('registrar-profesor/', views.registrar_profesor, name='registrar_profesor'),
     path('profesores/editar/<int:profesor_id>/', views.editar_profesor, name='editar_profesor'),
     path('profesores/eliminar/<int:profesor_id>/', views.eliminar_profesor, name='eliminar_profesor'),
+    path('perfil/', views.perfil_admin, name='perfil_admin'),
 ]

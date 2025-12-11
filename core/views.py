@@ -57,22 +57,6 @@ def login_view(request):
                 messages.error(request, 'Documento o contraseña incorrectos.')
     return render(request, 'login.html')
 
-def register_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        role = request.POST.get('role')
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'El usuario ya existe.')
-        elif role not in ['aprendiz', 'profesor', 'instructor']:
-            messages.error(request, 'Debes seleccionar un rol válido.')
-        else:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            Profile.objects.create(user=user, role=role)
-            messages.success(request, 'Usuario creado correctamente. Puedes iniciar sesión.')
-            return redirect('login')
-    return render(request, 'register.html')
 
 def landing_view(request):
     return render(request, 'landing.html')

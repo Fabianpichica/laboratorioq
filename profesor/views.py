@@ -2,8 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Jornada, Salon, Estudiante, Guia
 from django.contrib.auth.models import User
-from core.models import CuadernoEntry, Quimico
-from adminlab.models import Material, Equipo
+from core.models import CuadernoEntry, Quimico, Material, Equipo
 
 @login_required
 def dashboard_profesor(request):
@@ -51,7 +50,7 @@ def salon_estudiantes(request, salon_id, jornada_id=None):
 
 @login_required
 def guias_profesor(request):
-    jornadas = Jornada.objects.filter(profesores=request.user)
+    jornadas = Jornada.objects.filter(profesores=request.user).prefetch_related('salones')
     salones = Salon.objects.filter(jornadas__profesores=request.user).distinct()
     quimicos = Quimico.objects.all()
     # Agregar materiales y equipos del inventario
@@ -62,7 +61,7 @@ def guias_profesor(request):
     if request.method == 'POST' and 'asignar_guia' in request.POST:
         salon_id = request.POST.get('salon_id')
         archivo = request.FILES.get('archivo_guia')
-        titulo = request.POST.get('titulo', 'Guía sin título')
+        titulo = request.POST.get('main-title', 'Guía sin título')
         descripcion = request.POST.get('descripcion', '')
         if salon_id and archivo:
             salon = Salon.objects.get(id=salon_id)
@@ -84,23 +83,36 @@ def resultados_por_guia(request):
     # Solo profesores
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'profesor':
         return redirect('/')
+
+    if request.method == 'POST' and 'informe_id' in request.POST:
+        informe_id = request.POST.get('informe_id')
+        retroalimentacion = request.POST.get('retroalimentacion', '').strip()
+        try:
+            informe = CuadernoEntry.objects.get(id=informe_id)
+            informe.retroalimentacion = retroalimentacion if retroalimentacion else None
+            informe.save()
+        except CuadernoEntry.DoesNotExist:
+            # Manejar el caso en que el informe no se encuentre
+            pass
+        return redirect(request.path_info) # Redirigir para evitar reenvío
     jornadas = Jornada.objects.filter(profesores=request.user)
-    salones = Salon.objects.filter(jornadas__profesores=request.user).distinct()
     salones_info = []
-    for salon in salones:
-        estudiantes = salon.estudiantes.all()
-        guias = Guia.objects.filter(salones=salon).distinct()
-        guias_info = []
-        for guia in guias:
-            entregas = {}
-            for estudiante in estudiantes:
-                user = User.objects.filter(username=estudiante.documento).first()
-                informe = None
-                if user:
-                    informe = CuadernoEntry.objects.filter(aprendiz=user, guia=guia).first()
-                entregas[estudiante] = informe
-            guias_info.append({'guia': guia, 'entregas': entregas})
-        salones_info.append({'salon': salon, 'guias_info': guias_info})
+    for jornada in jornadas:
+        salones = Salon.objects.filter(jornadas=jornada).distinct()
+        for salon in salones:
+            estudiantes = salon.estudiantes.filter(jornada=jornada)
+            guias = Guia.objects.filter(salones=salon).distinct()
+            guias_info = []
+            for guia in guias:
+                entregas = {}
+                for estudiante in estudiantes:
+                    user = User.objects.filter(username=estudiante.documento).first()
+                    informe = None
+                    if user:
+                        informe = CuadernoEntry.objects.filter(aprendiz=user, guia=guia).first()
+                    entregas[estudiante] = informe
+                guias_info.append({'guia': guia, 'entregas': entregas})
+            salones_info.append({'salon': salon, 'jornada_id': jornada.id, 'guias_info': guias_info})
     return render(request, 'profesor/resultados_por_guia.html', {
         'salones_info': salones_info,
         'jornadas': jornadas
@@ -108,7 +120,7 @@ def resultados_por_guia(request):
 
 @login_required
 def materiales_profesor(request):
-    from adminlab.models import Material, Equipo
+    from core.models import Material, Equipo
     from core.models import Quimico
     materiales = Material.objects.all()
     equipos = Equipo.objects.all()
@@ -122,3 +134,9 @@ def materiales_profesor(request):
 @login_required
 def perfil_profesor(request):
     return render(request, 'profesor/perfil_profesor.html', {'user': request.user})
+
+@login_required
+def salones_jornada_view(request, jornada_id):
+    jornada = get_object_or_404(Jornada, id=jornada_id, profesores=request.user)
+    salones = jornada.salones.all()
+    return render(request, 'profesor/salones_jornada.html', {'jornada': jornada, 'salones': salones})

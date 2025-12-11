@@ -1,58 +1,30 @@
 {% extends 'adminlab/base.html' %}
 {% load static %}
 {% block content %}
-<main class="admin-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
-    <div class="card-admin" style="padding:32px 18px 24px 18px;width:100%;max-width:1200px;margin:auto;background:#fff;border-radius:18px;box-shadow:0 4px 18px rgba(40,53,147,0.09);">
-        <div class="admin-header" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 0;margin-bottom:32px;">
-            <h1 style="color:#283593;font-size:2.2rem;font-weight:800;margin:0;letter-spacing:1px;display:flex;align-items:center;gap:10px;"><i class="fa-solid fa-book"></i> Guías</h1>
-            <div class="admin-user" style="font-size:1.1rem;color:#1976d2;background:#f5f7fa;border-radius:20px;padding:8px 18px;box-shadow:0 2px 8px rgba(25,118,210,0.07);display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-user-shield"></i> Panel de guías</div>
-        </div>
-        <div class="guias-section" style="margin-bottom:40px;">
-            <a href="{% url 'agregar_guia_admin' %}" class="btn-agregar" style="display:inline-block;background:linear-gradient(90deg,#1976d2,#283593);color:#fff;padding:10px 22px;border-radius:8px;font-weight:600;text-decoration:none;margin-bottom:18px;margin-top:8px;transition:background 0.2s;box-shadow:0 2px 8px rgba(25,118,210,0.08);font-size:1.08rem;letter-spacing:0.5px;"><i class="fa-solid fa-plus"></i> Agregar Guía</a>
-            <div style="overflow-x:auto;width:100%;">
-                <table class="guias-table" style="min-width:600px;width:100%;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(25,118,210,0.07);border-collapse:separate;border-spacing:0;overflow:hidden;margin-bottom:32px;">
-                    <thead>
-                        <tr>
-                            <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;font-weight:700;padding:14px 10px;text-align:left;">Título</th>
-                            <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;font-weight:700;padding:14px 10px;text-align:left;">Descripción</th>
-                            <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;font-weight:700;padding:14px 10px;text-align:left;">Archivo</th>
-                            <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;font-weight:700;padding:14px 10px;text-align:left;">Salones asignados</th>
-                            <th style="background:#e3e6ea;color:#283593;font-size:1.05rem;font-weight:700;padding:14px 10px;text-align:left;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for g in guias %}
-                        <tr style="border-bottom:1px solid #f0f2f7;">
-                            <td style="padding:12px 10px;vertical-align:middle;">{{ g.titulo }}</td>
-                            <td style="padding:12px 10px;vertical-align:middle;">{{ g.descripcion }}</td>
-                            <td style="padding:12px 10px;vertical-align:middle;">{% if g.archivo %}<a href="{{ g.archivo.url }}" target="_blank" style="color:#1976d2;font-weight:500;text-decoration:none;"><i class="fa-solid fa-file-arrow-down"></i> Descargar</a>{% else %}-{% endif %}</td>
-                            <td style="padding:12px 10px;vertical-align:middle;">{% for s in g.salones.all %}<span style="background:#e3e6ea;color:#283593;padding:3px 10px;border-radius:12px;font-size:0.98rem;margin-right:4px;">{{ s.nombre }}</span>{% endfor %}</td>
-                            <td style="white-space:nowrap;padding:12px 10px;vertical-align:middle;">
-                                <form method="post" action="{% url 'eliminar_guia_admin' g.id %}" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar esta guía?');" class="btn-eliminar" style="background:linear-gradient(90deg,#e53935,#d32f2f);color:#fff;padding:6px 16px;border-radius:8px;font-weight:700;border:none;cursor:pointer;font-size:1rem;transition:background 0.2s;display:inline-flex;align-items:center;gap:6px;"><i class="fa-solid fa-trash"></i> Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="5" style="padding:18px 10px;text-align:center;color:#888;font-size:1.08rem;">No hay guías registradas.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div style="padding: 40px; max-width: 1200px; margin: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h1 style="font-size: 2.5rem; font-weight: 800;"><i class="fas fa-book"></i> GUIAS</h1>
+        <a href="{% url 'agregar_guia_admin' %}" style="background: #e0f7fa; color: #00796b; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">Agregar Guía</a>
+    </div>
+
+    <div class="guia-grid">
+        {% for guia in guias %}
+        <div class="guia-card">
+            <div class="guia-card-header">{{ guia.titulo }}</div>
+            <div class="guia-card-body">
+                <p><strong>Descripción:</strong> {{ guia.descripcion }}</p>
+                <p><strong>Salones Asignados:</strong></p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    {% for salon in guia.salones.all %}
+                        <span class="salon-tag">{{ salon.nombre }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="guia-card-footer">
+                <a href="{{ guia.archivo.url }}" target="_blank" style="background: #e0f7fa; color: #00796b; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; display: block; text-align: center;">Descargar Archivo <i class="fas fa-download"></i></a>
             </div>
         </div>
+        {% endfor %}
     </div>
-</main>
-<style>
-@media (max-width: 900px) {
-    .admin-header {flex-direction:column;align-items:flex-start;gap:10px;}
-    .card-admin {padding:18px 6px;}
-}
-@media (max-width: 600px) {
-    .card-admin {padding:10px 2px;}
-    .guias-table th, .guias-table td {font-size:0.98rem;padding:10px 6px;}
-    .btn-agregar {font-size:1rem;padding:8px 12px;}
-    .btn-eliminar {font-size:0.97rem;padding:5px 10px;}
-}
-</style>
+</div>
 {% endblock %}

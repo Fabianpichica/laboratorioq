@@ -1,45 +1,35 @@
 {% extends 'adminlab/base.html' %}
 {% load static %}
 {% block content %}
-<main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
-    <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
-        <h1 style="font-size:2.1rem;font-weight:800;margin-bottom:12px;"><i class="fa-solid fa-flask-vial"></i> Dashboard Administrador</h1>
-        <div style="color:#3949ab;font-weight:600;margin-bottom:18px;"><i class="fa-solid fa-user-shield"></i> Panel de control</div>
-        <div class="admin-cards" style="display:flex;gap:32px;margin-bottom:40px;flex-wrap:wrap;">
-            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
-                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Reactivos</div>
-                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ quimicos|length }}</div>
-                <a href="/adminlab/inventario/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver inventario</a>
-            </div>
-            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
-                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Estudiantes</div>
-                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ estudiantes|length }}</div>
-                <a href="/adminlab/estudiantes/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver estudiantes</a>
-            </div>
-            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
-                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Guías</div>
-                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ guias|length }}</div>
-                <a href="/adminlab/guias/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver guías</a>
-            </div>
-            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
-                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Jornadas</div>
-                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ jornadas|length }}</div>
-                <a href="/adminlab/jornadas/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver jornadas</a>
-            </div>
-            <div class="admin-card" style="background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:32px 28px 24px 28px;min-width:220px;flex:1 1 220px;display:flex;flex-direction:column;align-items:flex-start;transition:box-shadow 0.2s;">
-                <div class="admin-card-title" style="font-size:1.1rem;color:#1976d2;font-weight:700;margin-bottom:8px;">Salones</div>
-                <div class="admin-card-value" style="font-size:2.1rem;color:#283593;font-weight:800;">{{ salones|length }}</div>
-                <a href="/adminlab/salones/" class="admin-card-link" style="margin-top:18px;color:#1976d2;text-decoration:underline;font-size:1rem;font-weight:500;">Ver salones</a>
-            </div>
-        </div>
-        <div class="admin-section" style="margin-top:32px;">
-            <h3 style="color:#283593;font-size:1.3rem;margin-bottom:18px;">Accesos rápidos</h3>
-            <ul style="padding-left:18px;">
-                <li>Gestiona inventario, estudiantes, guías, jornadas y salones desde este panel.</li>
-                <li>Accede al <b>admin clásico</b> para configuraciones avanzadas.</li>
-                <li>Personaliza este dashboard según las necesidades del laboratorio.</li>
-            </ul>
-        </div>
+<div style="padding: 40px; max-width: 1200px; margin: auto;">
+    <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 5px;">Bienvenido, Administrador</h1>
+    <p style="font-size: 1.2rem; color: #555; margin-bottom: 40px;">{{ user.username }}</p>
+
+    <div class="admin-grid">
+        <a href="{% url 'inventario_admin' %}" class="admin-card-new">
+            <div class="card-header inventario"><i class="fas fa-boxes-stacked"></i> INVENTARIO</div>
+            <div class="card-body"></div>
+        </a>
+        <a href="{% url 'estudiantes_admin' %}" class="admin-card-new">
+            <div class="card-header estudiantes"><i class="fas fa-user-graduate"></i> ESTUDIANTES</div>
+            <div class="card-body"></div>
+        </a>
+        <a href="{% url 'profesores_admin' %}" class="admin-card-new">
+            <div class="card-header profesores"><i class="fas fa-chalkboard-teacher"></i> PROFESORES</div>
+            <div class="card-body"></div>
+        </a>
+        <a href="{% url 'salones_admin' %}" class="admin-card-new">
+            <div class="card-header salones"><i class="fas fa-school"></i> SALONES</div>
+            <div class="card-body"></div>
+        </a>
+        <a href="{% url 'guias_admin' %}" class="admin-card-new">
+            <div class="card-header guias"><i class="fas fa-book"></i> GUIAS</div>
+            <div class="card-body"></div>
+        </a>
+        <a href="{% url 'jornadas_admin' %}" class="admin-card-new">
+            <div class="card-header jornadas"><i class="fas fa-calendar-days"></i> JORNADAS</div>
+            <div class="card-body"></div>
+        </a>
     </div>
-</main>
+</div>
 {% endblock %}

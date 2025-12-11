@@ -1,909 +1,264 @@
 {% extends 'profesor/base.html' %}
-{% load static %}
+{% block title %}Crear Guía{% endblock %}
+
 {% block content %}
-    <main class="profesor-main-content" style="width:100%;max-width:1200px;margin:0 auto;">
-        <div style="padding: 24px; width:100%; max-width:1200px; margin:auto;">
-            <div style="display: flex; justify-content: center; align-items: center; margin-bottom:24px;">
-        <title>Agregar Guía</title>
-        <link rel="stylesheet" href="{% static 'styles.css' %}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-        body { background: #f4f6fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        .profesor-main-content { margin: 0 auto; padding: 48px 32px 32px 32px; width: 100%; }
-        @media (max-width: 900px) { .profesor-main-content { padding: 32px 8px 8px 8px; } }
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-            background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
-        }
-        .dashboard-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 40px;
-            margin: 0 auto;
-            min-height: 100vh;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        @media (max-width: 900px) {
-            .dashboard-container {
-                flex-direction: column;
-            }
-            .dashboard-section {
-                padding: 18px 2vw 8vw 2vw;
-                margin-top: 56px;
-                min-width: 0;
-            }
-            .guia-container {
-                flex-direction: column;
-                gap: 12px;
-                padding: 10px 2vw;
-                margin-top: 16px;
-            }
-        }
-        @media (max-width: 600px) {
-            .dashboard-section {
-                padding: 4vw 1vw 8vw 1vw;
-            }
-            .guia-container {
-                padding: 4px 0;
-            }
-            .guia-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
-                padding: 6px 1vw 6px 1vw !important;
-                min-width: 0;
-            }
-        }
-        @media (max-width: 400px) {
-            .dashboard-section {
-                padding: 2vw 0 8vw 0;
-            }
-            .guia-container {
-                padding: 2px 0;
-            }
-            .guia-box, .perfil-aprendiz-card, .cuaderno-box, .materiales-container {
-                padding: 2px 0 2px 0 !important;
-            }
-        }
-        .guia-container {
-            display: flex;
-            flex-direction: row;
-            gap: 32px;
-            padding: 48px 40px 40px 40px;
-            background: #fff;
-            border-radius: 22px;
-            box-shadow: 0 8px 32px rgba(60,72,88,0.13);
-            margin-top: 48px;
-            border: 2.5px solid #e3e6ea;
-            transition: box-shadow 0.2s;
-        }
-        .guia-container:hover {
-            box-shadow: 0 12px 40px rgba(60,72,88,0.18);
-        }
-        .guia-col {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-        }
-        .guia-img-box {
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(120deg, #f4f6fa 60%, #e3e6ea 100%);
-            border: 2.5px dashed #bfc8d6;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-            transition: border 0.2s;
-        }
-        .guia-img-box:hover {
-            border: 2.5px solid #3949ab;
-        }
-        .guia-section {
-            background: linear-gradient(120deg, #f7f9fc 80%, #e3e6ea 100%);
-            border-radius: 18px;
-            box-shadow: 0 4px 18px rgba(60,72,88,0.13);
-            padding: 22px 22px 14px 22px;
-            margin-bottom: 22px;
-            border: 2px solid #d1d9e6;
-            transition: box-shadow 0.2s, border 0.2s, background 0.2s;
-            position: relative;
-        }
-        .guia-section:hover {
-            box-shadow: 0 8px 32px rgba(60,72,88,0.18);
-            border: 2px solid #1976d2;
-            background: linear-gradient(120deg, #e3e6ea 60%, #f7f9fc 100%);
-        }
-        .guia-section label {
-            color: #1a237e;
-            font-size: 1.13rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            display: block;
-            letter-spacing: 0.7px;
-            text-shadow: 0 1px 0 #fff, 0 1.5px 2px #bfc8d6;
-        }
-        .guia-section input[type="text"],
-        .guia-section select,
-        .guia-section textarea {
-            border: 2px solid #bfc8d6;
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 1.13rem;
-            margin-bottom: 12px;
-            background: #f7f9fc;
-            box-shadow: 0 2px 8px rgba(60,72,88,0.06);
-            transition: border 0.2s, box-shadow 0.2s, background 0.2s;
-            color: #222;
-        }
-        .guia-section input[type="text"]:focus,
-        .guia-section select:focus,
-        .guia-section textarea:focus {
-            border: 2px solid #3949ab;
-            outline: none;
-            box-shadow: 0 4px 16px rgba(25,118,210,0.13);
-            background: #e3e6ea;
-        }
-        .guia-section select {
-            min-width: 120px;
-            max-width: 100%;
-            background: linear-gradient(90deg, #f7f9fc 80%, #e3e6ea 100%);
-            color: #3949ab;
-            font-weight: 600;
-        }
-        .guia-section input[type="file"] {
-            background: #f7f9fc;
-            border: 1.5px dashed #bfc8d6;
-            font-size: 1rem;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            padding: 8px 10px;
-            color: #3949ab;
-            transition: border 0.2s;
-        }
-        .guia-section input[type="file"]:hover {
-            border: 1.5px solid #3949ab;
-            background: #e3e6ea;
-        }
-        .guia-section .guia-label {
-            background: linear-gradient(90deg, #e3e6ea 60%, #f7f9fc 100%);
-            color: #3949ab;
-            border-radius: 10px;
-            padding: 10px 22px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            display: inline-block;
-            box-shadow: 0 2px 8px rgba(60,72,88,0.08);
-            font-size: 1.07rem;
-            letter-spacing: 0.5px;
-        }
-        .guia-section:last-child {
-            margin-bottom: 0;
-        }
-        .guia-section select:disabled,
-        .guia-section input:disabled,
-        .guia-section textarea:disabled {
-            background: #e3e6ea;
-            color: #bfc8d6;
-            cursor: not-allowed;
-        }
-        @media (max-width: 900px) {
-            .guia-section {
-                padding: 14px 8px 10px 8px;
-            }
-            .guia-section input[type="text"],
-            .guia-section select,
-            .guia-section textarea {
-                font-size: 1rem;
-                padding: 10px 10px;
-            }
-            .guia-section .guia-label {
-                font-size: 0.98rem;
-                padding: 8px 12px;
-            }
-        }
-        @media (max-width: 600px) {
-            .guia-section {
-                padding: 8px 2px 6px 2px;
-            }
-            .guia-section input[type="text"],
-            .guia-section select,
-            .guia-section textarea {
-                font-size: 0.95rem;
-                padding: 8px 6px;
-            }
-            .guia-section .guia-label {
-                font-size: 0.92rem;
-                padding: 6px 8px;
-            }
-        }
-        .guia-texto-adicional {
-            min-height: 110px;
-            background: #f7f9fc;
-            border: 2px solid #bfc8d6;
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 1.12rem;
-            color: #222;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(60,72,88,0.06);
-        }
-        .no-print {
-            display: block;
-            margin: 40px auto 0 auto;
-            padding: 14px 36px;
-            background: linear-gradient(90deg, #ffb300 60%, #ffa000 100%);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 1.15rem;
-            box-shadow: 0 4px 16px rgba(60,72,88,0.13);
-            transition: background 0.2s;
-        }
-        .no-print:hover {
-            background: linear-gradient(90deg, #ffa000 60%, #ffb300 100%);
-        }
-        .footer {
-            width: 100%;
-            background: #e7ebf2;
-            color: #181828;
-            text-align: center;
-            padding: 16px 0 8px 0;
-            font-size: 1.1rem;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-        }
-        @media print {
-            nav, .navbar, .navbar-top, .navbar-sticky, .navbar-header, .navbar-brand, .navbar-nav, .navbar-right, .navbar-menu, .navbar-container, .top-navbar, .header, header, #navbar {
-                display: none !important;
-                visibility: hidden !important;
-                height: 0 !important;
-                width: 0 !important;
-                min-height: 0 !important;
-                min-width: 0 !important;
-                max-height: 0 !important;
-                max-width: 0 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                border: none !important;
-                box-shadow: none !important;
-                position: static !important;
-            }
-            body, html {
-                height: 100%;
-                width: 100%;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            .profesor-main-content, .guia-container {
-                margin: 0 auto !important;
-                float: none !important;
-                display: block !important;
-                width: 100% !important;
-                min-width: 0 !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
-                align-items: initial !important;
-                justify-content: initial !important;
-            }
-            .guia-container {
-                box-shadow: none !important;
-                border: none !important;
-                background: transparent !important;
-                padding: 0 !important;
-                margin: 0 auto !important;
-            }            .guia-img-box {
-                display: none !important;
-            }
-            .print-only-section {
-                text-align: left !important;
-                margin-bottom: 24px !important;
-                box-sizing: border-box !important;
-                padding: 0.08cm !important;
-                width: 100% !important;
-                max-width: 98% !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
-            .print-only-section div, .print-only-section ul, .print-only-section li, .print-only-section p {
-                text-align: left !important;
-                box-sizing: border-box !important;
-                padding: 0 0.08cm !important;
-                width: 100% !important;
-                max-width: 98% !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
-        }
-        </style>
-</head>
-<body>
-    <div class="profesor-dashboard-wrapper">
-        <main class="profesor-main-content">
-            <div style="padding: 24px; width:100%; max-width:1200px;">
-                 
-                <div style="display: flex; justify-content: center; align-items: center; margin-bottom:24px;">
-                    <h2 id="editable-title" style="text-align:center; margin:0; cursor:pointer; padding: 4px 12px; border-radius: 8px; transition: background 0.2s;">Agregar Título</h2>
-                    <input id="title-input" type="text" value="Agregar Título" style="display:none; font-size:1.4rem; font-weight:700; text-align:center; margin:0; padding:4px 12px; border-radius:8px; border:2px solid #bfc8d6; outline:none; min-width:220px; max-width:400px; background:#f7f9fc;" />
+<style>
+    textarea {
+        resize: none;
+        overflow: hidden;
+        min-height: 50px;
+    }
+    .selected-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .selected-item {
+        background-color: #e0f7fa;
+        color: #00796b;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .remove-item { cursor: pointer; }
+</style>
+<div style="max-width: 1400px; margin: 40px auto; padding: 20px;">
+    <input type="text" id="main-title" value="Crear guía" style="font-size: 2.2rem; font-weight: 800; margin-bottom: 30px; text-align: center; border: none; background: transparent; width: 100%;">
+    
+    {% if mensaje %}
+        <div class="alert alert-success" style="background:#d4edda;color:#155724;padding:10px 18px;border-radius:6px;margin-bottom:18px;">
+            {{ mensaje }}
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="guia-form">
+        {% csrf_token %}
+        <div class="guia-form-grid">
+            <input type="hidden" name="main-title" id="hidden-main-title">
+            
+            <div class="form-card upload-area">
+                <h4>Previsualización</h4>
+                <img id="preview-imagen" src="#" alt="Vista previa" style="display:none; max-width: 100%; max-height: 150px; margin-bottom: 15px; border-radius: 8px;">
+                <input type="file" id="imagen_visual" name="imagen_visual" style="display: none;" onchange="previewImage(event)">
+                <label for="imagen_visual" class="btn-submit-guia" style="cursor: pointer; background-color: #fff; color: #333; border: 1px solid #ccc;">Seleccionar Archivo</label>
+            </div>
+
+            <div class="form-card procedure-area">
+                <h4>Procedimiento/Metodología</h4>
+                <textarea name="procedimiento" id="procedimiento" rows="10"></textarea>
+            </div>
+
+            <div class="form-card results-area">
+                <h4>Resultados esperados</h4>
+                <textarea name="resultados_esperados" id="resultados_esperados" rows="3"></textarea>
+            </div>
+
+            <div class="form-card additional-area">
+                <h4>Texto Adicional</h4>
+                <textarea name="texto_adicional" id="texto_adicional" rows="3"></textarea>
+            </div>
+
+            <div class="form-card conclusions-area">
+                <h4>Conclusiones</h4>
+                <textarea name="conclusiones" id="conclusiones" rows="8"></textarea>
+            </div>
+
+            <div class="form-card objectives-area">
+                <h4>Objetivos</h4>
+                <textarea name="objetivos" id="objetivos" rows="8"></textarea>
+            </div>
+
+            <div class="form-card references-area">
+                <h4>Referencias</h4>
+                <textarea name="referencias" id="referencias" rows="8"></textarea>
+            </div>
+
+            <div class="form-card materials-area">
+                <h4>Materiales</h4>
+                <select id="materiales-select">
+                    <option value="">Seleccionar</option>
+                    {% for quimico in quimicos %}
+                        <option value="{{ quimico.nombre }}">{{ quimico.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <div id="materiales-selected" class="selected-items"></div>
+            </div>
+
+            <div class="form-card instruments-area">
+                <h4>Instrumento o Material</h4>
+                <select id="instrumentos-select">
+                    <option value="">Seleccionar</option>
+                    {% for instrumento in instrumentos %}
+                        <option value="{{ instrumento.nombre }}">{{ instrumento.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <div id="instrumentos-selected" class="selected-items"></div>
+            </div>
+
+            <div class="form-card jornadas-salones-area">
+                <h4>Jornadas Asignadas</h4>
+                <div class="radio-card-group">
+                    {% for jornada in jornadas %}
+                    <div class="radio-card">
+                        <input type="radio" name="jornada_id" value="{{ jornada.id }}" id="jornada-{{ jornada.id }}" onchange="filterSalones('{{ jornada.id }}')">
+                        <label for="jornada-{{ jornada.id }}">{{ jornada.nombre }}<br><span style="font-size:0.8rem; color: #666;">{{ jornada.fecha|date:"M/d/Y" }}</span></label>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% if mensaje %}
-                    <div class="alert alert-success" style="background:#d4edda;color:#155724;padding:10px 18px;border-radius:6px;margin-bottom:18px;">
-                        {{ mensaje }}
-                    </div>
-                {% endif %}
-                <div style="clear:both;"></div>
-                <div class="guia-container">
-                    <div class="guia-col">
-                        <div class="guia-img-box" id="guia-img-box">
-                            <img id="preview-imagen1" src="#" alt="Vista previa" style="display:none;max-width:100%;max-height:160px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin:auto;" />
-                            <span id="imagen1-label" style="display:block;text-align:center;color:#1a237e;font-weight:500;">Imagen 1</span>
+                <h4 style="margin-top: 20px;">Salones Asignados</h4>
+                <div id="salones-container" class="radio-card-group">
+                    {% for jornada in jornadas %}
+                        {% for salon in jornada.salones.all %}
+                        <div class="radio-card salon-card" data-jornada="{{ jornada.id }}" style="display: none;">
+                            <input type="radio" name="salon_id" value="{{ salon.id }}" id="salon-{{ salon.id }}">
+                            <label for="salon-{{ salon.id }}">{{ salon.nombre }}</label>
                         </div>
-                        <div class="guia-section guia-section-subir-imagen">
-                            <label for="imagen1">Subir imagen</label>
-                            <input type="file" id="imagen1" accept="image/*" style="margin-bottom:12px;" onchange="mostrarImagen(event)">
-                        </div>
-                        <div class="guia-section">
-                            <label>Texto adicional</label>
-                            <div contenteditable="true" class="guia-texto-adicional" style="min-height:100px;border:1px solid #ccc;padding:8px;border-radius:6px;white-space:pre-wrap;word-break:break-word;"></div>
-                        </div>
-                        <div class="guia-section">
-                            <label>Objetivos</label>
-                            <div contenteditable="true" class="guia-texto-objetivos" style="min-height:100px;border:1px solid #ccc;padding:8px;border-radius:6px;white-space:pre-wrap;word-break:break-word;"></div>
-                        </div>
-                        <div style="display:flex;gap:16px;">
-                            <div class="guia-section" style="flex:1;">
-                                <label>Materiales <span title="Seleccionar" style="cursor:pointer;">&#9432;</span></label>
-                                <select name="material-quimico" id="materialQuimicoSelect">
-                                    <option value="">Seleccionar</option>
-                                    {% for quimico in quimicos %}
-                                        <option value="{{ quimico.id }}">{{ quimico.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                                <div id="materialesSeleccionados" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;"></div>
-                            </div>
-                        </div>
-                    <div class="guia-section instrumento-material">
-                        <span class="guia-label">Instrumento o material <i class="fa fa-info-circle" title="Selecciona los instrumentos o materiales adicionales"></i></span>
-                        <select id="instrumentoMaterialSelect">
-                            <option value="">Seleccionar</option>
-                            {% for instrumento in instrumentos %}
-                                <option value="{{ instrumento.id }}">{{ instrumento.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                        <div id="instrumentosSeleccionados" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;"></div>
-                    </div>
-                    </div> <!-- cierre de la sección de Materiales -->
-                        <!-- ...resto del código... -->
-                       
-                    <div class="guia-col">
-                        <div class="guia-section procedimiento">
-                            <label>Procedimiento / Metodología</label>
-                            <div contenteditable="true" class="guia-texto-procedimiento" style="min-height:100px;border:1px solid #ccc;padding:8px;border-radius:6px;white-space:pre-wrap;word-break:break-word;"></div>
-                        </div>
-                        <div class="guia-section resultados">
-                            <label>Resultados Esperados</label>
-                            <div contenteditable="true" class="guia-texto-resultados" style="min-height:100px;border:1px solid #ccc;padding:8px;border-radius:6px;white-space:pre-wrap;word-break:break-word;"></div>
-                        </div>
-                        <div class="guia-section conclusiones">
-                            <label>Conclusiones</label>
-                            <div contenteditable="true" class="guia-texto-conclusiones" style="min-height:100px;border:1px solid #ccc;padding:8px;border-radius:6px;white-space:pre-wrap;word-break:break-word;"></div>
-                        </div>
-                        <div class="guia-section referencias">
-                            <label>Referencias</label>
-                            <div contenteditable="true" class="guia-texto-referencias" style="min-height:100px;border:1px solid #ccc;padding:8px;border-radius:6px;white-space:pre-wrap;word-break:break-word;"></div>
-                        </div>
-                        <button onclick="descargarPDF()" class="no-print" style="display:block;margin:32px auto 0 auto;padding:8px 18px;background:#007bff;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:500;">Descargar como PDF</button>
-                        <div class="jornadas-profesor" style="margin-top: 32px; text-align:left;">
-                            <h3>Jornadas asignadas</h3>
-                            {% if jornadas %}
-                                <ul class="jornadas-list">
-                                    {% for jornada in jornadas %}
-                                        <li class="jornada-item">
-                                            <button class="jornada-toggle" onclick="toggleSalones('salones-{{ jornada.id }}')">
-                                                <strong>{{ jornada.nombre }}</strong> - {{ jornada.fecha }}
-                                            </button>
-                                            <div id="salones-{{ jornada.id }}" class="salones-jornada" style="display:none; margin-left:20px;">
-                                                <h4>Salones asignados:</h4>
-                                                {% if jornada.salones.all %}
-                                                    <ul>
-                                                        {% for salon in jornada.salones.all %}
-                                                            <li>
-                                                                <a href="{% url 'salon_estudiantes' salon.id jornada.id %}">{{ salon.nombre }}{% if salon.ubicacion %} ({{ salon.ubicacion }}){% endif %}</a>
-                                                                <form method="post" enctype="multipart/form-data" style="margin-top:18px;" onsubmit="return setTituloHidden(this)">
-                                                                    {% csrf_token %}
-                                                                    <label for="archivo_guia">Subir archivo final de la guía (PDF, Word, etc):</label>
-                                                                    <input type="file" name="archivo_guia" id="archivo_guia" accept=".pdf,.doc,.docx,.odt" required>
-                                                                    <input type="hidden" name="salon_id" value="{{ salon.id }}">
-                                                                    <input type="hidden" name="titulo" id="hidden-titulo-{{ salon.id }}" value="Agregar Título">
-                                                                    <button type="submit" name="asignar_guia" value="{{ salon.id }}" style="background:#28a745;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.95em;">Subir y asignar guía a este salón</button>
-                                                                </form>
-                                                            </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% else %}
-                                                    <em>No hay salones asignados.</em>
-                                                {% endif %}
-                                            </div>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p>No tienes jornadas asignadas.</p>
-                            {% endif %}
-                        </div>
-                    </div>
+                        {% endfor %}
+                    {% endfor %}
                 </div>
             </div>
-        </main>
-    </div>
-    <script>
-        function mostrarImagen(event) {
-            const input = event.target;
-            const preview = document.getElementById('preview-imagen1');
-            const label = document.getElementById('imagen1-label');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                    label.style.display = 'none';
-                }
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.src = '#';
-                preview.style.display = 'none';
-                label.style.display = 'block';
-            }
-        }
-        function toggleSalones(id) {
-            var el = document.getElementById(id);
-            if (el.style.display === "none") {
-                el.style.display = "block";
-            } else {
-                el.style.display = "none";
-            }
-        }
-        const editableTitle = document.getElementById('editable-title');
-        const titleInput = document.getElementById('title-input');
-        editableTitle.addEventListener('click', function() {
-            editableTitle.style.display = 'none';
-            titleInput.style.display = 'inline-block';
-            titleInput.focus();
-            titleInput.select();
-        });
-        titleInput.addEventListener('blur', function() {
-            editableTitle.textContent = titleInput.value || 'Agregar Título';
-            editableTitle.style.display = 'block';
-            titleInput.style.display = 'none';
-        });
-        titleInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                titleInput.blur();
-            }
-        });
-        function descargarPDF() {
-            // Asegura que el título esté visible
-            const editableTitle = document.getElementById('editable-title');
-            const titleInput = document.getElementById('title-input');
-            if (titleInput.style.display !== 'none') {
-                editableTitle.textContent = titleInput.value || 'Agregar Título';
-                editableTitle.style.display = 'block';
-                titleInput.style.display = 'none';
-            }
-            // Oculta todas las tarjetas y secciones originales
-            document.querySelectorAll('.guia-section').forEach(function(section) {
-                section.classList.add('hide-print-section');
-            });
-            // Oculta el título editable original para impresión y NO insertes ningún bloque plano de título
-            var editableTitleEl = document.getElementById('editable-title');
-            if (editableTitleEl) {
-                editableTitleEl.classList.add('hide-print-section');
-            }
-            // Mostrar la imagen cargada en el PDF (ya está plano)
-            var imgBox = document.getElementById('guia-img-box');
-            var previewImg = document.getElementById('preview-imagen1');
-            var mainContent = document.querySelector('.profesor-main-content .guia-container');
-            // Mostrar imagen cargada en el PDF (arriba de materiales)
-            var materialesPrintBlock = null;
-            var printImgBlock = null;
-            if (previewImg && previewImg.style.display !== 'none' && previewImg.src && previewImg.src !== '#') {
-                printImgBlock = document.createElement('div');
-                printImgBlock.className = 'print-only-section';
-                var imgTitle = document.createElement('h3');
-                imgTitle.textContent = 'Imagen de la guía';
-                var img = document.createElement('img');
-                img.src = previewImg.src;
-                img.style.maxWidth = '320px';
-                img.style.maxHeight = '180px';
-                img.style.display = 'block';
-                img.style.margin = '12px auto 18px auto';
-                printImgBlock.appendChild(imgTitle);
-                printImgBlock.appendChild(img);
-            }
-            // Mostrar materiales químicos en el PDF
-            var materialesSeleccionados = document.getElementById('materialesSeleccionados');
-            if (materialesSeleccionados && materialesSeleccionados.children.length > 0) {
-                materialesPrintBlock = document.createElement('div');
-                materialesPrintBlock.className = 'print-only-section';
-                var h3 = document.createElement('h3');
-                h3.textContent = 'Materiales';
-                materialesPrintBlock.appendChild(h3);
-                var lista = document.createElement('ul');
-                lista.style.listStyle = 'disc inside';
-                for (var i = 0; i < materialesSeleccionados.children.length; i++) {
-                    var nombre = materialesSeleccionados.children[i].querySelector('span');
-                    if (nombre) {
-                        var li = document.createElement('li');
-                        li.textContent = nombre.textContent;
-                        lista.appendChild(li);
-                    }
-                }
-                materialesPrintBlock.appendChild(lista);
-            }
-            // Mostrar instrumentos/materiales seleccionados en el PDF
-            var instrumentosSeleccionados = document.getElementById('instrumentosSeleccionados');
-            if (instrumentosSeleccionados && instrumentosSeleccionados.children.length > 0) {
-                var instrumentosPrintBlock = document.createElement('div');
-                instrumentosPrintBlock.className = 'print-only-section';
-                var h3 = document.createElement('h3');
-                h3.textContent = 'Instrumento o material';
-                instrumentosPrintBlock.appendChild(h3);
-                var lista = document.createElement('ul');
-                lista.style.listStyle = 'disc inside';
-                for (var i = 0; i < instrumentosSeleccionados.children.length; i++) {
-                    var nombre = instrumentosSeleccionados.children[i].querySelector('span');
-                    if (nombre) {
-                        var li = document.createElement('li');
-                        li.textContent = nombre.textContent;
-                        lista.appendChild(li);
-                    }
-                }
-                instrumentosPrintBlock.appendChild(lista);
-                if (mainContent) mainContent.parentNode.insertBefore(instrumentosPrintBlock, mainContent.nextSibling);
-            }
-            // Insertar imagen y materiales en orden
-            if (mainContent) {
-                if (printImgBlock) mainContent.parentNode.insertBefore(printImgBlock, mainContent.nextSibling);
-                if (materialesPrintBlock) mainContent.parentNode.insertBefore(materialesPrintBlock, mainContent.nextSibling);
-            }
-            // Bloques para PDF en el orden solicitado (de arriba hacia abajo)
-            let bloquesPDF = [];
-            // 1. Imagen de la guía
-            if (printImgBlock) bloquesPDF.push(printImgBlock);
-            // 2. Texto adicional
-            var divTextoAdicional = document.querySelector('.guia-texto-adicional');
-            if (divTextoAdicional && divTextoAdicional.innerText.trim()) {
-                var printBlock = document.createElement('div');
-                printBlock.className = 'print-only-section';
-                var h3 = document.createElement('h3');
-                h3.textContent = 'Texto adicional';
-                var span = document.createElement('div');
-                span.textContent = divTextoAdicional.innerText.trim();
-                printBlock.appendChild(h3);
-                printBlock.appendChild(span);
-                bloquesPDF.push(printBlock);
-            }
-            // 3. Objetivos
-            var divObjetivos = document.querySelector('.guia-texto-objetivos');
-            if (divObjetivos && divObjetivos.innerText.trim()) {
-                var printBlock = document.createElement('div');
-                printBlock.className = 'print-only-section';
-                var h3 = document.createElement('h3');
-                h3.textContent = 'Objetivos';
-                var span = document.createElement('div');
-                span.textContent = divObjetivos.innerText.trim();
-                printBlock.appendChild(h3);
-                printBlock.appendChild(span);
-                bloquesPDF.push(printBlock);
-            }
-            // 4. Materiales
-            if (materialesPrintBlock) bloquesPDF.push(materialesPrintBlock);
-            // 5. Instrumento o material
-            if (instrumentosPrintBlock) bloquesPDF.push(instrumentosPrintBlock);
-            // 6. Procedimiento / Metodología
-            var divProcedimiento = document.querySelector('.guia-texto-procedimiento');
-            if (divProcedimiento && divProcedimiento.innerText.trim()) {
-                var printBlock = document.createElement('div');
-                printBlock.className = 'print-only-section';
-                var h3 = document.createElement('h3');
-                h3.textContent = 'Procedimiento / Metodología';
-                var span = document.createElement('div');
-                span.textContent = divProcedimiento.innerText.trim();
-                printBlock.appendChild(h3);
-                printBlock.appendChild(span);
-                bloquesPDF.push(printBlock);
-            }
-            // 7. Resultados Esperados
-            var divResultados = document.querySelector('.guia-texto-resultados');
-            if (divResultados && divResultados.innerText.trim()) {
-                var printBlock = document.createElement('div');
-                printBlock.className = 'print-only-section';
-                var h3 = document.createElement('h3');
-                h3.textContent = 'Resultados Esperados';
-                var span = document.createElement('div');
-                span.textContent = divResultados.innerText.trim();
-                printBlock.appendChild(h3);
-                printBlock.appendChild(span);
-                bloquesPDF.push(printBlock);
-            }
-            // 8. Conclusiones
-            var divConclusiones = document.querySelector('.guia-texto-conclusiones');
-            if (divConclusiones && divConclusiones.innerText.trim()) {
-                var printBlock = document.createElement('div');
-                printBlock.className = 'print-only-section';
-                var h3 = document.createElement('h3');
-                h3.textContent = 'Conclusiones';
-                var span = document.createElement('div');
-                span.textContent = divConclusiones.innerText.trim();
-                printBlock.appendChild(h3);
-                printBlock.appendChild(span);
-                bloquesPDF.push(printBlock);
-            }
-            // 9. Referencias
-            var divReferencias = document.querySelector('.guia-texto-referencias');
-            if (divReferencias && divReferencias.innerText.trim()) {
-                var printBlock = document.createElement('div');
-                printBlock.className = 'print-only-section';
-                var h3 = document.createElement('h3');
-                h3.textContent = 'Referencias';
-                var span = document.createElement('div');
-                span.textContent = divReferencias.innerText.trim();
-                printBlock.appendChild(h3);
-                printBlock.appendChild(span);
-                bloquesPDF.push(printBlock);
-            }
-            // Inserta los bloques en el orden correcto (de arriba hacia abajo)
-            if (mainContent) {
-                bloquesPDF.reverse().forEach(function(bloque) {
-                    mainContent.parentNode.insertBefore(bloque, mainContent.nextSibling);
-                });
-            }
-            // Oculta el botón de descargar PDF y la sección de jornadas para impresión
-            let pdfBtn = document.querySelector('.no-print');
-            let jornadas = document.querySelector('.jornadas-profesor');
-            if (pdfBtn) pdfBtn.classList.add('hide-print-section');
-            if (jornadas) jornadas.classList.add('hide-print-section');
-            // Cambia el título de la ventana temporalmente
-            const originalTitle = document.title;
-            const guiaTitle = editableTitle.textContent.trim() || 'Guía';
-            document.title = guiaTitle;
-            // Agrega CSS temporal para ocultar tarjetas y mostrar solo print-only-section
-            let style = document.createElement('style');
-            style.id = 'print-hide-cards';
-            style.innerHTML = `@media print { 
-                .guia-section, .guia-section.hide-print-section, .no-print.hide-print-section, .jornadas-profesor.hide-print-section { display: none !important; }
-                .print-only-section {
-                    display: block !important;
-                    margin-bottom: 24px;
-                    background: none !important;
-                    border: none !important;
-                    box-shadow: none !important;
-                    padding: 0 !important;
-                }
-                .print-only-section h3 {
-                    font-size: 1.25rem;
-                    color: #1a237e;
-                    margin-bottom: 8px;
-                    background: none !important;
-                    border: none !important;
-                    box-shadow: none !important;
-                    padding: 0 !important;
-                }
-                .print-only-section div, .print-only-section img {
-                    font-size: 1.08rem;
-                    color: #222;
-                    white-space: pre-wrap;
-                    background: none !important;
-                    border: none !important;
-                    box-shadow: none !important;
-                    padding: 0 !important;
-                }
-                .print-only-section img {
-                    max-width: 320px;
-                    max-height: 180px;
-                    display: block;
-                    margin: 12px auto 18px auto;
-                }
-            }`;
-            document.head.appendChild(style);
-            window.print();
-            setTimeout(function() {
-                // Restaurar todo después de imprimir
-                document.querySelectorAll('.guia-section').forEach(function(section) {
-                    section.classList.remove('hide-print-section');
-                });
-                if (pdfBtn) pdfBtn.classList.remove('hide-print-section');
-                if (jornadas) jornadas.classList.remove('hide-print-section');
-                // Restaurar el título editable
-                if (editableTitleEl) {
-                    editableTitleEl.classList.remove('hide-print-section');
-                }
-                document.querySelectorAll('.print-only-section').forEach(function(el) { el.remove(); });
-                let style = document.getElementById('print-hide-cards');
-                if (style) style.remove();
-                document.title = originalTitle;
-            }, 1000);
-        }
-        function setTituloHidden(form) {
-            // Busca el input hidden de título dentro del formulario
-            var input = form.querySelector('input[name="titulo"]');
-            var titleInput = document.getElementById('title-input');
-            input.value = titleInput.value || 'Guía sin título';
-            return true;
-        }
-        // Hamburguesa responsive
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebar = document.getElementById('sidebar');
-        menuToggle.addEventListener('click', function(e) {
-            e.stopPropagation(); // Evita que el click se propague y cierre el menú inmediatamente
-            sidebar.classList.toggle('open');
-        });
-        document.addEventListener('click', function(e) {
-            if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
-                // No cerrar si el click es en el botón o dentro del botón
-                if (!sidebar.contains(e.target) && e.target !== menuToggle && !menuToggle.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
-        document.querySelectorAll('.dashboard-aside a').forEach(function(link) {
-            link.addEventListener('click', function() {
-                if (window.innerWidth <= 900) {
-                    sidebar.classList.remove('open');
-                }
-            });
-        });
-        // Materiales químicos dinámicos
-        const materialQuimicoSelect = document.getElementById('materialQuimicoSelect');
-        const materialesSeleccionados = document.getElementById('materialesSeleccionados');
-        materialQuimicoSelect.addEventListener('change', function() {
-            const selectedOption = materialQuimicoSelect.options[materialQuimicoSelect.selectedIndex];
-            if (selectedOption.value) {
-                // Evita duplicados
-                if (!document.getElementById('quimico-'+selectedOption.value)) {
-                    // Crea el cuadro visual
-                    const div = document.createElement('div');
-                    div.className = 'material-quimico-box';
-                    div.id = 'quimico-'+selectedOption.value;
-                    div.style = 'background:#e3e6ea;color:#3949ab;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 2px 8px rgba(60,72,88,0.08);';
-                    div.innerHTML = `<span>${selectedOption.text}</span> <button type="button" style="background:none;border:none;color:#d32f2f;font-size:1.1rem;cursor:pointer;font-weight:700;" title="Eliminar" onclick="this.parentNode.remove(); document.getElementById('input-quimico-${selectedOption.value}').remove();">&times;</button>`;
-                    // Input oculto para enviar al backend
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'quimicos[]';
-                    input.value = selectedOption.value;
-                    input.id = 'input-quimico-'+selectedOption.value;
-                    div.appendChild(input);
-                    materialesSeleccionados.appendChild(div);
-                }
-                // Reinicia el select
-                materialQuimicoSelect.selectedIndex = 0;
-            }
-        });
-        // Instrumentos/materiales adicionales dinámicos
-        const instrumentoMaterialSelect = document.getElementById('instrumentoMaterialSelect');
-        const instrumentosSeleccionados = document.getElementById('instrumentosSeleccionados');
-        function actualizarTextoInstrumentos() {
-            let hayInstrumentos = false;
-            for (let i = 0; i < instrumentosSeleccionados.children.length; i++) {
-                if (instrumentosSeleccionados.children[i].classList && instrumentosSeleccionados.children[i].classList.contains('material-quimico-box')) {
-                    hayInstrumentos = true;
-                    break;
-                }
-            }
-            if (!hayInstrumentos) {
-                instrumentosSeleccionados.innerHTML = '<span style="color:#bfc8d6;font-weight:600;">Instrumento o material</span>';
-            }
-        }
-        actualizarTextoInstrumentos();
-        if (instrumentoMaterialSelect) {
-            instrumentoMaterialSelect.addEventListener('change', function() {
-                const selectedOption = instrumentoMaterialSelect.options[instrumentoMaterialSelect.selectedIndex];
-                if (selectedOption.value) {
-                    if (!document.getElementById('instrumento-'+selectedOption.value)) {
-                        const div = document.createElement('div');
-                        div.className = 'material-quimico-box';
-                        div.id = 'instrumento-'+selectedOption.value;
-                        div.style = 'background:#e3e6ea;color:#3949ab;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 2px 8px rgba(60,72,88,0.08);margin-bottom:4px;';
-                        div.innerHTML = `<span>${selectedOption.text}</span> <button type="button" style="background:none;border:none;color:#d32f2f;font-size:1.1rem;cursor:pointer;font-weight:700;" title="Eliminar" onclick="this.parentNode.remove(); actualizarTextoInstrumentos(); document.getElementById('input-instrumento-${selectedOption.value}').remove();">&times;</button>`;
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'instrumentos[]';
-                        input.value = selectedOption.value;
-                        input.id = 'input-instrumento-'+selectedOption.value;
-                        div.appendChild(input);
-                        // Si el área solo tiene el texto por defecto, lo quitamos
-                        if (instrumentosSeleccionados.innerHTML.includes('Instrumento o material')) {
-                            instrumentosSeleccionados.innerHTML = '';
-                        }
-                        instrumentosSeleccionados.appendChild(div);
-                    }
-                    instrumentoMaterialSelect.selectedIndex = 0;
-                }
-                actualizarTextoInstrumentos();
+
+            <div class="form-card upload-final-area">
+                <h4>Subir archivo final de la guía (PDF, Word, etc)</h4>
+                                <input type="file" id="archivo_guia" name="archivo_guia" required>
+                <button type="submit" name="asignar_guia" class="btn-submit-guia">Subir y asignar guía a este salon</button>
+            </div>
+
+            <div class="form-card download-pdf-area">
+                 <button type="button" id="download-pdf-btn" class="btn-download-pdf">Descargar como PDF</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// Image preview script
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        const output = document.getElementById('preview-imagen');
+        output.src = reader.result;
+        output.style.display = 'block';
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+// PDF Generation Logic
+document.addEventListener('input', function (e) {
+    if (e.target.tagName.toLowerCase() !== 'textarea') return;
+    e.target.style.height = 'auto';
+    e.target.style.height = (e.target.scrollHeight) + 'px';
+}, false);
+
+function setupMultiSelect(selectId, containerId) {
+    const select = document.getElementById(selectId);
+    const container = document.getElementById(containerId);
+
+    select.addEventListener('change', function() {
+        const value = select.value;
+        if (value && !document.querySelector(`[data-value="${value}"]`)) {
+            const item = document.createElement('div');
+            item.className = 'selected-item';
+            item.dataset.value = value;
+            item.innerHTML = `<span>${value}</span><span class="remove-item" data-value="${value}">&times;</span>`;
+            container.appendChild(item);
+
+            item.querySelector('.remove-item').addEventListener('click', function() {
+                item.remove();
             });
         }
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Materiales químicos dinámicos (NO TOCAR)
-        const materialQuimicoSelect = document.getElementById('materialQuimicoSelect');
-        const materialesSeleccionados = document.getElementById('materialesSeleccionados');
-        if (materialQuimicoSelect) {
-            materialQuimicoSelect.addEventListener('change', function() {
-                const selectedOption = materialQuimicoSelect.options[materialQuimicoSelect.selectedIndex];
-                if (selectedOption.value) {
-                    if (!document.getElementById('quimico-'+selectedOption.value)) {
-                        const div = document.createElement('div');
-                        div.className = 'material-quimico-box';
-                        div.id = 'quimico-'+selectedOption.value;
-                        div.style = 'background:#e3e6ea;color:#3949ab;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 2px 8px rgba(60,72,88,0.08);margin-bottom:4px;';
-                        div.innerHTML = `<span>${selectedOption.text}</span> <button type="button" style="background:none;border:none;color:#d32f2f;font-size:1.1rem;cursor:pointer;font-weight:700;" title="Eliminar" onclick="this.parentNode.remove(); document.getElementById('input-quimico-${selectedOption.value}').remove();">&times;</button>`;
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'quimicos[]';
-                        input.value = selectedOption.value;
-                        input.id = 'input-quimico-'+selectedOption.value;
-                        div.appendChild(input);
-                        materialesSeleccionados.appendChild(div);
-                    }
-                    materialQuimicoSelect.selectedIndex = 0;
-                }
-            });
-        }
-        // Instrumentos/materiales adicionales dinámicos (EQUIPOS Y MATERIALES DEL INVENTARIO)
-        const instrumentoMaterialSelect = document.getElementById('instrumentoMaterialSelect');
-        const instrumentosSeleccionados = document.getElementById('instrumentosSeleccionados');
-        function actualizarTextoInstrumentos() {
-            let hayInstrumentos = false;
-            for (let i = 0; i < instrumentosSeleccionados.children.length; i++) {
-                if (instrumentosSeleccionados.children[i].classList && instrumentosSeleccionados.children[i].classList.contains('material-quimico-box')) {
-                    hayInstrumentos = true;
-                    break;
-                }
-            }
-            if (!hayInstrumentos) {
-                instrumentosSeleccionados.innerHTML = '<span style="color:#bfc8d6;font-weight:600;">Instrumento o material</span>';
-            }
-        }
-        actualizarTextoInstrumentos();
-        if (instrumentoMaterialSelect) {
-            instrumentoMaterialSelect.addEventListener('change', function() {
-                const selectedOption = instrumentoMaterialSelect.options[instrumentoMaterialSelect.selectedIndex];
-                if (selectedOption.value) {
-                    if (!document.getElementById('instrumento-'+selectedOption.value)) {
-                        const div = document.createElement('div');
-                        div.className = 'material-quimico-box';
-                        div.id = 'instrumento-'+selectedOption.value;
-                        div.style = 'background:#e3e6ea;color:#3949ab;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 2px 8px rgba(60,72,88,0.08);margin-bottom:4px;';
-                        div.innerHTML = `<span>${selectedOption.text}</span> <button type="button" style="background:none;border:none;color:#d32f2f;font-size:1.1rem;cursor:pointer;font-weight:700;" title="Eliminar" onclick="this.parentNode.remove(); actualizarTextoInstrumentos(); document.getElementById('input-instrumento-${selectedOption.value}').remove();">&times;</button>`;
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'instrumentos[]';
-                        input.value = selectedOption.value;
-                        input.id = 'input-instrumento-'+selectedOption.value;
-                        div.appendChild(input);
-                        // Si el área solo tiene el texto por defecto, lo quitamos
-                        if (instrumentosSeleccionados.innerHTML.includes('Instrumento o material')) {
-                            instrumentosSeleccionados.innerHTML = '';
-                        }
-                        instrumentosSeleccionados.appendChild(div);
-                    }
-                    instrumentoMaterialSelect.selectedIndex = 0;
-                }
-                actualizarTextoInstrumentos();
-            });
+        select.value = '';
+    });
+}
+
+setupMultiSelect('materiales-select', 'materiales-selected');
+setupMultiSelect('instrumentos-select', 'instrumentos-selected');
+
+function filterSalones(jornadaId) {
+    document.querySelectorAll('.salon-card').forEach(card => {
+        if (card.dataset.jornada === jornadaId) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
         }
     });
-    </script>
-</body>
-</html>
+}
+
+document.getElementById('main-title').addEventListener('input', function() {
+    document.getElementById('hidden-main-title').value = this.value;
+});
+
+document.getElementById('download-pdf-btn').addEventListener('click', function() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    let y = 20;
+    
+    const addSection = (title, content, options = {}) => {
+        if (content && content.trim() !== '') {
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            if (y > 260) {
+                doc.addPage();
+                y = 20;
+            }
+            doc.text(title, 15, y);
+            y += 8;
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            const splitText = doc.splitTextToSize(content, 180);
+
+            splitText.forEach(line => {
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.text(line, 15, y, options);
+                y += 5;
+            });
+            y += 5; // Extra space after section
+        }
+    };
+
+    const title = document.getElementById('main-title').value || 'Guía de Laboratorio';
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text(title, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+    y += 20;
+
+    const img = document.getElementById('preview-imagen');
+    if (img.src && img.style.display !== 'none') {
+        const imgData = img.src;
+        // You might need to adjust width and height based on your image aspect ratio
+        const imgWidth = 100;
+        const imgHeight = (img.height * imgWidth) / img.width;
+        if (y + imgHeight > 280) { // Check if image fits on the page
+            doc.addPage();
+            y = 20;
+        }
+        doc.addImage(imgData, 'JPEG', (doc.internal.pageSize.getWidth() - imgWidth) / 2, y, imgWidth, imgHeight);
+        y += imgHeight + 10;
+    }
+
+    addSection('Objetivos', document.getElementById('objetivos').value);
+    const materiales = Array.from(document.querySelectorAll('#materiales-selected .selected-item span')).map(el => el.textContent).join(', ');
+    addSection('Materiales', materiales);
+
+    const instrumentos = Array.from(document.querySelectorAll('#instrumentos-selected .selected-item span')).map(el => el.textContent).join(', ');
+    addSection('Instrumentos', instrumentos);
+    addSection('Procedimiento/Metodología', document.getElementById('procedimiento').value);
+    addSection('Resultados Esperados', document.getElementById('resultados_esperados').value);
+    addSection('Conclusiones', document.getElementById('conclusiones').value, { align: 'justify' });
+    addSection('Referencias', document.getElementById('referencias').value);
+    addSection('Texto Adicional', document.getElementById('texto_adicional').value);
+
+    doc.save((title).replace(/ /g, '_') + '.pdf');
+});
+</script>
 {% endblock %}

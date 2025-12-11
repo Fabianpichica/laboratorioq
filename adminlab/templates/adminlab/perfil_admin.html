@@ -1,19 +1,18 @@
-{% extends 'profesor/base.html' %}
+{% extends 'adminlab/base.html' %}
 {% load static %}
 
 {% block content %}
 <style>
     .main-content {
-        background: url('{% static "img/perfil_background1.png" %}') center center no-repeat;
-        background-size: cover;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        padding: 0;
+        background: url('{% static "img/perfil_background2.png" %}') center center no-repeat !important;
+        background-size: cover !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
     }
     .profile-info {
         width: 650px;
-        padding-right: 20%;
+        padding-right: 20%; /* Mueve el contenido a la izquierda */
     }
     .profile-info h1 {
         text-align: center;
@@ -48,7 +47,7 @@
 </style>
 
 <div class="profile-info">
-    <h1>Perfil del Profesor</h1>
+    <h1>Perfil del Administrador</h1>
     <div class="info-item">
         <div class="info-label">Usuario:</div>
         <div class="info-value">{{ user.username }}</div>
@@ -59,7 +58,7 @@
     </div>
     <div class="info-item">
         <div class="info-label">Rol</div>
-        <div class="info-value">{{ user.profile.role|title }}</div>
+        <div class="info-value">Administrador</div>
     </div>
 </div>
 {% endblock %}
